@@ -64,6 +64,11 @@ type config struct {
 	kubeconfigLocation    string
 	allowPaths            []string
 	ignorePaths           []string
+
+	// HTTP2 flags
+	HTTP2Disable              bool
+	HTTP2MaxConcurrentStreams uint32
+	HTTP2MaxSize              uint32
 }
 
 type tlsConfig struct {
@@ -115,6 +120,11 @@ func main() {
 	flagset.StringVar(&cfg.tls.minVersion, "tls-min-version", "VersionTLS12", "Minimum TLS version supported. Value must match version names from https://golang.org/pkg/crypto/tls/#pkg-constants.")
 	flagset.StringSliceVar(&cfg.tls.cipherSuites, "tls-cipher-suites", nil, "Comma-separated list of cipher suites for the server. Values are from tls package constants (https://golang.org/pkg/crypto/tls/#pkg-constants). If omitted, the default Go cipher suites will be used")
 	flagset.DurationVar(&cfg.tls.reloadInterval, "tls-reload-interval", time.Minute, "The interval at which to watch for TLS certificate changes, by default set to 1 minute.")
+
+	// HTTPS/2 flags
+	flagset.BoolVar(&cfg.HTTP2Disable, "http2-disable", false, "Disable HTTP/2 support")
+	flagset.Uint32Var(&cfg.HTTP2MaxConcurrentStreams, "http2-max-concurrent-streams", 100, "The maximum number of concurrent streams per HTTP/2 connection.")
+	flagset.Uint32Var(&cfg.HTTP2MaxSize, "http2-max-size", 256*1024, "The maximum number of bytes that the server will accept for frame size and buffer per stream in a HTTP/2 request.")
 
 	// Auth flags
 	flagset.StringVar(&cfg.auth.Authentication.X509.ClientCAFile, "client-ca-file", "", "If set, any request presenting a client certificate signed by one of the authorities in the client-ca-file is authenticated with an identity corresponding to the CommonName of the client certificate.")
@@ -312,6 +322,17 @@ func main() {
 		proxy.ServeHTTP(w, req)
 	}))
 
+	var http2Options *http2.Server
+	if !cfg.HTTP2Disable {
+		http2Options = &http2.Server{
+			IdleTimeout:                  90 * time.Second,
+			MaxConcurrentStreams:         cfg.HTTP2MaxConcurrentStreams,
+			MaxReadFrameSize:             cfg.HTTP2MaxSize,
+			MaxUploadBufferPerStream:     int32(cfg.HTTP2MaxSize),
+			MaxUploadBufferPerConnection: int32(cfg.HTTP2MaxSize) * int32(cfg.HTTP2MaxConcurrentStreams),
+		}
+	}
+
 	var gr run.Group
 	{
 		if cfg.secureListenAddress != "" {
@@ -364,8 +385,13 @@ func main() {
 			srv.TLSConfig.MinVersion = version
 			srv.TLSConfig.ClientAuth = tls.RequestClientCert
 
-			if err := http2.ConfigureServer(srv, nil); err != nil {
-				klog.Fatalf("failed to configure http2 server: %v", err)
+			if cfg.HTTP2Disable {
+				srv.TLSNextProto = make(map[string]func(*http.Server, *tls.Conn, http.Handler))
+				srv.TLSConfig.NextProtos = []string{"http/1.1"}
+			} else {
+				if err := http2.ConfigureServer(srv, http2Options); err != nil {
+					klog.Fatalf("failed to configure http2 server: %v", err)
+				}
 			}
 
 			klog.Infof("Starting TCP socket on %v", cfg.secureListenAddress)
@@ -390,7 +416,13 @@ func main() {
 	}
 	{
 		if cfg.insecureListenAddress != "" {
-			srv := &http.Server{Handler: h2c.NewHandler(mux, &http2.Server{})}
+			srv := &http.Server{}
+			if cfg.HTTP2Disable {
+				srv.Handler = mux
+				srv.TLSNextProto = make(map[string]func(*http.Server, *tls.Conn, http.Handler))
+			} else {
+				srv.Handler = h2c.NewHandler(mux, http2Options)
+			}
 
 			l, err := net.Listen("tcp", cfg.insecureListenAddress)
 			if err != nil {
