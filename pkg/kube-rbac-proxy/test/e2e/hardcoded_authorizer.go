@@ -37,7 +37,7 @@ func testHardcodedAuthorizer(client kubernetes.Interface) kubetest.TestSuite {
 	return func(t *testing.T) {
 		command := `curl --connect-timeout 5 -v -s -k --fail -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" https://kube-rbac-proxy.openshift-monitoring.svc.cluster.local:8443/metrics`
 
-		runScenarioInNamespace(kubetest.Scenario{
+		kubetest.Scenario{
 			Name: "OpenShift Hardcoded Authorizer",
 			Description: `
 				Verify that the ServiceAccount prometheus-k8s can access the metrics endpoint
@@ -45,7 +45,7 @@ func testHardcodedAuthorizer(client kubernetes.Interface) kubetest.TestSuite {
 			`,
 
 			Given: kubetest.Actions(
-				WithNamespace(client),
+				WithNamespace(client, hardcodedAuthorizerNamespace),
 				WithServiceAccount(client, hardcodedAuthorizerClientSA),
 				kubetest.NewBasicKubeRBACProxyTestConfig().
 					AddSAClusterRoleBinding("kube-rbac-proxy", testtemplates.GetKRPAuthDelegatorRole()).
@@ -71,12 +71,14 @@ func testHardcodedAuthorizer(client kubernetes.Interface) kubetest.TestSuite {
 					},
 				),
 			),
-		}, t, hardcodedAuthorizerNamespace)
+		}.Run(t)
 	}
 }
 
-func WithNamespace(client kubernetes.Interface) kubetest.Action {
+func WithNamespace(client kubernetes.Interface, namespace string) kubetest.Action {
 	return func(ctx *kubetest.ScenarioContext) error {
+		ctx.Namespace = namespace
+
 		ns := &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: ctx.Namespace,
@@ -115,44 +117,4 @@ func WithServiceAccount(client kubernetes.Interface, name string) kubetest.Actio
 
 		return nil
 	}
-}
-
-// runScenarioInNamespace is a copy of the Scenario runner that enables us to
-// set a custom Namespace. It would be good that upstream enables us to set a
-// custom namespace. We need to run in openshift-monitoring for the custom SA to
-// be verified.
-// Compare with `func (s Scenario) Run(t *testing.T) bool {` in
-// test/kubetest/kubetest.go.
-func runScenarioInNamespace(s kubetest.Scenario, t *testing.T, namespace string) bool {
-	ctx := &kubetest.ScenarioContext{
-		Namespace: namespace,
-	}
-
-	defer func(ctx *kubetest.ScenarioContext) {
-		for _, f := range ctx.CleanUp {
-			if err := f(); err != nil {
-				t.Logf("cleanup error: %v", err)
-			}
-		}
-	}(ctx)
-
-	return t.Run(s.Name, func(t *testing.T) {
-		if s.Given != nil {
-			if err := s.Given(ctx); err != nil {
-				t.Fatalf("failed to create given setup: %v", err)
-			}
-		}
-
-		if s.When != nil {
-			if err := s.When(ctx); err != nil {
-				t.Errorf("failed to evaluate state: %v", err)
-			}
-		}
-
-		if s.Then != nil {
-			if err := s.Then(ctx); err != nil {
-				t.Errorf("checks failed: %v", err)
-			}
-		}
-	})
 }
