@@ -8,9 +8,11 @@ set -u
 # for debugging
 set -x
 
-# github actions, by default, fetches using `--no-tags`.
-# we need tags though to create a release version string.
-git fetch --tags --force
+if [[ -n "$PULL_TAGS" ]]; then
+  # github actions, by default, fetches using `--no-tags`.
+  # we need tags though to create a release version string.
+  git fetch --tags --force
+fi
 
 QUAY_PATH="${QUAY_PATH:-quay.io/brancz/kube-rbac-proxy}"
 CPU_ARCHS="amd64 arm64 arm ppc64le s390x"
@@ -21,7 +23,8 @@ VERSION="${TAG}"
 
 # if the current commit, does not correspond to a tag, create a verbose version string.
 if [ "${TAG_COMMIT}" != "${COMMIT}" ]; then
-  VERSION=$(git rev-parse --abbrev-ref HEAD | tr / -)-$(date +%Y-%m-%d)-$(git rev-parse --short HEAD)
+  echo "current head commit does not match any 'v*' tag"
+  exit 1
 fi
 
 # build and push arch specific images
