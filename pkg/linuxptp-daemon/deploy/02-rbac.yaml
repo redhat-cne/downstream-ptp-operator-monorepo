@@ -1,0 +1,28 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: openshift-ptp
+  name: linuxptp-daemon-role
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch","patch"]
+  - apiGroups: [ "" ]
+    resources: [ "configmaps" ]
+    verbs: [ "get", "list", "watch","patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: linuxptp-daemon-rolebinding
+  namespace: openshift-ptp
+subjects:
+  - kind: ServiceAccount
+    name: linuxptp-daemon
+    namespace: openshift-ptp
+roleRef:
+  kind: Role
+  name: linuxptp-daemon-role
+  apiGroup: rbac.authorization.k8s.io
+
