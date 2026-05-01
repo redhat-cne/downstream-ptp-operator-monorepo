@@ -1,0 +1,22 @@
+# Channel template for the ptp-operator FBC catalog.
+#
+# The CI workflow dynamically generates the full channel entry list from all
+# bundle images. This file documents the schema and serves as a reference for
+# manual or local catalog builds.
+#
+# Each entry uses skipRange so that OLM can upgrade from any prior version
+# directly to the selected version without stepping through intermediates.
+---
+schema: olm.channel
+package: ptp-operator
+name: stable
+entries:
+  # Entries are generated at build time, one per release branch.
+  # Example:
+  # - name: ptp-operator.v4.12.0
+  #   skipRange: ">=4.3.0-0 <4.12.0"
+  # - name: ptp-operator.v4.13.0
+  #   skipRange: ">=4.3.0-0 <4.13.0"
+  # ...
+  # - name: ptp-operator.v5.0.0
+  #   skipRange: ">=4.3.0-0 <5.0.0"

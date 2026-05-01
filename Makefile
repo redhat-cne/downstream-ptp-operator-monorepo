@@ -361,6 +361,30 @@ catalog-deploy:
 catalog-undeploy:
 	hack/catalog-deploy.sh --remove
 
+##@ GHCR Multi-Version Catalog
+
+GHCR_REGISTRY ?= ghcr.io
+GHCR_ORG ?= redhat-cne
+GHCR_OPERATOR_IMG ?= $(GHCR_REGISTRY)/$(GHCR_ORG)/ptp-operator:v$(VERSION)
+GHCR_LINUXPTP_IMG ?= $(GHCR_REGISTRY)/$(GHCR_ORG)/ptp:v$(VERSION)
+GHCR_CEP_IMG ?= $(GHCR_REGISTRY)/$(GHCR_ORG)/cloud-event-proxy:v$(VERSION)
+GHCR_KRP_IMG ?= $(GHCR_REGISTRY)/$(GHCR_ORG)/kube-rbac-proxy:v$(VERSION)
+GHCR_MUST_GATHER_IMG ?= $(GHCR_REGISTRY)/$(GHCR_ORG)/ptp-must-gather:v$(VERSION)
+GHCR_BUNDLE_IMG ?= $(GHCR_REGISTRY)/$(GHCR_ORG)/ptp-operator-bundle:v$(BUNDLE_VERSION)
+GHCR_CATALOG_IMG ?= $(GHCR_REGISTRY)/$(GHCR_ORG)/ptp-operator-catalog:latest
+
+.PHONY: ghcr-catalog-build
+ghcr-catalog-build: ## Build the multi-version FBC catalog image locally (requires bundle images in GHCR)
+	hack/build-catalog-all-versions.sh
+
+.PHONY: ghcr-catalog-deploy
+ghcr-catalog-deploy: ## Deploy the GHCR catalog to the current cluster
+	CATALOG_IMG=$(GHCR_CATALOG_IMG) hack/catalog-deploy.sh $(GHCR_CATALOG_IMG)
+
+.PHONY: ghcr-catalog-undeploy
+ghcr-catalog-undeploy: ## Remove the GHCR catalog from the current cluster
+	CATALOG_IMG=$(GHCR_CATALOG_IMG) hack/catalog-deploy.sh --remove
+
 .PHONY: common-deps-update
 common-deps-update:	controller-gen kustomize
 	go mod tidy && \
