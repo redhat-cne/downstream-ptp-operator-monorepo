@@ -14,4 +14,12 @@ permissions:
 
 jobs:
   lint:
-    uses: redhat-cne/upstream-ptp-operator-monorepo/.github/workflows/_reusable-linuxptp-daemon-linter.yml@main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+      - uses: golangci/golangci-lint-action@v9
+        with:
+          working-directory: pkg/linuxptp-daemon
