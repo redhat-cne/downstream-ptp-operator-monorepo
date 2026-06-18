@@ -2,8 +2,6 @@ module github.com/k8snetworkplumbingwg/linuxptp-daemon
 
 go 1.25.0
 
-toolchain go1.25.0
-
 require (
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/bigkevmcd/go-configparser v0.0.0-20240624060122-ccd05f93a9d2
