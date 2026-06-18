@@ -2,6 +2,8 @@ module github.com/k8snetworkplumbingwg/ptp-operator
 
 go 1.25.0
 
+toolchain go1.25.0
+
 require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/Masterminds/semver/v3 v3.4.0
