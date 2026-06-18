@@ -4,6 +4,7 @@ WORKDIR /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon
 COPY . .
 ENV GOEXPERIMENT=strictfipsruntime
 ENV CGO_ENABLED=1
+ENV GOFLAGS="-mod=vendor"
 RUN make clean && make
 
 FROM registry.access.redhat.com/ubi9/ubi:latest@sha256:1b99266db480e8aa6dfda6900697a07ec99334095b4f87d1687edfc06c965132

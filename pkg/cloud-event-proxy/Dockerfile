@@ -1,7 +1,7 @@
 FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.25@sha256:977bd041377a1367c8b102a460ae8e63f89905f7cf9d8235484ae658c9b47646 AS builder
-ENV GO111MODULE=off
 ENV CGO_ENABLED=1
 ENV GOEXPERIMENT=strictfipsruntime
+ENV GOFLAGS="-mod=vendor"
 ENV COMMON_GO_ARGS=-race
 ENV GOOS=linux
 ENV GOPATH=/go
