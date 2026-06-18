@@ -1,18 +1,32 @@
-FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.25-openshift-4.22 AS builder
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.25@sha256:977bd041377a1367c8b102a460ae8e63f89905f7cf9d8235484ae658c9b47646 AS builder
 WORKDIR /go/src/github.com/k8snetworkplumbingwg/ptp-operator
 COPY . .
-ENV GO111MODULE=auto
+ENV GOEXPERIMENT=strictfipsruntime
+ENV CGO_ENABLED=1
 RUN make
 
-FROM registry.ci.openshift.org/ocp/4.22:base-rhel9
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:1bc3c5c15720506a0cf48adfdf8b623dfe704377e007d7bbae8d14876392ca6a
 COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/ptp-operator/build/_output/bin/ptp-operator /usr/local/bin/
 COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/ptp-operator/manifests /manifests
 COPY bindata /bindata
 
-LABEL io.k8s.display-name="OpenShift ptp-operator" \
-      io.k8s.description="This is a component that manages cluster PTP configuration." \
-      io.openshift.tags="openshift,ptp" \
-      com.redhat.delivery.appregistry=true \
-      maintainer="PTP Dev Team <ptp-dev@redhat.com>"
+COPY LICENSE /licenses/
+
+LABEL name="ptp/ptp-operator-mono-rhel9-operator"
+LABEL summary="PTP Operator Mono"
+LABEL description="Manages cluster-wide Precision Time Protocol (PTP) configuration for OpenShift nodes."
+LABEL io.k8s.display-name="PTP Operator Mono"
+LABEL io.k8s.description="Manages cluster-wide Precision Time Protocol (PTP) configuration for OpenShift nodes."
+LABEL io.openshift.tags="openshift,ptp,operator"
+LABEL maintainer="PTP Dev Team <ptp-dev@redhat.com>"
+LABEL com.redhat.component="ptp-operator-mono-rhel9-operator-container"
+LABEL version="4.22"
+LABEL release="1"
+LABEL vendor="Red Hat, Inc."
+LABEL url="https://github.com/openshift/ptp-operator"
+LABEL distribution-scope="public"
+LABEL cpe="cpe:/a:redhat:openshift:4.22::el9"
+
+USER 65532:65532
 
 ENTRYPOINT ["/usr/local/bin/ptp-operator"]

@@ -1,4 +1,4 @@
-FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.23-openshift-4.19 AS builder
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.25@sha256:977bd041377a1367c8b102a460ae8e63f89905f7cf9d8235484ae658c9b47646 AS builder
 ENV CGO_ENABLED=1
 ENV GOOS=linux
 ENV GOPATH=/go
@@ -14,7 +14,7 @@ RUN go build -gcflags="all=-N -l" -o cloud-event-proxy cmd/main.go
 RUN	go build -gcflags="all=-N -l" -a -o plugins/ptp_operator_plugin.so -buildmode=plugin plugins/ptp_operator/ptp_operator_plugin.go
 RUN	go build -gcflags="all=-N -l" -a -o plugins/mock_plugin.so -buildmode=plugin plugins/mock/mock_plugin.go
 
-FROM registry.ci.openshift.org/ocp/4.19:base-rhel9 AS bin
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:1bc3c5c15720506a0cf48adfdf8b623dfe704377e007d7bbae8d14876392ca6a AS bin
 COPY --from=builder /cloud-event-proxy /
 COPY --from=builder /plugins/*.so /plugins/
 COPY --from=builder /go/bin/dlv /

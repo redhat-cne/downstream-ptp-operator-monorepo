@@ -1,10 +1,12 @@
-FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.25-openshift-4.22 AS builder
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.25@sha256:977bd041377a1367c8b102a460ae8e63f89905f7cf9d8235484ae658c9b47646 AS builder
 WORKDIR /go/src/github.com/openshift/linuxptp-daemon
 WORKDIR /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon
 COPY . .
+ENV GOEXPERIMENT=strictfipsruntime
+ENV CGO_ENABLED=1
 RUN make clean && make
 
-FROM registry.ci.openshift.org/ocp/4.22:base-rhel9
+FROM registry.access.redhat.com/ubi9/ubi:latest@sha256:1b99266db480e8aa6dfda6900697a07ec99334095b4f87d1687edfc06c965132
 
 RUN yum -y update && yum -y update glibc && yum --setopt=skip_missing_names_on_install=False -y \
   install \
@@ -16,17 +18,31 @@ RUN yum -y update && yum -y update glibc && yum --setopt=skip_missing_names_on_i
   iproute \
   procps-ng \
   chrony \
-  # gpsd-minimal and gpsd-minimal-clients were renamed to gpsd and gpsd-clients in RHEL 10
-  # try the old names first, fall back to new names if it fails
   && (yum -y install gpsd-minimal gpsd-minimal-clients || yum -y install gpsd gpsd-clients) \
   && yum clean all
 
-# Create symlinks for executables to match references
 RUN ln -s /usr/bin/gpspipe /usr/local/bin/gpspipe
 RUN ln -s /usr/sbin/gpsd /usr/local/sbin/gpsd
 RUN ln -s /usr/bin/ubxtool /usr/local/bin/ubxtool
 
 COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon/bin/ptp /usr/local/bin/
 COPY ./extra/leap-seconds.list /usr/share/zoneinfo/leap-seconds.list
+
+COPY LICENSE /licenses/
+
+LABEL name="ptp/linuxptp-daemon-mono-rhel9"
+LABEL summary="LinuxPTP Daemon Mono"
+LABEL description="Applies node-specific PTP configuration and runs linuxptp services on OpenShift nodes."
+LABEL io.k8s.display-name="LinuxPTP Daemon Mono"
+LABEL io.k8s.description="Applies node-specific PTP configuration and runs linuxptp services on OpenShift nodes."
+LABEL io.openshift.tags="openshift,ptp,linuxptp,daemon"
+LABEL maintainer="PTP Dev Team <ptp-dev@redhat.com>"
+LABEL com.redhat.component="linuxptp-daemon-mono-rhel9-container"
+LABEL version="4.22"
+LABEL release="1"
+LABEL vendor="Red Hat, Inc."
+LABEL url="https://github.com/openshift/linuxptp-daemon"
+LABEL distribution-scope="public"
+LABEL cpe="cpe:/a:redhat:openshift:4.22::el9"
 
 CMD ["/usr/local/bin/ptp"]

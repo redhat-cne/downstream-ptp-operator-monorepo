@@ -1,11 +1,27 @@
-FROM registry.ci.openshift.org/ocp/builder:rhel-9-golang-1.25-openshift-4.22 AS builder
+FROM brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_1.25@sha256:977bd041377a1367c8b102a460ae8e63f89905f7cf9d8235484ae658c9b47646 AS builder
 WORKDIR /go/src/github.com/k8snetworkplumbingwg/ptp-operator/must-gather
-COPY . .
+COPY must-gather/ .
 
-FROM registry.ci.openshift.org/ocp/4.22:must-gather
-LABEL io.k8s.display-name="ptp-operator-must-gather" \
-      io.k8s.description="This is a PTP must-gather image that collectes PTP operator related resources."
+FROM registry.redhat.io/openshift4/ose-must-gather:latest@sha256:26fe3781e9b02e4f7c864a54056837e3e9175b6a299c43638e4947803844a841
+
 COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/ptp-operator/must-gather/collection-scripts/* /usr/bin/
 RUN chmod +x /usr/bin/gather
+
+COPY LICENSE /licenses/
+
+LABEL name="ptp/ptp-must-gather-mono-rhel9"
+LABEL summary="PTP Must Gather Mono"
+LABEL description="Collects PTP diagnostic data for troubleshooting OpenShift PTP configurations."
+LABEL io.k8s.display-name="PTP Must Gather Mono"
+LABEL io.k8s.description="Collects PTP diagnostic data for troubleshooting OpenShift PTP configurations."
+LABEL io.openshift.tags="openshift,ptp,must-gather,diagnostics"
+LABEL maintainer="PTP Dev Team <ptp-dev@redhat.com>"
+LABEL com.redhat.component="ptp-must-gather-mono-rhel9-container"
+LABEL version="4.22"
+LABEL release="1"
+LABEL vendor="Red Hat, Inc."
+LABEL url="https://github.com/openshift/ptp-operator"
+LABEL distribution-scope="public"
+LABEL cpe="cpe:/a:redhat:openshift:4.22::el9"
 
 ENTRYPOINT /usr/bin/gather
