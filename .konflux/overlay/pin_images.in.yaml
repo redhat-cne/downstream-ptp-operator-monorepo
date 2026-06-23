@@ -2,20 +2,20 @@
 # Operator (manager)
 - key: manager
   source: quay.io/openshift/origin-ptp-operator:4.22
-  target: quay.io/redhat-user-workloads/telco-5g-tenant/ptp-operator-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:placeholder
 #
 # linuxptp-daemon
 - key: linuxptp_daemon_image
   source: quay.io/openshift/origin-ptp:4.22
-  target: quay.io/redhat-user-workloads/telco-5g-tenant/linuxptp-daemon-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-22@sha256:placeholder
 #
 # kube-rbac-proxy
 - key: kube_rbac_proxy_image
   source: quay.io/openshift/origin-kube-rbac-proxy:4.22
-  target: quay.io/redhat-user-workloads/telco-5g-tenant/kube-rbac-proxy-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-4-22@sha256:placeholder
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:4.22
-  target: quay.io/redhat-user-workloads/telco-5g-tenant/cloud-event-proxy-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22@sha256:placeholder
 #
