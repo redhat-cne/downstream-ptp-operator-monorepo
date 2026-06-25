@@ -24,7 +24,7 @@ metadata:
       )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: ptp-operator-mono-4-22
+    appstudio.openshift.io/application: ptp-operator-fbc-4-22
     appstudio.openshift.io/component: ptp-operator-fbc-4-22
     pipelines.appstudio.openshift.io/type: build
   name: ptp-operator-fbc-4-22-on-pull-request
