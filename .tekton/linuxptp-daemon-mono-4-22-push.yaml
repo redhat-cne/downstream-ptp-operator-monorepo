@@ -47,7 +47,7 @@ spec:
     - name: build-args-file
       value: .konflux/container_build_args.conf
     - name: hermetic
-      value: "true"
+      value: "false"
     - name: dev-package-managers
       value: "true"
     - name: prefetch-input
