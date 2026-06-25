@@ -2,7 +2,7 @@ ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_
 ARG RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
 
 FROM ${BUILDER_IMAGE} AS builder
-WORKDIR /go/src/github.com/k8snetworkplumbingwg/ptp-operator/must-gather
+WORKDIR /go/src/github.com/k8snetworkplumbingwg/ptp-operator
 COPY . .
 
 FROM ${RUNTIME_IMAGE}
