@@ -256,6 +256,8 @@ spec:
           value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
         - name: IMAGE_APPEND_PLATFORM
           value: $(params.image-append-platform)
+        - name: ADDITIONAL_SECRET
+          value: experimental-ptp-tenant-stage-catalog
         - name: LABELS
           value:
             - $(tasks.generate-labels.results.labels[*])
