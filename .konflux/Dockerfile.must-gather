@@ -1,0 +1,17 @@
+ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.25
+ARG RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
+
+FROM ${BUILDER_IMAGE} AS builder
+WORKDIR /go/src/github.com/k8snetworkplumbingwg/ptp-operator/must-gather
+COPY . .
+
+FROM ${RUNTIME_IMAGE}
+
+RUN yum -y install rsync tar && yum clean all
+
+LABEL io.k8s.display-name="ptp-operator-must-gather" \
+      io.k8s.description="This is a PTP must-gather image that collectes PTP operator related resources."
+COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/ptp-operator/must-gather/collection-scripts/* /usr/bin/
+RUN chmod +x /usr/bin/gather
+
+ENTRYPOINT /usr/bin/gather
