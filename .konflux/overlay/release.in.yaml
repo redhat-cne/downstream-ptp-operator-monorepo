@@ -14,7 +14,4 @@ variables:
   # min_kube_version should match ocp
   # https://access.redhat.com/solutions/4870701
   min_kube_version: "1.35.0"
-  linuxptp_daemon_image: PLACEHOLDER_LINUXPTP_DAEMON_IMAGE
-  kube_rbac_proxy_image: PLACEHOLDER_KUBE_RBAC_PROXY_IMAGE
-  cloud_event_proxy_image: PLACEHOLDER_CLOUD_EVENT_PROXY_IMAGE
   version: "4.22.0"
