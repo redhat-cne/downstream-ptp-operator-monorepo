@@ -16,6 +16,7 @@ metadata:
         '.konflux/container_build_args.conf'.pathChanged() ||
         '.tekton/build-pipeline.yaml'.pathChanged() ||
         '.tekton/ptp-operator-mono-4-22-push.yaml'.pathChanged() ||
+        '.konflux/Dockerfile.operator'.pathChanged() ||
         'api/***'.pathChanged() ||
         'bindata/***'.pathChanged() ||
         'config/***'.pathChanged() ||
@@ -51,7 +52,7 @@ spec:
         - linux/x86_64
         - linux/arm64
     - name: dockerfile
-      value: Dockerfile
+      value: .konflux/Dockerfile.operator
     - name: build-args-file
       value: .konflux/container_build_args.conf
     - name: hermetic

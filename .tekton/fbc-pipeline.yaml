@@ -257,7 +257,7 @@ spec:
         - name: IMAGE_APPEND_PLATFORM
           value: 'true'
         - name: ADDITIONAL_SECRET
-          value: telco-5g-redhat-pull-secret
+          value: experimental-ptp-tenant-stage-catalog
         - name: BUILDAH_FORMAT
           value: $(params.buildah-format)
       runAfter:
