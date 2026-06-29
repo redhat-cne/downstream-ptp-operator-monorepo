@@ -9,11 +9,6 @@
   production: registry.redhat.io/openshift4/ptp-rhel9
   staging: registry.stage.redhat.io/openshift4/ptp-rhel9
 #
-# kube-rbac-proxy
-- key: kube_rbac_proxy_image
-  production: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
-  staging: registry.stage.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
-#
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   production: registry.redhat.io/openshift4/cloud-event-proxy-rhel9
