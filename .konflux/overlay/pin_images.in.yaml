@@ -2,20 +2,20 @@
 # Operator (manager)
 - key: manager
   source: quay.io/openshift/origin-ptp-operator:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:8509e5bf29ab7b7cfd7c2ac0936fcf106da8c388df248291f24fab38cc23a57f
 #
 # linuxptp-daemon
 - key: linuxptp_daemon_image
   source: quay.io/openshift/origin-ptp:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-22@sha256:e62b0cc029af8f5161b5411f088c8680323fd3b7d0203a285dd3169b7811ede1
 #
 # kube-rbac-proxy
 - key: kube_rbac_proxy_image
   source: quay.io/openshift/origin-kube-rbac-proxy:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:8509e5bf29ab7b7cfd7c2ac0936fcf106da8c388df248291f24fab38cc23a57f
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22@sha256:placeholder
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22@sha256:22e9e7c76924dbb4caef1bb09000cfa87259fa14664290986b97240ff1cde3a4
 #
