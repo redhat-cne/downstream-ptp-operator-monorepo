@@ -9,6 +9,11 @@
   source: quay.io/openshift/origin-ptp:4.22
   target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-22@sha256:e62b0cc029af8f5161b5411f088c8680323fd3b7d0203a285dd3169b7811ede1
 #
+# kube-rbac-proxy
+- key: kube_rbac_proxy_image
+  source: quay.io/openshift/origin-kube-rbac-proxy:4.22
+  target: quay.io/openshift/origin-kube-rbac-proxy@sha256:8ba06e7a76497f85c891cb9fcd6a8a0a100c60aa200bd0bea02f3d1ba3556c3e
+#
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:4.22
