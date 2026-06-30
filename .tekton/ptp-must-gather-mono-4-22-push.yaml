@@ -46,7 +46,7 @@ spec:
     - name: build-args-file
       value: .konflux/container_build_args.conf
     - name: hermetic
-      value: "false"
+      value: "true"
     - name: prefetch-input
       value: ""
     - name: build-source-image
