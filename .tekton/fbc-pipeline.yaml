@@ -293,6 +293,59 @@ spec:
           - name: kind
             value: task
         resolver: bundles
+    - name: build-source-image
+      params:
+        - name: BINARY_IMAGE
+          value: $(tasks.build-image-index.results.IMAGE_URL)
+        - name: SOURCE_ARTIFACT
+          value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
+        - name: CACHI2_ARTIFACT
+          value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
+        - name: BINARY_IMAGE_DIGEST
+          value: $(tasks.build-image-index.results.IMAGE_DIGEST)
+      runAfter:
+        - build-image-index
+      taskRef:
+        params:
+          - name: name
+            value: source-build-oci-ta
+          - name: bundle
+            value: quay.io/konflux-ci/tekton-catalog/task-source-build-oci-ta:0.3@sha256:8567bb7bf8fa9147c96b297533336fa7079ecf972cb86c09ccdd6bddedb25711
+          - name: kind
+            value: task
+        resolver: bundles
+      when:
+        - input: $(params.build-source-image)
+          operator: in
+          values:
+            - 'true'
+    - matrix:
+        params:
+          - name: image-platform
+            value:
+              - $(params.build-platforms)
+      name: clair-scan
+      params:
+        - name: image-digest
+          value: $(tasks.build-image-index.results.IMAGE_DIGEST)
+        - name: image-url
+          value: $(tasks.build-image-index.results.IMAGE_URL)
+      runAfter:
+        - build-image-index
+      taskRef:
+        params:
+          - name: name
+            value: clair-scan
+          - name: bundle
+            value: quay.io/konflux-ci/tekton-catalog/task-clair-scan:0.3@sha256:8fad4c2e2f470f82ee43d6b2ac72327b4d9c6e9cb514a678911c1c9359c29894
+          - name: kind
+            value: task
+        resolver: bundles
+      when:
+        - input: $(params.skip-checks)
+          operator: in
+          values:
+            - 'false'
     - name: deprecated-base-image-check
       params:
         - name: IMAGE_URL
