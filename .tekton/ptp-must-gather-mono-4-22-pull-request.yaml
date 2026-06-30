@@ -51,7 +51,7 @@ spec:
     - name: hermetic
       value: "true"
     - name: prefetch-input
-      value: '{"type": "rpm", "path": ".konflux/rpms/must-gather"}'
+      value: '{"type": "rpm", "path": ".konflux/rpms/must-gather", "options": {"dnf": {"ubi-9-baseos-rpms": {"gpgcheck": "0"}, "ubi-9-baseos-source-rpms": {"gpgcheck": "0"}}}}'
     - name: build-source-image
       value: "true"
     - name: skip-sast-coverity
