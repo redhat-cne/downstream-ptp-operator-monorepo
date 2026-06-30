@@ -1,5 +1,5 @@
 ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.25
-ARG RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi:latest
+ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9
 
 FROM ${BUILDER_IMAGE} AS builder
 WORKDIR /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon
