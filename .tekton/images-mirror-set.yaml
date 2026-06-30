@@ -19,3 +19,6 @@ spec:
     - mirrors:
         - quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22
       source: registry.redhat.io/openshift4/cloud-event-proxy-rhel9
+    - mirrors:
+        - quay.io/openshift/origin-kube-rbac-proxy
+      source: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
