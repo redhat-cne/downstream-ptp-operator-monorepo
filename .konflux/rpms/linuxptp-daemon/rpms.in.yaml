@@ -1,0 +1,25 @@
+packages:
+  - pciutils
+  - linuxptp
+  - ethtool
+  - hwdata
+  - synce4l
+  - iproute
+  - procps-ng
+  - chrony
+  - name: gpsd-minimal
+    arches:
+      only:
+        - x86_64
+        - aarch64
+  - name: gpsd-minimal-clients
+    arches:
+      only:
+        - x86_64
+        - aarch64
+contentOrigin:
+  repofiles:
+    - ./centos.repo
+arches:
+  - x86_64
+  - aarch64

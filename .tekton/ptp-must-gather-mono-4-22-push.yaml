@@ -46,9 +46,9 @@ spec:
     - name: build-args-file
       value: .konflux/container_build_args.conf
     - name: hermetic
-      value: "false"
+      value: "true"
     - name: prefetch-input
-      value: ""
+      value: '{"type": "rpm", "path": ".konflux/rpms/must-gather"}'
     - name: build-source-image
       value: "true"
     - name: skip-sast-coverity
