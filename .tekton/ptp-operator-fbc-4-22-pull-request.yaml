@@ -10,18 +10,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "pull_request" &&
-      target_branch == "release-4.22" &&
-      (
-        '.konflux/catalog/***'.pathChanged() ||
-        '.konflux/container_build_args.conf'.pathChanged() ||
-        '.konflux/Dockerfile.catalog'.pathChanged() ||
-        '.tekton/fbc-pipeline.yaml'.pathChanged() ||
-        '.tekton/images-mirror-set.yaml'.pathChanged() ||
-        '.tekton/ptp-operator-fbc-4-22-pull-request.yaml'.pathChanged() ||
-        'telco5g-konflux'.pathChanged() ||
-        'telco5g-konflux/***'.pathChanged()
-      )
+      event == "pull_request" && target_branch == "release-4.22"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: ptp-operator-fbc-4-22
