@@ -298,6 +298,13 @@ arches:
     name: systemd
     evr: 252-71.el9
     sourcerpm: systemd-252-71.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-libs-252-71.el9.aarch64.rpm
+    repoid: baseos
+    size: 640767
+    checksum: sha256:51586771ef916e4a75535c08cf08a25a38c919c9917c04ac936a24fad20b8970
+    name: systemd-libs
+    evr: 252-71.el9
+    sourcerpm: systemd-252-71.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-pam-252-71.el9.aarch64.rpm
     repoid: baseos
     size: 259924
@@ -833,6 +840,13 @@ arches:
     size: 4390842
     checksum: sha256:762f43784312f9e19c5f1e39381fbe91f2d1601fc6a711c586063e8909ef7378
     name: systemd
+    evr: 252-71.el9
+    sourcerpm: systemd-252-71.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-libs-252-71.el9.x86_64.rpm
+    repoid: baseos
+    size: 673027
+    checksum: sha256:8c64338faba581c7348243b5f451a17acdfd1aacf8494ee7d20634c890bd5d98
+    name: systemd-libs
     evr: 252-71.el9
     sourcerpm: systemd-252-71.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-pam-252-71.el9.x86_64.rpm

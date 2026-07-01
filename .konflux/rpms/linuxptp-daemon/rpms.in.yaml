@@ -1,4 +1,5 @@
 packages:
+  - systemd-libs
   - pciutils
   - linuxptp
   - ethtool

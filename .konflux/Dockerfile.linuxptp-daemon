@@ -11,7 +11,7 @@ RUN make clean && make
 
 FROM ${RUNTIME_IMAGE}
 
-RUN yum --setopt=skip_missing_names_on_install=False -y \
+RUN yum -y install systemd-libs && yum --setopt=skip_missing_names_on_install=False -y \
   install \
   pciutils \
   linuxptp \
@@ -21,15 +21,12 @@ RUN yum --setopt=skip_missing_names_on_install=False -y \
   iproute \
   procps-ng \
   chrony \
+  && (yum -y install gpsd-minimal gpsd-minimal-clients || yum -y install gpsd gpsd-clients) \
   && yum clean all
 
-RUN yum -y install gpsd-minimal gpsd-minimal-clients \
-  || yum -y install gpsd gpsd-clients \
-  || echo "WARN: gpsd packages not available due to systemd version mismatch, GPS support disabled"
-
-RUN [ -f /usr/bin/gpspipe ] && ln -s /usr/bin/gpspipe /usr/local/bin/gpspipe || true
-RUN [ -f /usr/sbin/gpsd ] && ln -s /usr/sbin/gpsd /usr/local/sbin/gpsd || true
-RUN [ -f /usr/bin/ubxtool ] && ln -s /usr/bin/ubxtool /usr/local/bin/ubxtool || true
+RUN ln -s /usr/bin/gpspipe /usr/local/bin/gpspipe
+RUN ln -s /usr/sbin/gpsd /usr/local/sbin/gpsd
+RUN ln -s /usr/bin/ubxtool /usr/local/bin/ubxtool
 
 COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon/bin/ptp /usr/local/bin/
 COPY ./extra/leap-seconds.list /usr/share/zoneinfo/leap-seconds.list
