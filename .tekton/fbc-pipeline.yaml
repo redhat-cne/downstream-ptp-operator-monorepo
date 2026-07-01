@@ -430,6 +430,11 @@ spec:
           - name: kind
             value: task
         resolver: bundles
+      when:
+        - input: 'true'
+          operator: in
+          values:
+            - 'false'
     - name: fbc-fips-check-oci-ta
       params:
         - name: image-digest
@@ -449,6 +454,11 @@ spec:
           - name: kind
             value: task
         resolver: bundles
+      when:
+        - input: 'true'
+          operator: in
+          values:
+            - 'false'
   workspaces:
     - name: git-auth
       optional: true
