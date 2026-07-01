@@ -1,4 +1,5 @@
 packages:
+  - systemd-libs
   - pciutils
   - linuxptp
   - ethtool
@@ -19,7 +20,7 @@ packages:
         - aarch64
 contentOrigin:
   repofiles:
-    - ./ubi.repo
+    - ./centos.repo
 arches:
   - x86_64
   - aarch64
