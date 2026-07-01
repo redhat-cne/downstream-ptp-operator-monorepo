@@ -22,3 +22,6 @@ spec:
     - mirrors:
         - quay.io/openshift/origin-kube-rbac-proxy
       source: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
+    - mirrors:
+        - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-22
+      source: registry.redhat.io/openshift4/ptp-operator-must-gather

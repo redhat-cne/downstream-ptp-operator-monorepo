@@ -49,6 +49,8 @@ spec:
       value: .konflux/container_build_args.conf
     - name: additional-tags
       value: ["on-pr-latest"]
+    - name: build-source-image
+      value: "true"
     - name: hermetic
       value: "true"
   pipelineRef:

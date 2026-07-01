@@ -47,11 +47,11 @@ spec:
     - name: build-args-file
       value: .konflux/container_build_args.conf
     - name: hermetic
-      value: "false"
+      value: "true"
     - name: dev-package-managers
       value: "true"
     - name: prefetch-input
-      value: '[{"type": "gomod", "path": "pkg/linuxptp-daemon"}]'
+      value: '[{"type": "gomod", "path": "pkg/linuxptp-daemon"}, {"type": "rpm", "path": ".konflux/rpms/linuxptp-daemon", "options": {"dnf": {"appstream": {"gpgcheck": "0"}, "baseos": {"gpgcheck": "0"}, "appstream-source": {"gpgcheck": "0"}, "baseos-source": {"gpgcheck": "0"}}}}]'
     - name: build-source-image
       value: "true"
     - name: skip-sast-coverity

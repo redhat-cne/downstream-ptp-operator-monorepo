@@ -14,4 +14,5 @@ variables:
   # min_kube_version should match ocp
   # https://access.redhat.com/solutions/4870701
   min_kube_version: "1.35.0"
+  subscription_badges: '["OpenShift Container Platform", "OpenShift Platform Plus"]'
   version: "4.22.0"
