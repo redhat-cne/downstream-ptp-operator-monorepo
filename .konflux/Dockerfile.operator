@@ -5,7 +5,9 @@ FROM ${BUILDER_IMAGE} AS builder
 USER root
 WORKDIR /go/src/github.com/k8snetworkplumbingwg/ptp-operator
 COPY . .
-ENV CGO_ENABLED=0
+ENV GOEXPERIMENT=strictfipsruntime
+ENV CGO_ENABLED=1
+ENV GOFLAGS="-tags=strictfipsruntime"
 RUN make
 
 FROM ${RUNTIME_IMAGE}
