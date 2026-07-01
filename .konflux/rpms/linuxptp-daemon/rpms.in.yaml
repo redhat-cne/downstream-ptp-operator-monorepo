@@ -18,13 +18,8 @@ packages:
         - x86_64
         - aarch64
 contentOrigin:
-  contentSets:
-    x86_64:
-      - rhel-9-for-x86_64-appstream-rpms
-      - rhel-9-for-x86_64-baseos-rpms
-    aarch64:
-      - rhel-9-for-aarch64-appstream-rpms
-      - rhel-9-for-aarch64-baseos-rpms
+  repofiles:
+    - ./centos.repo
 arches:
   - x86_64
   - aarch64
