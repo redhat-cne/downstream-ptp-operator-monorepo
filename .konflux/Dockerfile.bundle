@@ -19,6 +19,7 @@ COPY telco5g-konflux/scripts/bundle/konflux-bundle-overlay.sh $OVERLAY_PATH/konf
 RUN $OVERLAY_PATH/konflux-bundle-overlay.sh  \
     --set-csv-file $MANIFESTS_PATH/ptp-operator.clusterserviceversion.yaml \
     --set-mapping-file $OVERLAY_PATH/map_images.in.yaml \
+    --set-mapping-staging \
     --set-pinning-file $OVERLAY_PATH/pin_images.in.yaml \
     --set-release-file $OVERLAY_PATH/release.in.yaml
 
