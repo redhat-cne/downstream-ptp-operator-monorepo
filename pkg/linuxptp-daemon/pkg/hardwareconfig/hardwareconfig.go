@@ -13,6 +13,7 @@ import (
 	"github.com/golang/glog"
 	dpllcfg "github.com/k8snetworkplumbingwg/linuxptp-daemon/pkg/dpll"
 	dpll "github.com/k8snetworkplumbingwg/linuxptp-daemon/pkg/dpll-netlink"
+	"github.com/k8snetworkplumbingwg/linuxptp-daemon/pkg/network"
 	"k8s.io/client-go/kubernetes"
 
 	// loader is part of this package (vendor_loader.go)
@@ -198,6 +199,8 @@ type enrichedHardwareConfig struct {
 	structureSysFSCommands []SysFSCommand
 	// Holdover parameters mapped by clock ID
 	holdoverParams map[uint64]*ptpv2alpha1.HoldoverParameters
+	// DPLL monitoring flags mapped by clock ID (from hardware vendor defaults)
+	dpllFlags map[uint64]dpllcfg.Flag
 }
 
 // HardwareConfigManager manages hardware configurations and their application
@@ -215,14 +218,15 @@ type HardwareConfigManager struct {
 	// current PtpConfig used for resolving clock chains (optional)
 	ptpConfig *ptpv1.PtpConfig
 	// ConfigMap loader for board label remapping (optional, can be nil)
-	configMapLoader *BoardLabelMapLoader
-	mu              sync.RWMutex
-	cond            *sync.Cond
-	ready           bool
+	configMapLoader   *BoardLabelMapLoader
+	interfaceResolver *network.InterfaceResolver
+	mu                sync.RWMutex
+	cond              *sync.Cond
+	ready             bool
 }
 
 // NewHardwareConfigManager creates a new hardware config manager.
-func NewHardwareConfigManager(kubeClient kubernetes.Interface, namespace string) *HardwareConfigManager {
+func NewHardwareConfigManager(kubeClient kubernetes.Interface, namespace string, resolver *network.InterfaceResolver) *HardwareConfigManager {
 	hcm := &HardwareConfigManager{
 		hardwareConfigs: make([]enrichedHardwareConfig, 0),
 		pinApplier:      func(cmds []dpll.PinParentDeviceCtl) error { return BatchPinSet(cmds) },
@@ -236,6 +240,7 @@ func NewHardwareConfigManager(kubeClient kubernetes.Interface, namespace string)
 			return os.WriteFile(path, []byte(value), 0o644)
 		},
 	}
+	hcm.interfaceResolver = resolver
 	hcm.cond = sync.NewCond(&hcm.mu)
 
 	// Set up ConfigMap loader for board label remapping
@@ -283,6 +288,14 @@ func (hcm *HardwareConfigManager) UpdateHardwareConfig(hwConfigs []ptpv2alpha1.H
 
 	// Clear clock ID cache for new hardware config processing
 	hcm.clockIDCache = make(map[string]uint64)
+
+	// Resolve RHEL 10 npN interface name changes in hardware configs
+	if hcm.interfaceResolver != nil {
+		if err := hcm.interfaceResolver.Refresh(); err != nil {
+			glog.Warningf("Failed to refresh interface resolver for hardware config, name resolution may use stale data: %v", err)
+		}
+		hcm.interfaceResolver.ResolveHardwareConfigInterfaces(hwConfigs)
+	}
 
 	// Detect removed hardwareconfigs before updating
 	removedConfigs := hcm.detectRemovedHardwareConfigs(hwConfigs)
@@ -361,6 +374,13 @@ func (hcm *HardwareConfigManager) UpdateHardwareConfig(hwConfigs []ptpv2alpha1.H
 		prepared[i].holdoverParams = holdoverParams
 		if len(holdoverParams) > 0 {
 			glog.Infof("  holdover: extracted parameters for %d DPLLs", len(holdoverParams))
+		}
+
+		// Extract DPLL flags from hardware vendor defaults
+		dpllFlags := hcm.extractDPLLFlags(*resolvedConfig)
+		prepared[i].dpllFlags = dpllFlags
+		if len(dpllFlags) > 0 {
+			glog.Infof("  dpllFlags: extracted flags for %d DPLLs", len(dpllFlags))
 		}
 	}
 
@@ -2219,6 +2239,82 @@ func (hcm *HardwareConfigManager) GetHoldoverParameters(profileName string, cloc
 				return params
 			}
 		}
+	}
+
+	return nil
+}
+
+// extractDPLLFlags extracts DPLL monitoring flags from hardware vendor defaults for all subsystems.
+// Flags are intrinsic to the hardware model (e.g., E830 only reports phase status)
+// and are loaded from the embedded defaults.yaml for each subsystem's hardwareSpecificDefinitions.
+func (hcm *HardwareConfigManager) extractDPLLFlags(hwConfig ptpv2alpha1.HardwareConfig) map[uint64]dpllcfg.Flag {
+	flags := make(map[uint64]dpllcfg.Flag)
+
+	for _, subsystem := range hwConfig.Spec.Profile.ClockChain.Structure {
+		hwDefPath := strings.TrimSpace(subsystem.HardwareSpecificDefinitions)
+		if hwDefPath == "" {
+			continue
+		}
+
+		hwDefaults, err := hcm.getHardwareDefaults(hwDefPath)
+		if err != nil {
+			glog.Warningf("Subsystem %s: failed to load hardware defaults from %s: %v", subsystem.Name, hwDefPath, err)
+			continue
+		}
+		if hwDefaults == nil {
+			glog.Warningf("Subsystem %s: hardware defaults not found for %s", subsystem.Name, hwDefPath)
+			continue
+		}
+
+		dpllFlags, err := hwDefaults.ParseDPLLFlags()
+		if err != nil {
+			glog.Warningf("Subsystem %s: failed to parse DPLL flags from %s: %v", subsystem.Name, hwDefPath, err)
+			continue
+		}
+		if dpllFlags == 0 {
+			continue
+		}
+
+		networkInterface := subsystem.DPLL.NetworkInterface
+		if networkInterface == "" && len(subsystem.Ethernet) > 0 && len(subsystem.Ethernet[0].Ports) > 0 {
+			networkInterface = subsystem.Ethernet[0].Ports[0]
+		}
+		if networkInterface == "" {
+			glog.Warningf("Subsystem %s has DPLL flags but no network interface", subsystem.Name)
+			continue
+		}
+
+		clockID, err := hcm.getClockIDCached(networkInterface, hwDefPath)
+		if err != nil {
+			glog.Warningf("Subsystem %s: failed to resolve clock ID from interface %s: %v", subsystem.Name, networkInterface, err)
+			continue
+		}
+
+		flags[clockID] = dpllFlags
+		glog.Infof("  DPLL flags for clock %#x (subsystem %s, hw %s): %d", clockID, subsystem.Name, hwDefPath, dpllFlags)
+	}
+
+	return flags
+}
+
+// GetDPLLFlags returns DPLL monitoring flags for a specific clock ID from the given profile.
+// Returns nil if no DPLL flags are configured for the clock ID.
+func (hcm *HardwareConfigManager) GetDPLLFlags(profileName string, clockID uint64) *dpllcfg.Flag {
+	hcm.mu.RLock()
+	defer hcm.mu.RUnlock()
+
+	matchedProfile := false
+	for _, hwConfig := range hcm.hardwareConfigs {
+		if ProfileNamesMatch(profileName, hwConfig.Spec.RelatedPtpProfileName) {
+			matchedProfile = true
+			if f, found := hwConfig.dpllFlags[clockID]; found {
+				return &f
+			}
+			glog.Infof("No DPLL flags found for clock %#x (profile %s, hwConfig %s)", clockID, profileName, hwConfig.Name)
+		}
+	}
+	if !matchedProfile {
+		glog.Infof("No matching hardware config found for profile %s", profileName)
 	}
 
 	return nil

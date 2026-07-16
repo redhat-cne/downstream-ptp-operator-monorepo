@@ -439,7 +439,8 @@ type Daemon struct {
 	processManager *ProcessManager
 	readyTracker   *ReadyTracker
 
-	hwconfigs *[]ptpv1.HwConfig
+	hwconfigs   *[]ptpv1.HwConfig
+	hwconfigsMu sync.Mutex // protects hwconfigs from concurrent GPSD goroutine writes
 
 	// Hardware config manager handles hardware configurations from HardwareConfig CRs
 	hardwareConfigManager *hardwareconfig.HardwareConfigManager
@@ -465,7 +466,11 @@ type Daemon struct {
 
 	delayedPhc2sys   atomic.Bool
 	delayedPhc2sysMu sync.Mutex // protects skipInitialStartup on phc2sys processes
+
+	interfaceResolver *ptpnetwork.InterfaceResolver
 }
+
+type initialStateSyncer interface{ SyncInitialState() }
 
 // UpdateHardwareConfig implements controller.HardwareConfigUpdateHandler.
 // It is invoked by the controller reconciler via HardwareConfigHandler
@@ -489,6 +494,12 @@ func (dn *Daemon) getHoldoverParameters(profileName string, clockID uint64) *ptp
 	return dn.hardwareConfigManager.GetHoldoverParameters(profileName, clockID)
 }
 
+// getDPLLFlags retrieves DPLL monitoring flags from HardwareConfig for a specific clock ID.
+// Returns nil if no hardware config is available or no flags are configured for the clock.
+func (dn *Daemon) getDPLLFlags(profileName string, clockID uint64) *dpll.Flag {
+	return dn.hardwareConfigManager.GetDPLLFlags(profileName, clockID)
+}
+
 // getInterfacesFromHardwareConfig derives interfaces from hardwareconfig structure for T-BC mode.
 // It extracts the first interface from structure[*]->dpll->networkInterface.
 // Returns an empty slice if no hardwareconfig is available or no interfaces are found.
@@ -506,24 +517,31 @@ func (dn *Daemon) getInterfacesFromHardwareConfig(nodeProfile *ptpv1.PtpProfile)
 
 	var interfaces config.IFaces
 
-	// Iterate through hardware profiles and extract interfaces from structure
+	// Iterate through hardware profiles and extract interfaces from all subsystems.
+	// All subsystems (not just the first) are included so that unmanaged DPLL subsystems
+	// (e.g., Intel E830 CF1/CF2) enter the DPLL initialisation loop.
 	for _, hwProfile := range hwProfiles {
 		if hwProfile.ClockChain == nil || len(hwProfile.ClockChain.Structure) == 0 {
 			continue
 		}
 
-		// Get the first subsystem from structure and use GetSubsystemNetworkInterface
-		firstSubsystem := hwProfile.ClockChain.Structure[0]
-		networkInterface, err := hardwareconfig.GetSubsystemNetworkInterface(hwProfile.ClockChain, firstSubsystem.Name)
-		if err != nil {
-			glog.V(2).Infof("Failed to get network interface for first subsystem %s: %v", firstSubsystem.Name, err)
-			continue
+		profileName := "<unnamed>"
+		if hwProfile.Name != nil {
+			profileName = *hwProfile.Name
 		}
+		glog.Infof("getInterfacesFromHardwareConfig: iterating %d subsystems in profile %s",
+			len(hwProfile.ClockChain.Structure), profileName)
 
-		if networkInterface != "" {
-			// Determine event source based on T-BC configuration
-			// For T-BC, the interface typically depends on PTP4l
-			eventSource := event.PTP4l
+		for _, subsystem := range hwProfile.ClockChain.Structure {
+			networkInterface, err := hardwareconfig.GetSubsystemNetworkInterface(hwProfile.ClockChain, subsystem.Name)
+			if err != nil {
+				glog.Infof("getInterfacesFromHardwareConfig: subsystem %s: no network interface: %v", subsystem.Name, err)
+				continue
+			}
+			if networkInterface == "" {
+				glog.Infof("getInterfacesFromHardwareConfig: subsystem %s: empty network interface, skipping", subsystem.Name)
+				continue
+			}
 
 			// Get PHC ID for the interface
 			phcID := ptpnetwork.GetPhcId(networkInterface)
@@ -538,9 +556,21 @@ func (dn *Daemon) getInterfacesFromHardwareConfig(nodeProfile *ptpv1.PtpProfile)
 				glog.Warningf("getInterfacesFromHardwareConfig: could not get PHC ID for iface %s, convergeConfig PHC fallback will not work", networkInterface)
 			}
 
+			// Subsystems that have PhaseInputs configured are driven by ptp4l (they
+			// receive a PTP time-receiver pin and run a ptp4l process).  Subsystems
+			// without PhaseInputs are hardware-slaved (e.g., Intel E830 CF cards that
+			// receive timing through hardware SDP/esync signals from the leader card)
+			// and must not use PTP4l as their source: getDpllState() would otherwise
+			// always return phaseStatus which stays DPLL_INVALID because no pps device
+			// notification ever arrives for these cards.  PPS is the correct source for
+			// hardware-slaved unmanaged DPLLs.
+			source := event.PTP4l
+			if len(subsystem.DPLL.PhaseInputs) == 0 {
+				source = event.PPS
+			}
 			interfaces = append(interfaces, config.Iface{
 				Name:     networkInterface,
-				Source:   eventSource,
+				Source:   source,
 				PhcId:    phcID,
 				IsMaster: false,
 			})
@@ -599,24 +629,25 @@ func New(
 	}
 
 	dn := &Daemon{
-		nodeName:              nodeName,
-		namespace:             namespace,
-		stdoutToSocket:        stdoutToSocket,
-		kubeClient:            kubeClient,
-		ptpClient:             ptpClient,
-		ptpUpdate:             ptpUpdate,
-		pluginManager:         pluginManager,
-		unknownPlugins:        unknownPlugins,
-		hwconfigs:             hwconfigs,
-		hardwareConfigManager: hardwareconfig.NewHardwareConfigManager(kubeClient, namespace),
-		refreshNodePtpDevice:  refreshNodePtpDevice,
-		pmcPollInterval:       pmcPollInterval,
-		processManager:        pm,
-		readyTracker:          tracker,
-		stopCh:                stopCh,
-		saFileWatcher:         saFileWatch,
-		liveGate:              &liveGate{},
+		nodeName:             nodeName,
+		namespace:            namespace,
+		stdoutToSocket:       stdoutToSocket,
+		kubeClient:           kubeClient,
+		ptpClient:            ptpClient,
+		ptpUpdate:            ptpUpdate,
+		pluginManager:        pluginManager,
+		unknownPlugins:       unknownPlugins,
+		hwconfigs:            hwconfigs,
+		interfaceResolver:    ptpnetwork.NewInterfaceResolver(),
+		refreshNodePtpDevice: refreshNodePtpDevice,
+		pmcPollInterval:      pmcPollInterval,
+		processManager:       pm,
+		readyTracker:         tracker,
+		stopCh:               stopCh,
+		saFileWatcher:        saFileWatch,
+		liveGate:             &liveGate{},
 	}
+	dn.hardwareConfigManager = hardwareconfig.NewHardwareConfigManager(kubeClient, namespace, dn.interfaceResolver)
 	pm.daemon = dn
 	return dn
 }
@@ -774,7 +805,9 @@ func (dn *Daemon) applyNodePTPProfiles() error {
 	// only apply when nodeProfile changes
 
 	// clear hwconfig before updating
+	dn.hwconfigsMu.Lock()
 	*dn.hwconfigs = []ptpv1.HwConfig{}
+	dn.hwconfigsMu.Unlock()
 
 	glog.Infof("updating NodePTPProfiles to:")
 	runID := 0
@@ -806,6 +839,11 @@ func (dn *Daemon) applyNodePTPProfiles() error {
 		dn.hardwareConfigManager.SetPtpConfig(ptpConfig)
 		glog.Infof("Updated PtpConfig in hardware config manager with %d profiles (after sorting and reconciliation)", len(dn.ptpUpdate.NodeProfiles))
 	}
+	// Refresh interface resolver so RHEL 10 npN name mapping uses current system state
+	if err := dn.interfaceResolver.Refresh(); err != nil {
+		glog.Warningf("Failed to refresh interface resolver, name resolution may use stale data: %v", err)
+	}
+
 	// TODO: resolve clock IDs, clockType, leadingInterface and upstreamPort from hardware config
 	// (needed to keep code compatibility elsewhere and allow it to work both with hardware config and plugins)
 	for _, profile := range dn.ptpUpdate.NodeProfiles {
@@ -832,6 +870,8 @@ func (dn *Daemon) applyNodePTPProfiles() error {
 		if controlledID, ok := relations[*profile.Name]; ok {
 			profile.PtpSettings["controlledId"] = strconv.Itoa(controlledID)
 		}
+
+		dn.interfaceResolver.ResolveProfileInterfaces(&profile)
 
 		glog.Infof("Calling applyNodePtpProfile for profile %s with runID %d", *profile.Name, runID)
 		err := dn.applyNodePtpProfile(runID, &profile)
@@ -869,6 +909,13 @@ func (dn *Daemon) applyNodePTPProfiles() error {
 						},
 						InitialPTPState: event.PTP_FREERUN,
 					})
+					// Pre-populate event state immediately after the EventChannel
+					// is set up so that hardware-slaved DPLLs (e.g. E830 CF) are
+					// present in the event data before the async monitoring goroutine
+					// completes its own initial dump.
+					if syncer, ok := d.(initialStateSyncer); ok {
+						syncer.SyncInitialState()
+					}
 					glog.Infof("enabling dep process %s with Max %d Min %d Holdover %d", d.Name(), p.ptpClockThreshold.MaxOffsetThreshold, p.ptpClockThreshold.MinOffsetThreshold, p.ptpClockThreshold.HoldOverTimeout)
 				}
 			}
@@ -889,7 +936,9 @@ func (dn *Daemon) applyNodePTPProfiles() error {
 			break
 		}
 	}
+	dn.hwconfigsMu.Lock()
 	dn.pluginManager.PopulateHwConfig(dn.hwconfigs)
+	dn.hwconfigsMu.Unlock()
 	*dn.refreshNodePtpDevice = true
 	dn.readyTracker.setConfig(true)
 	return dn.sendSidecarRestart()
@@ -1110,6 +1159,7 @@ func (dn *Daemon) applyNodePtpProfile(runID int, nodeProfile *ptpv1.PtpProfile) 
 			printNodeProfile(nodeProfile)
 			return err
 		}
+		output.ResolveInterfaceNames(dn.interfaceResolver)
 
 		if configOpts == nil || *configOpts == "" {
 			glog.Infof("configOpts empty for profile %s, skipping process: %s", *nodeProfile.Name, pProcess)
@@ -1244,21 +1294,45 @@ func (dn *Daemon) applyNodePtpProfile(runID int, nodeProfile *ptpv1.PtpProfile) 
 		} else if pProcess == ts2phcProcessName { //& if the x plugin is enabled
 			if clockType == event.GM {
 				if output.gnss_serial_port == "" {
-					output.gnss_serial_port = GPSPIPE_SERIALPORT
+					output.gnss_serial_port = GPSDDefaultGNSSSerialPort
+					glog.Warningf("Setting GNSS serial port to %s", output.gnss_serial_port)
 				}
-				// TODO: move this to plugin or call it from hwplugin or leave it here and remove Hardcoded
 				gmInterface := dprocess.ifaces.GetLeadingInterface().Name
+				glog.Infof("Working with GNSS serial port %s, leading iface %s", output.gnss_serial_port, gmInterface)
+
+				// Record ublox init results (MON-HW, etc.) to NodePtpDevice status.
+				// Replaces any previous "gnss" entries to avoid duplicates on re-init.
+				gnssResultsFn := func(results []string) {
+					dn.hwconfigsMu.Lock()
+					defer dn.hwconfigsMu.Unlock()
+					// Remove previous gnss entries
+					filtered := (*dn.hwconfigs)[:0]
+					for _, hw := range *dn.hwconfigs {
+						if hw.DeviceID != "gnss" {
+							filtered = append(filtered, hw)
+						}
+					}
+					// Add current results
+					for _, result := range results {
+						filtered = append(filtered, ptpv1.HwConfig{
+							DeviceID: "gnss",
+							Status:   result,
+						})
+					}
+					*dn.hwconfigs = filtered
+				}
 
 				gpsDaemon := &GPSD{
-					name:        GPSD_PROCESSNAME,
-					execMutex:   sync.Mutex{},
-					cmd:         nil,
-					serialPort:  output.gnss_serial_port,
-					exitCh:      make(chan struct{}),
-					gmInterface: gmInterface,
-					stopped:     false,
-					messageTag:  messageTag,
-					ublxTool:    nil,
+					name:          GPSD_PROCESSNAME,
+					execMutex:     sync.Mutex{},
+					cmd:           nil,
+					serialPort:    output.gnss_serial_port,
+					exitCh:        make(chan struct{}),
+					gmInterface:   gmInterface,
+					stopped:       false,
+					messageTag:    messageTag,
+					ublxTool:      nil,
+					gnssResultsFn: gnssResultsFn,
 				}
 				gpsDaemon.CmdInit()
 				gpsDaemon.cmdLine = addScheduling(nodeProfile, gpsDaemon.cmdLine)
@@ -1382,6 +1456,23 @@ func (dn *Daemon) applyNodePtpProfile(runID int, nodeProfile *ptpv1.PtpProfile) 
 						// Fall back to plugin/profile settings (backward compatibility)
 						glog.Infof("Using holdover parameters from profile/plugin for clock %#x: MaxInSpec=%dns, LocalMaxOffset=%dns, Timeout=%ds",
 							clockId, maxInSpecOffset, localMaxHoldoverOffSet, localHoldoverTimeout)
+					}
+
+					// Try to get DPLL flags from HardwareConfig (new system)
+					// This takes precedence over plugin-provided values
+					hwFlags := dn.getDPLLFlags(profileName, clockId)
+					if hwFlags != nil {
+						flags = *hwFlags
+						glog.Infof("Using DPLL flags from HardwareConfig for clock %#x: %d", clockId, flags)
+					}
+
+					// Hardware-slaved DPLLs (e.g. E830 CF cards, identified by
+					// FlagOnlyPhaseStatus) never perform holdover
+					if flags&dpll.FlagOnlyPhaseStatus == dpll.FlagOnlyPhaseStatus {
+						localMaxHoldoverOffSet = 0
+						localHoldoverTimeout = 1 //do not divide by zero in case it is ever used
+						maxInSpecOffset = 0
+						glog.Infof("Resetting holdover parameters for %s (FlagOnlyPhaseStatus): not applicable for hardware-slaved DPLLs", iface.Name)
 					}
 
 					eventSource = []event.EventSource{iface.Source}
@@ -1941,10 +2032,10 @@ func (p *ptpProcess) cmdSetEnabled(enabled bool) {
 				cmd := p.cmd
 				newCmd := exec.Command(cmd.Args[0], cmd.Args[1:]...)
 				p.cmd = newCmd
-				go p.cmdRun(p.dn.stdoutToSocket, &(p.dn.pluginManager))
+				go p.cmdRun(p.dn.stdoutToSocket, &p.dn.pluginManager)
 			}
 		} else {
-			go p.cmdStop()
+			p.cmdStop()
 		}
 	case phc2sysProcessName:
 		if enabled {
