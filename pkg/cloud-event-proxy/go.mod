@@ -13,8 +13,8 @@ require (
 	github.com/prometheus/client_golang v1.14.0
 	github.com/redhat-cne/rest-api v1.23.6
 	github.com/redhat-cne/sdk-go v1.23.6
-	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.8.1
+	github.com/sirupsen/logrus v1.9.4
+	github.com/stretchr/testify v1.10.0
 	golang.org/x/net v0.39.0
 	k8s.io/api v0.26.0
 	k8s.io/apiextensions-apiserver v0.24.2
