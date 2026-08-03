@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.4.0
-	github.com/bigkevmcd/go-configparser v0.0.0-20240624060122-ccd05f93a9d2
+	github.com/bigkevmcd/go-configparser v0.0.0-20251110123434-de62ed489b4f
 	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/golang/glog v1.2.5

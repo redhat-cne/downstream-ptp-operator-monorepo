@@ -1,6 +1,8 @@
 package configparser
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/bigkevmcd/go-configparser/chainmap"
@@ -22,9 +24,32 @@ type options struct {
 	strict                bool
 }
 
+func (o *options) compileRegex() (
+	keyValue *regexp.Regexp, keyWNoValue *regexp.Regexp, err error,
+) {
+	if o.allowNoValue {
+		keyWNoValue, err = regexp.Compile(
+			fmt.Sprintf(
+				`([^%[1]s\s][^%[1]s]*)\s*((?P<vi>[%[1]s]+)\s*(.*)$)?`,
+				o.delimiters,
+			),
+		)
+		if err != nil {
+			return
+		}
+	}
+
+	keyValue, err = regexp.Compile(
+		fmt.Sprintf(
+			`([^%[1]s\s][^%[1]s]*)\s*(?P<vi>[%[1]s]+)\s*(.*)$`,
+			o.delimiters,
+		),
+	)
+
+	return
+}
+
 // Converter contains custom convert functions for available types.
-// The caller should guarantee type assertion to the requested type
-// after custom processing!
 type Converter map[int]ConvertFunc
 
 // Predefined types for Converter.
@@ -145,7 +170,9 @@ func Delimiters(d string) optFunc {
 // after custom processing or the method will panic.
 func Converters(conv Converter) optFunc {
 	return func(o *options) {
-		o.converters = conv
+		for k, fn := range conv {
+			o.converters[k] = fn
+		}
 	}
 }
 
