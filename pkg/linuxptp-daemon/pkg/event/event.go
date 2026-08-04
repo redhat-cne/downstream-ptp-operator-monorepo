@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/k8snetworkplumbingwg/linuxptp-daemon/pkg/alias"
@@ -186,6 +187,20 @@ type EventHandler struct {
 	ReduceLog          bool                          // reduce logs for every announce
 	LeadingClockData   *LeadingClockParams
 	portRole           map[string]map[string]*parser.PTPEvent
+	// applyingProfiles is set while applyNodePTPProfiles is tearing down /
+	// restarting processes. When true, updateBCState is skipped so teardown
+	// races (e.g. ts2phc Reset wiping e.data) cannot emit T-BC HOLDOVER.
+	applyingProfiles atomic.Bool
+}
+
+// SetApplying marks whether a PTP profile apply is in progress.
+func (e *EventHandler) SetApplying(v bool) {
+	e.applyingProfiles.Store(v)
+}
+
+// IsApplying reports whether a PTP profile apply is in progress.
+func (e *EventHandler) IsApplying() bool {
+	return e.applyingProfiles.Load()
 }
 
 // getConn returns the current event socket connection under lock.
@@ -736,10 +751,13 @@ func (e *EventHandler) reconnectEventSocket() bool {
 	}()
 	defer cancel()
 	dialer := net.Dialer{Timeout: socketDialTimeout}
-	newConn := utils.ReconnectWithBackoff(ctx,
+	newConn, err := utils.ReconnectWithBackoff(ctx,
 		func() (net.Conn, error) { return dialer.DialContext(ctx, "unix", e.stdoutSocket) },
 		utils.DefaultReconnectConfig(),
 	)
+	if err != nil {
+		glog.Errorf("failed to reconnect to event socket %s: %v", e.stdoutSocket, err)
+	}
 	if newConn != nil {
 		e.setConn(newConn)
 		return true
@@ -957,12 +975,19 @@ func (e *EventHandler) ProcessEvents() {
 					}
 				} else { // T-BC or T-TSC
 					e.Lock()
+					applying := e.IsApplying()
+					if applying {
+						// Ignore in-flight events during profile apply/teardown so
+						// convergeConfig/addEvent/updateBCState cannot race with Reset.
+						e.Unlock()
+						continue
+					}
 					event = e.convergeConfig(event)
 					dataDetails = e.addEvent(event)
 					var needsTTSCAnnounce, needsDownstreamUpdate bool
 					clockState, needsTTSCAnnounce, needsDownstreamUpdate = e.updateBCState(event)
 					e.Unlock()
-					// Perform I/O after releasing the lock
+					// Perform I/O after releasing the lock.
 					if needsTTSCAnnounce {
 						e.emitClockClass(clockState.clockClass, event.CfgName)
 					}
@@ -989,8 +1014,10 @@ func (e *EventHandler) ProcessEvents() {
 						debug.UpdateTs2phcState(string(d.State), 0, debug.OverallTs2phcKey)
 					}
 				}
-				debug.UpdateGMState(string(clockState.state))
-
+				// GM debug state only; T-BC/T-TSC clockState is not a GM state.
+				if event.ClockType == GM {
+					debug.UpdateGMState(string(clockState.state))
+				}
 				if clockState.clkLog != "" && clockState.leadingIFace != LEADING_INTERFACE_UNKNOWN {
 					logOut = append(logOut, clockState.clkLog)
 				}
