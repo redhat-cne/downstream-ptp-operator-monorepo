@@ -17,9 +17,15 @@ packages:
       only:
         - x86_64
         - aarch64
+# Force systemd-libs into the hermetic repo. The Dockerfile runs `yum -y update`
+# before installs; without matching libs, installing/updating systemd fails.
+reinstallPackages:
+  - systemd-libs
 contentOrigin:
   repofiles:
     - ./centos.repo
 arches:
   - x86_64
   - aarch64
+context:
+  image: quay.io/centos/centos:stream9
