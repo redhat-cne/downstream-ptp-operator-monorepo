@@ -88,6 +88,14 @@ spec:
       default: 'true'
       description: Use the package registry proxy when prefetching dependencies
       type: string
+    - name: bundle-image-override
+      default: ''
+      description: >
+        Optional bundle pullspec to embed in the catalog instead of
+        .konflux/catalog/bundle.builds.in.yaml. On-PR builds set this to the
+        same-revision bundle tag so certsuite tests the PR bundle. Leave empty
+        on push/release to use the pin file.
+      type: string
   results:
     - description: ''
       name: IMAGE_URL
@@ -145,9 +153,53 @@ spec:
         - name: SCRIPT_RUNNER_IMAGE
           value: quay.io/konflux-ci/yq:latest
         - name: SCRIPT
-          value: ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml --set-bundle-builds-file .konflux/catalog/bundle.builds.in.yaml
+          value: |
+            set -euo pipefail
+            OVERRIDE="$(params.bundle-image-override)"
+            BUNDLE_BUILDS_FILE=".konflux/catalog/bundle.builds.in.yaml"
+            if [ -n "${OVERRIDE}" ]; then
+              echo "bundle-image-override set; waiting for ${OVERRIDE}"
+              curl -fsSL -o /tmp/crane.tgz \
+                https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
+              tar -xzf /tmp/crane.tgz -C /tmp crane
+              chmod +x /tmp/crane
+              i=0
+              DIGEST=""
+              while [ "${i}" -lt 90 ]; do
+                if DIGEST="$$(/tmp/crane digest "${OVERRIDE}" 2>/dev/null)"; then
+                  echo "Bundle image available: ${OVERRIDE} -> ${DIGEST}"
+                  break
+                fi
+                i=$$((i + 1))
+                echo "Waiting for bundle image (${i}/90)..."
+                sleep 20
+              done
+              if [ -z "${DIGEST}" ]; then
+                echo "ERROR: timed out waiting for ${OVERRIDE}" >&2
+                exit 1
+              fi
+              case "${OVERRIDE}" in
+                *@sha256:*)
+                  BUNDLE_PULLSPEC="${OVERRIDE}"
+                  ;;
+                *)
+                  REPO="$${OVERRIDE%:*}"
+                  BUNDLE_PULLSPEC="${REPO}@${DIGEST}"
+                  ;;
+              esac
+              BUNDLE_BUILDS_FILE="$$(mktemp)"
+              printf '%s\n' '---' "quay: ${BUNDLE_PULLSPEC}" >"${BUNDLE_BUILDS_FILE}"
+              echo "Wrote override bundle builds file:"
+              cat "${BUNDLE_BUILDS_FILE}"
+            else
+              echo "Using pin file ${BUNDLE_BUILDS_FILE}"
+            fi
+            ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh \
+              --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml \
+              --set-bundle-builds-file "${BUNDLE_BUILDS_FILE}"
+        # Network needed to wait on/resolve the on-PR bundle override.
         - name: HERMETIC
-          value: $(params.hermetic)
+          value: "false"
         - name: SOURCE_ARTIFACT
           value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       runAfter:

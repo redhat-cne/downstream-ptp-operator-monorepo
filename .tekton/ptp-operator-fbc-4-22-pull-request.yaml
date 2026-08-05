@@ -42,6 +42,10 @@ spec:
       value: "true"
     - name: hermetic
       value: "true"
+    # Embed the same-revision PR bundle so certsuite tests this PR's build,
+    # not the digest pinned in .konflux/catalog/bundle.builds.in.yaml.
+    - name: bundle-image-override
+      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22:on-pr-{{revision}}
   pipelineRef:
     name: fbc-pipeline
   taskRunTemplate:
