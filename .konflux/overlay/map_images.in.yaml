@@ -1,0 +1,26 @@
+---
+# Operator (manager)
+- key: manager
+  production: registry.redhat.io/openshift4/ptp-rhel9-operator
+  staging: registry.stage.redhat.io/openshift4/ptp-rhel9-operator
+#
+# linuxptp-daemon
+- key: linuxptp_daemon_image
+  production: registry.redhat.io/openshift4/ptp-rhel9
+  staging: registry.stage.redhat.io/openshift4/ptp-rhel9
+#
+# kube-rbac-proxy
+- key: kube_rbac_proxy_image
+  production: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
+  staging: registry.stage.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
+#
+# cloud-event-proxy
+- key: cloud_event_proxy_image
+  production: registry.redhat.io/openshift4/cloud-event-proxy-rhel9
+  staging: registry.stage.redhat.io/openshift4/cloud-event-proxy-rhel9
+#
+# must-gather
+- key: must_gather_image
+  production: registry.redhat.io/openshift4/ptp-operator-must-gather
+  staging: registry.stage.redhat.io/openshift4/ptp-operator-must-gather
+#
