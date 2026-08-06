@@ -92,4 +92,4 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 )
 
-replace github.com/k8snetworkplumbingwg/ptp-operator => ../..
+replace github.com/k8snetworkplumbingwg/ptp-operator v0.0.0-20260303163839-6140f5a2b152 => ../..
