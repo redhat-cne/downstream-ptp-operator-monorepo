@@ -24,8 +24,10 @@ SLEEP_SECONDS=20
 TENANT_PREFIX="quay.io/redhat-user-workloads/experimental-ptp-tenant/"
 CRANE_BIN=""
 
-log() { echo "[$SCRIPT_NAME] $*"; }
-die() { log "ERROR: $*" >&2; exit 1; }
+# Logs must go to stderr: wait_digest is captured via $(), and stdout pollution
+# would corrupt pin digests (breaking the bundle CSV YAML).
+log() { echo "[$SCRIPT_NAME] $*" >&2; }
+die() { log "ERROR: $*"; exit 1; }
 
 usage() {
   cat <<EOF
@@ -144,6 +146,9 @@ for i in "${!KEYS[@]}"; do
   if ! digest="$(wait_digest "${tagged}")"; then
     die "timed out waiting for ${tagged}"
   fi
+  # Defense in depth: only the digest line may appear on stdout.
+  digest="$(printf '%s\n' "${digest}" | tail -n1 | tr -d '[:space:]')"
+  [[ "${digest}" =~ ^sha256:[0-9a-f]+$ ]] || die "invalid digest for ${tagged}: ${digest}"
 
   new_target="${repo}@${digest}"
   if [[ "${target}" == "${new_target}" ]]; then
