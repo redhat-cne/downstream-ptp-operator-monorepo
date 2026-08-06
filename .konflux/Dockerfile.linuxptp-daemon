@@ -1,23 +1,20 @@
 ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.25
 ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9
 
+# Built with path-context "." so Hermeto/cachi2 RPM injection (repo root) is
+# visible to yum. Sources are copied from pkg/linuxptp-daemon/.
+
 FROM ${BUILDER_IMAGE} AS builder
 USER root
 WORKDIR /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon
-COPY . .
+COPY pkg/linuxptp-daemon/ .
 RUN make clean && make
 
 FROM ${RUNTIME_IMAGE}
 
-# KONFLUX=true is set via .konflux/container_build_args.conf on Konflux builds.
-# Hermetic RPM installs use the locked set from .konflux/rpms/linuxptp-daemon;
-# a full `yum update` pulls packages outside that lock and fails prefetch/build.
-ARG KONFLUX=false
-
-RUN if [ "$KONFLUX" != "true" ]; then \
-      yum -y update && yum -y update glibc; \
-    fi \
- && yum --setopt=skip_missing_names_on_install=False -y install \
+# Do not `yum update` here: hermetic builds only have the locked RPM set from
+# .konflux/rpms/linuxptp-daemon. A full update pulls unlocked packages and fails.
+RUN yum --setopt=skip_missing_names_on_install=False -y install \
       pciutils \
       linuxptp \
       ethtool \
@@ -35,6 +32,6 @@ RUN ln -s /usr/sbin/gpsd /usr/local/sbin/gpsd
 RUN ln -s /usr/bin/ubxtool /usr/local/bin/ubxtool
 
 COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon/bin/ptp /usr/local/bin/
-COPY ./extra/leap-seconds.list /usr/share/zoneinfo/leap-seconds.list
+COPY pkg/linuxptp-daemon/extra/leap-seconds.list /usr/share/zoneinfo/leap-seconds.list
 
 CMD ["/usr/local/bin/ptp"]

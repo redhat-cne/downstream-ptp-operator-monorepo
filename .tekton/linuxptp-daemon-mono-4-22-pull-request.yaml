@@ -32,8 +32,10 @@ spec:
       value:
         - linux/x86_64
         - linux/arm64
+    # Repo root so hermetic RPM injection from prefetch is in the build context.
+    # Dockerfile copies sources from pkg/linuxptp-daemon/.
     - name: path-context
-      value: pkg/linuxptp-daemon
+      value: .
     - name: dockerfile
       value: .konflux/Dockerfile.linuxptp-daemon
     - name: build-args-file
