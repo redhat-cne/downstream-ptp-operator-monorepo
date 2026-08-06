@@ -1,0 +1,8 @@
+name: "ptp-operator: netdevsim CI"
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  netdevsim-ci:
+    uses: redhat-cne/upstream-ptp-operator-monorepo/.github/workflows/_reusable-ptp-operator-netdevsim-ci.yml@main
