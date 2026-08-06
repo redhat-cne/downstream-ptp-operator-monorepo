@@ -39,13 +39,13 @@ arches:
     name: synce4l
     evr: 1.1.0-2.el9
     sourcerpm: synce4l-1.1.0-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/acl-2.3.1-4.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/acl-2.4.0-2.el9.aarch64.rpm
     repoid: baseos
-    size: 73011
-    checksum: sha256:a0a9b302d252d32c0da8100a0ad762852c22eeac4ccad0aaf72ad68a2bbd7a93
+    size: 77253
+    checksum: sha256:1d4ca14e2b7f2da10f486efe6d85822491cd961da95ba9218e155d671c095392
     name: acl
-    evr: 2.3.1-4.el9
-    sourcerpm: acl-2.3.1-4.el9.src.rpm
+    evr: 2.4.0-2.el9
+    sourcerpm: acl-2.4.0-2.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/bluez-libs-5.87+1.git30db66dc971b-1.el9.aarch64.rpm
     repoid: baseos
     size: 87628
@@ -172,6 +172,13 @@ arches:
     name: kmod-libs
     evr: 28-11.el9
     sourcerpm: kmod-28-11.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libacl-2.4.0-2.el9.aarch64.rpm
+    repoid: baseos
+    size: 24963
+    checksum: sha256:4b3f377d2ba55efbdc6c959e8216b383ce0b70fb2bf9f4b92776138f61ea47a4
+    name: libacl
+    evr: 2.4.0-2.el9
+    sourcerpm: acl-2.4.0-2.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libbpf-1.5.0-3.el9.aarch64.rpm
     repoid: baseos
     size: 188720
@@ -365,12 +372,12 @@ arches:
     checksum: sha256:675f10b1752218152a081e226248c6c044687d9336ada4d3050972c46c842473
     name: synce4l
     evr: 1.1.0-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/acl-2.3.1-4.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/acl-2.4.0-2.el9.src.rpm
     repoid: baseos-source
-    size: 534373
-    checksum: sha256:46bb73ec040aeffeca18dca0dff00985211ef995ffdb8be32fb0463c346b743b
+    size: 603792
+    checksum: sha256:5872b8f2484ea20cbdbcedad561e841fd3430027750ab6f5f93a5ba97bb70f29
     name: acl
-    evr: 2.3.1-4.el9
+    evr: 2.4.0-2.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/bluez-5.87+1.git30db66dc971b-1.el9.src.rpm
     repoid: baseos-source
     size: 1935385
@@ -583,13 +590,13 @@ arches:
     name: synce4l
     evr: 1.1.0-2.el9
     sourcerpm: synce4l-1.1.0-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/acl-2.3.1-4.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/acl-2.4.0-2.el9.x86_64.rpm
     repoid: baseos
-    size: 73013
-    checksum: sha256:dd11bab2ea0abdfa310362eace871422a003340bf223135626500f8f5a985f6b
+    size: 78016
+    checksum: sha256:706c131ab22d2b8f0834d8747a36a06d1c4c905d4e8ba79dd2ebfc33b4d8fa66
     name: acl
-    evr: 2.3.1-4.el9
-    sourcerpm: acl-2.3.1-4.el9.src.rpm
+    evr: 2.4.0-2.el9
+    sourcerpm: acl-2.4.0-2.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/bluez-libs-5.87+1.git30db66dc971b-1.el9.x86_64.rpm
     repoid: baseos
     size: 83814
@@ -716,6 +723,13 @@ arches:
     name: kmod-libs
     evr: 28-11.el9
     sourcerpm: kmod-28-11.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libacl-2.4.0-2.el9.x86_64.rpm
+    repoid: baseos
+    size: 25007
+    checksum: sha256:2d928a27d32720058d90b415dcf24a9df070393a5a5947117fb45524a8a9654a
+    name: libacl
+    evr: 2.4.0-2.el9
+    sourcerpm: acl-2.4.0-2.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libbpf-1.5.0-3.el9.x86_64.rpm
     repoid: baseos
     size: 188358
@@ -909,12 +923,12 @@ arches:
     checksum: sha256:675f10b1752218152a081e226248c6c044687d9336ada4d3050972c46c842473
     name: synce4l
     evr: 1.1.0-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/acl-2.3.1-4.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/acl-2.4.0-2.el9.src.rpm
     repoid: baseos-source
-    size: 534373
-    checksum: sha256:46bb73ec040aeffeca18dca0dff00985211ef995ffdb8be32fb0463c346b743b
+    size: 603792
+    checksum: sha256:5872b8f2484ea20cbdbcedad561e841fd3430027750ab6f5f93a5ba97bb70f29
     name: acl
-    evr: 2.3.1-4.el9
+    evr: 2.4.0-2.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/bluez-5.87+1.git30db66dc971b-1.el9.src.rpm
     repoid: baseos-source
     size: 1935385

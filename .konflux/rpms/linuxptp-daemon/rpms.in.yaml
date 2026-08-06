@@ -17,10 +17,12 @@ packages:
       only:
         - x86_64
         - aarch64
-# Force systemd-libs into the hermetic repo. The Dockerfile runs `yum -y update`
-# before installs; without matching libs, installing/updating systemd fails.
+# Force matching libs into the hermetic repo. CentOS Stream base images drift
+# ahead of pinned transitive deps (e.g. acl needing libacl=EVR); without these
+# reinstalls, hermetic yum fails with "nothing provides libacl…".
 reinstallPackages:
   - systemd-libs
+  - libacl
 contentOrigin:
   repofiles:
     - ./centos.repo
