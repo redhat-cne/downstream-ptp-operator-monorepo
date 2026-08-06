@@ -2,7 +2,7 @@
 # Operator (manager)
 - key: manager
   source: quay.io/openshift/origin-ptp-operator:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:8b86529dfe2e312f9839bc5ac899797bd3f49c62724975c1d70d31550ad687bd
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:a88e4afa46dddc57bed85a26c3b624b9bd45deb09d2f26d833a229066bf232f5
 #
 # linuxptp-daemon
 - key: linuxptp_daemon_image
