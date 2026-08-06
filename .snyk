@@ -1,0 +1,22 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.25.0
+exclude:
+  global:
+    - '**/*_test.go'
+    - test/**
+    - pkg/render/testdata/**
+    - hack
+    - scripts
+    - bin
+    - vendor
+# ignores vulnerabilities until expiry date; change duration by modifying expiry date
+ignore:
+  f0fd13c9-82e6-4cd6-bf2e-2cec2ec48a44:
+    - 'vendor/sigs.k8s.io/controller-runtime/pkg/log/log.go, line 64':
+        reason: >-
+          False Positive: The stack trace is possibly invoked only when
+          log.SetLogger() was never called. The log.SetLogger() is called in
+          main.go in ptp-operator so this is not an issue.
+        expires: 2054-12-31T00:00:00.000Z
+        created: 2024-06-14T20:52:14.051Z
+patch: {}

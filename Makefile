@@ -1,0 +1,390 @@
+# Load local .env if present
+ifneq (,$(wildcard ./.env))
+    include ./.env
+    export
+endif
+
+# VERSION defines the project version for the bundle.
+# Update this value when you upgrade the version of your project.
+# To re-generate a bundle for another specific version without changing the standard setup, you can:
+# - use the VERSION as arg of the bundle target (e.g make bundle VERSION=0.0.2)
+# - use environment variables to overwrite this value (e.g export VERSION=0.0.2)
+VERSION ?= 4.22
+
+# CHANNELS define the bundle channels used in the bundle.
+# Add a new line here if you would like to change its default config. (E.g CHANNELS = "preview,fast,stable")
+# To re-generate a bundle for other specific channels without changing the standard setup, you can:
+# - use the CHANNELS as arg of the bundle target (e.g make bundle CHANNELS=preview,fast,stable)
+# - use environment variables to overwrite this value (e.g export CHANNELS="preview,fast,stable")
+ifneq ($(origin CHANNELS), undefined)
+BUNDLE_CHANNELS := --channels=$(CHANNELS)
+endif
+
+# DEFAULT_CHANNEL defines the default channel used in the bundle.
+# Add a new line here if you would like to change its default config. (E.g DEFAULT_CHANNEL = "stable")
+# To re-generate a bundle for any other default channel without changing the default setup, you can:
+# - use the DEFAULT_CHANNEL as arg of the bundle target (e.g make bundle DEFAULT_CHANNEL=stable)
+# - use environment variables to overwrite this value (e.g export DEFAULT_CHANNEL="stable")
+ifneq ($(origin DEFAULT_CHANNEL), undefined)
+BUNDLE_DEFAULT_CHANNEL := --default-channel=$(DEFAULT_CHANNEL)
+endif
+BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
+
+# IMAGE_TAG_BASE defines the docker.io namespace and part of the image name for remote images.
+# This variable is used to construct full image tags for bundle and catalog images.
+#
+# For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
+# openshift.io/ptp-operator-bundle:$VERSION and openshift.io/ptp-operator-catalog:$VERSION.
+IMAGE_TAG_BASE ?= quay.io/openshift/origin-ptp-operator
+
+# BUNDLE_IMG defines the image:tag used for the bundle.
+# You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
+BUNDLE_IMG ?= $(IMAGE_TAG_BASE)-bundle:v$(VERSION)
+
+# BUNDLE_VERSION is the semver version of the bundle contents (includes the Deployment manifest)
+BUNDLE_VERSION ?= $(VERSION).0
+
+# BUNDLE_GEN_FLAGS are the flags passed to the operator-sdk generate bundle command
+BUNDLE_GEN_FLAGS ?= -q --overwrite --version $(BUNDLE_VERSION) $(BUNDLE_METADATA_OPTS) --extra-service-accounts "linuxptp-daemon"
+
+# Set the Operator SDK version to use. By default, what is installed on the system is used.
+# This is useful for CI or a project to utilize a specific version of the operator-sdk toolkit.
+OPERATOR_SDK_VERSION ?= v1.36.1-ocp
+
+# Image URL to use all building/pushing image targets
+IMG ?= quay.io/openshift/origin-ptp-operator:$(VERSION)
+
+# KUBECONFIG defines the kubeconfig file to use for the install, uninstall, deploy and undeploy targets.
+ifneq ($(origin KUBECONFIG), undefined)
+KUBECONFIG_OPTS := --kubeconfig=$(KUBECONFIG)
+endif
+
+#ARCH defines the architecture to use for the docker-build target.
+ARCH ?= $(shell uname -m)
+ifeq ($(ARCH),x86_64)
+BUILDARCH ?= --platform=linux/amd64
+endif
+ifneq ($(filter $(ARCH),aarch64 arm64),)
+BUILDARCH ?= --platform=linux/arm64
+endif
+
+# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
+endif
+
+# CONTAINER_TOOL defines the container tool to be used for building images.
+# Be aware that the target commands are only tested with Docker which is
+# scaffolded by default. However, you might want to replace it to use other
+# tools. (i.e. podman)
+CONTAINER_TOOL ?= docker
+
+# Setting SHELL to bash allows bash commands to be executed by recipes.
+# This is a requirement for 'setup-envtest.sh' in the test target.
+# Options are set to exit when a recipe line exits non-zero or a piped command fails.
+SHELL = /usr/bin/env bash -o pipefail
+.SHELLFLAGS = -ec
+
+OS := $(shell uname -s)
+
+all: bin
+
+##@ General
+
+# The help target prints out all targets with their descriptions organized
+# beneath their categories. The categories are represented by '##@' and the
+# target descriptions by '##'. The awk commands is responsible for reading the
+# entire set of makefiles included in this invocation, looking for lines of the
+# file as xyz: ## something, and then pretty-format the target and help. Then,
+# if there's a line with ##@ something, that gets pretty-printed as a category.
+# More info on the usage of ANSI control characters for terminal formatting:
+# https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
+# More info on the awk command:
+# http://linuxcommand.org/lc3_adv_awk.php
+
+help: ## Display this help.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
+##@ Development
+
+manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+	$(CONTROLLER_GEN) crd rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+
+generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+
+.PHONY: fmt
+fmt: ## Go fmt your code
+	hack/gofmt.sh
+
+.PHONY: fmt-code
+fmt-code: ## Run go fmt against code.
+	go fmt ./...
+
+.PHONY: vet
+vet: ## Run go vet against code.
+	go vet ./...
+
+#ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+#test: manifests generate fmt vet ## Run tests.
+#	mkdir -p ${ENVTEST_ASSETS_DIR}
+#	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.8.3/hack/setup-envtest.sh
+#	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out
+
+##@ Build
+
+build: generate fmt vet ## Build manager binary.
+	go build -o bin/manager main.go
+
+run: manifests generate fmt vet ## Run a controller from your host.
+	go run ./main.go
+
+docker-build: #test ## Build docker image with the manager.
+	$(CONTAINER_TOOL) build $(BUILDARCH) -t ${IMG} .
+
+docker-push: ## Push docker image with the manager.
+	$(CONTAINER_TOOL) push ${IMG}
+
+##@ Deployment
+
+install: manifests kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build config/crd | kubectl $(KUBECONFIG_OPTS) apply -f -
+
+uninstall: manifests kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build config/crd | kubectl $(KUBECONFIG_OPTS) delete -f - || true
+
+deploy: manifests kustomize update-env-yaml ## Deploy controller to the K8s cluster specified in ~/.kube/config.
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default | kubectl $(KUBECONFIG_OPTS) apply -f -
+	$(KUSTOMIZE) build config/custom | kubectl $(KUBECONFIG_OPTS) apply -f -
+	@$(MAKE) restore-env-yaml
+
+undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build config/default | kubectl $(KUBECONFIG_OPTS) delete -f - || true
+	$(KUSTOMIZE) build config/custom | kubectl $(KUBECONFIG_OPTS) delete -f - || true
+
+##@ Build Dependencies
+
+## Location to install dependencies to
+LOCALBIN ?= $(shell pwd)/bin
+$(LOCALBIN):
+	mkdir -p $(LOCALBIN)/x86_64/
+
+## Tool Binaries
+KUSTOMIZE ?= $(LOCALBIN)/kustomize
+CONTROLLER_GEN ?= $(LOCALBIN)/controller-gen
+ENVTEST ?= $(LOCALBIN)/setup-envtest
+
+## Tool Versions
+KUSTOMIZE_VERSION ?= v5.4.2
+CONTROLLER_TOOLS_VERSION ?= v0.18.0
+
+
+KUSTOMIZE_INSTALL_SCRIPT ?= "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+.PHONY: kustomize
+kustomize: $(KUSTOMIZE) ## Download kustomize locally if necessary. If wrong version is installed, it will be removed before downloading.
+$(KUSTOMIZE): $(LOCALBIN)
+	@if test -x $(LOCALBIN)/kustomize && ! $(LOCALBIN)/kustomize version | grep -q $(KUSTOMIZE_VERSION); then \
+		echo "$(LOCALBIN)/kustomize version is not expected $(KUSTOMIZE_VERSION). Removing it before installing."; \
+		rm -rf $(LOCALBIN)/kustomize; \
+	fi
+	test -s $(LOCALBIN)/kustomize || { curl -Ss $(KUSTOMIZE_INSTALL_SCRIPT) | bash -s -- $(subst v,,$(KUSTOMIZE_VERSION)) $(LOCALBIN); }
+
+.PHONY: controller-gen
+controller-gen: $(CONTROLLER_GEN) ## Download controller-gen locally if necessary. If wrong version is installed, it will be overwritten.
+$(CONTROLLER_GEN): $(LOCALBIN)
+	test -s $(LOCALBIN)/controller-gen && $(LOCALBIN)/controller-gen --version | grep -q $(CONTROLLER_TOOLS_VERSION) || \
+	GOFLAGS=-mod=mod GOBIN=$(LOCALBIN) go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
+
+.PHONY: operator-sdk
+
+OPERATOR_SDK ?= $(LOCALBIN)/x86_64/operator-sdk
+OPERATOR_SDK_VERSION_INSTALLED = $(shell $(OPERATOR_SDK) version 2>/dev/null | sed 's/^operator-sdk version: "\([^"]*\).*/\1/')
+operator-sdk: ## Download operator-sdk locally if necessary.
+ifneq ($(OPERATOR_SDK_VERSION),$(OPERATOR_SDK_VERSION_INSTALLED))
+ifeq ($(OS), Darwin)
+	mkdir -p $(LOCALBIN)/x86_64/
+	curl -L https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/operator-sdk/4.17.0/operator-sdk-v1.36.1-ocp-darwin-x86_64.tar.gz? | tar -xz -C bin/
+else
+	curl -L https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/operator-sdk/4.17.0/operator-sdk-v1.36.1-ocp-linux-x86_64.tar.gz? | tar -xz -C bin/
+endif
+endif
+
+ENV_YAML_BACKUP := config/manager/env.yaml.bak
+
+.PHONY: update-env-yaml
+update-env-yaml: ## Update config/manager/env.yaml with image variables if provided (creates backup)
+	@if [ -n "$(LINUXPTP_DAEMON_IMAGE)$(KUBE_RBAC_PROXY_IMAGE)$(SIDECAR_EVENT_IMAGE)" ]; then \
+		cp config/manager/env.yaml $(ENV_YAML_BACKUP); \
+		if [ -n "$(LINUXPTP_DAEMON_IMAGE)" ]; then \
+			if [ "$(OS)" = "Darwin" ]; then \
+				sed -i '' '/- name: LINUXPTP_DAEMON_IMAGE$$/,/value:/s|value: ".*"|value: "$(LINUXPTP_DAEMON_IMAGE)"|' config/manager/env.yaml; \
+			else \
+				sed -i '/- name: LINUXPTP_DAEMON_IMAGE$$/,/value:/s|value: ".*"|value: "$(LINUXPTP_DAEMON_IMAGE)"|' config/manager/env.yaml; \
+			fi; \
+		fi; \
+		if [ -n "$(SIDECAR_EVENT_IMAGE)" ]; then \
+			if [ "$(OS)" = "Darwin" ]; then \
+				sed -i '' '/- name: SIDECAR_EVENT_IMAGE$$/,/value:/s|value: ".*"|value: "$(SIDECAR_EVENT_IMAGE)"|' config/manager/env.yaml; \
+			else \
+				sed -i '/- name: SIDECAR_EVENT_IMAGE$$/,/value:/s|value: ".*"|value: "$(SIDECAR_EVENT_IMAGE)"|' config/manager/env.yaml; \
+			fi; \
+		fi; \
+	fi
+
+.PHONY: restore-env-yaml
+restore-env-yaml: ## Restore config/manager/env.yaml from backup
+	@if [ -f $(ENV_YAML_BACKUP) ]; then \
+		mv $(ENV_YAML_BACKUP) config/manager/env.yaml; \
+	fi
+
+.PHONY: bundle
+bundle: manifests kustomize operator-sdk update-env-yaml ## Generate bundle manifests and metadata, then validate generated files.
+	$(OPERATOR_SDK) generate kustomize manifests --interactive=false -q
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMG)
+	$(KUSTOMIZE) build config/manifests | $(OPERATOR_SDK) generate bundle $(BUNDLE_GEN_FLAGS)
+	$(OPERATOR_SDK) bundle validate ./bundle
+	rm -rf manifests/stable
+	cp -r bundle/manifests manifests/stable
+	# Use double quotes in values of olm.skipRange to match the expected regexp in art.yaml
+ifeq ($(OS), Darwin)
+	find . -type f -name "*.clusterserviceversion.yaml" -print0 | xargs -0 sed -i '' '/olm.skipRange:/s#'\''#"#g'
+else
+	find . -type f -name "*.clusterserviceversion.yaml" -print0 | xargs -0 sed -i '/olm.skipRange:/s#'\''#"#g'
+endif
+	@$(MAKE) restore-env-yaml
+
+.PHONY: bundle-build ## Build the bundle image.
+bundle-build:
+	$(CONTAINER_TOOL) build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+
+.PHONY: bundle-push
+bundle-push: ## Push the bundle image.
+	$(MAKE) docker-push IMG=$(BUNDLE_IMG)
+
+.PHONY: bundle-check
+bundle-check: common-deps-update generate manifests bundle
+	hack/check-git-tree.sh
+
+.PHONY: opm
+OPM = ./bin/opm
+opm: ## Download opm locally if necessary.
+ifeq (,$(wildcard $(OPM)))
+ifeq (,$(shell which opm 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(OPM)) ;\
+	OS=$(shell go env GOOS) && ARCH=$(shell go env GOARCH) && \
+	curl -sSLo $(OPM) https://github.com/operator-framework/operator-registry/releases/download/v1.60.0/$${OS}-$${ARCH}-opm ;\
+	chmod +x $(OPM) ;\
+	}
+else
+OPM = $(shell which opm)
+endif
+endif
+
+# A comma-separated list of bundle images (e.g. make catalog-build BUNDLE_IMGS=example.com/operator-bundle:v0.1.0,example.com/operator-bundle:v0.2.0).
+# These images MUST exist in a registry and be pull-able.
+BUNDLE_IMGS ?= $(BUNDLE_IMG)
+
+# The image tag given to the resulting catalog image (e.g. make catalog-build CATALOG_IMG=example.com/operator-catalog:v0.2.0).
+GPRC_CATALOG_IMG ?= $(IMAGE_TAG_BASE)-gprc-catalog:v$(VERSION)
+
+# Set GPRC_CATALOG_BASE_IMG to an existing catalog image tag to add $BUNDLE_IMGS to that image.
+ifneq ($(origin GPRC_CATALOG_BASE_IMG), undefined)
+FROM_INDEX_OPT := --from-index $(GPRC_CATALOG_BASE_IMG)
+endif
+
+# Build a catalog image by adding bundle images to an empty catalog using the operator package manager tool, 'opm'.
+# This recipe invokes 'opm' in 'semver' bundle add mode. For more information on add modes, see:
+# https://github.com/operator-framework/community-operators/blob/7f1438c/docs/packaging-operator.md#updating-your-existing-operator
+.PHONY: gprc-catalog-build
+gprc-catalog-build: opm ## Build a catalog image (legacy GPRC format)
+	$(OPM) index add --container-tool $(CONTAINER_TOOL) --mode semver --tag $(GPRC_CATALOG_IMG) --bundles $(BUNDLE_IMGS) $(FROM_INDEX_OPT)
+
+# Push the catalog image.
+.PHONY: gprc-catalog-push
+gprc-catalog-push: ## Push a catalog image (legacy GPRC format)
+	$(MAKE) docker-push IMG=$(GPRC_CATALOG_IMG)
+
+CATALOG_IMG ?= $(IMAGE_TAG_BASE)-catalog:v$(VERSION)
+CATALOG_DEFAULT_CHANNEL ?= alpha
+
+.PHONY: catalog/index.yaml
+catalog/index.yaml: README.md
+	@mkdir -p catalog
+	$(OPM) init ptp-operator -d README.md -c $(CATALOG_DEFAULT_CHANNEL) -o yaml >$@
+
+.PHONY: catalog/operator.yaml
+catalog/operator.yaml:
+	@mkdir -p catalog
+	$(OPM) render $(BUNDLE_IMGS) -o yaml >$@
+
+define CHANNEL_TEMPLATE
+---
+schema: olm.channel
+package: ptp-operator
+channel: $(CATALOG_DEFAULT_CHANNEL)
+name: $(CATALOG_DEFAULT_CHANNEL)
+entries:
+  - name: ptp-operator.v$(BUNDLE_VERSION)
+    skipRange: ">=4.3.0-0 <$(BUNDLE_VERSION)"
+endef
+
+.PHONY: catalog/channel.yaml
+catalog/channel.yaml:
+	$(eval BUNDLE_VERSION := $(shell yq <catalog/operator.yaml '.properties | map(select(.type == "olm.package"))[0].value.version'))
+	@echo "Detected bundle version $(BUNDLE_VERSION) from catalog/operator.yaml; Setting channel to match"
+	$(file > $@,$(CHANNEL_TEMPLATE))
+
+.PHONY: catalog.Dockerfile
+catalog.Dockerfile: catalog/index.yaml catalog/operator.yaml catalog/channel.yaml
+	@-rm -f $@
+	opm generate dockerfile catalog
+
+.PHONY: catalog-build
+catalog-build: catalog.Dockerfile catalog/index.yaml catalog/operator.yaml catalog/channel.yaml
+	$(OPM) validate catalog/
+	$(CONTAINER_TOOL) build -t ${CATALOG_IMG} -f catalog.Dockerfile .
+
+.PHONY: catalog-push
+catalog-push:
+	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+.PHONY: catalog-deploy
+catalog-deploy:
+	hack/catalog-deploy.sh $(CATALOG_IMG)
+
+.PHONY: catalog-undeploy
+catalog-undeploy:
+	hack/catalog-deploy.sh --remove
+
+.PHONY: common-deps-update
+common-deps-update:	controller-gen kustomize
+	go mod tidy && \
+	go mod vendor
+
+.PHONY: bin
+bin:
+	hack/build.sh
+
+image:
+	$(CONTAINER_TOOL) build -t openshift.io/ptp-operator -f Dockerfile.rhel7 .
+
+clean:
+	rm -rf build/_output/bin/ptp-operator
+
+functests:
+	SUITE=./test/conformance hack/run-functests.sh
+
+test-validation-only:
+	SUITE=./test/validation hack/run-functests.sh
+
+buildtest:
+	PATH=${PATH}:${GOBIN} ginkgo build ./test/conformance
+	cp ./test/conformance/conformance.test ./bin/testptp
+
+buildimage: buildtest
+	./scripts/image.sh

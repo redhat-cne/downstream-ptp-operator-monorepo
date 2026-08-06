@@ -1,0 +1,12 @@
+---
+global:
+ maxoffset: 100
+ minoffset: -100
+soaktest:
+  disable_all: false
+  slave_clock_sync:
+    spec:
+      failure_threshold: 10
+      duration: 5
+    desc: "some-description"
+    

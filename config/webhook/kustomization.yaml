@@ -1,0 +1,13 @@
+resources:
+- manifests.yaml
+- service.yaml
+
+configurations:
+- kustomizeconfig.yaml
+
+patches:
+- path: patches/patch_webhook_configuration.yaml
+  target:
+    version: v1
+    kind: ValidatingWebhookConfiguration
+    name: validating-webhook-configuration
