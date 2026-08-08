@@ -41,6 +41,16 @@ var (
 	DefaultTLSCiphers = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].Ciphers //nolint:gochecknoglobals
 	// DefaultMinTLSVersion is the default minimum TLS version for API servers.
 	DefaultMinTLSVersion = configv1.TLSProfiles[configv1.TLSProfileIntermediateType].MinTLSVersion //nolint:gochecknoglobals
+
+	// HTTP2NextProtos are the ALPN protocols advertised when HTTP/2 is enabled,
+	// with HTTP/1.1 fallback.
+	HTTP2NextProtos = []string{"h2", "http/1.1"} //nolint:gochecknoglobals
+
+	// HTTP1NextProtos are the ALPN protocols advertised when HTTP/2 is disabled,
+	// restricting negotiation to HTTP/1.1 only. This provides defense-in-depth
+	// against HTTP/2 Rapid Reset (CVE-2023-44487, CVE-2023-39325) alongside
+	// the primary fixes in Go 1.21.3+ and golang.org/x/net v0.17.0+.
+	HTTP1NextProtos = []string{"http/1.1"} //nolint:gochecknoglobals
 )
 
 // FetchAPIServerTLSProfile fetches the TLS profile spec configured in APIServer.
@@ -129,6 +139,34 @@ func NewTLSConfigFromProfile(profile configv1.TLSProfileSpec) (tlsConfig func(*t
 			tlsConf.CipherSuites = cipherSuites
 		}
 	}, unsupportedCiphers
+}
+
+// SetNextProtos returns a TLS configuration function that sets the ALPN
+// protocol negotiation list on a tls.Config. Empty strings are silently
+// ignored, which allows conditional protocol inclusion.
+// The returned function is intended to be used with controller-runtime's TLSOpts.
+//
+// Example:
+//
+//	// Disable HTTP/2:
+//	openshifttls.SetNextProtos("http/1.1")
+//
+//	// Enable HTTP/2 with fallback:
+//	openshifttls.SetNextProtos("h2", "http/1.1")
+//
+//	// Using the well-known protocol lists:
+//	openshifttls.SetNextProtos(openshifttls.HTTP1NextProtos...)
+//	openshifttls.SetNextProtos(openshifttls.HTTP2NextProtos...)
+func SetNextProtos(protos ...string) func(*tls.Config) {
+	var p []string
+	for _, proto := range protos {
+		if proto != "" {
+			p = append(p, proto)
+		}
+	}
+	return func(c *tls.Config) {
+		c.NextProtos = p
+	}
 }
 
 // cipherCode returns the TLS cipher code for an OpenSSL or IANA cipher name.
