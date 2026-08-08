@@ -12,7 +12,7 @@ require (
 	github.com/jaypipes/ghw v0.12.0
 	github.com/k8snetworkplumbingwg/ptp-operator v0.0.0-20260303163839-6140f5a2b152
 	github.com/mdlayher/genetlink v1.3.2
-	github.com/mdlayher/netlink v1.8.0
+	github.com/mdlayher/netlink v1.11.2
 	github.com/prometheus/client_golang v1.23.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stratoberry/go-gpsd v1.1.0
@@ -53,7 +53,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mdlayher/socket v0.5.1 // indirect
+	github.com/mdlayher/socket v0.6.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
