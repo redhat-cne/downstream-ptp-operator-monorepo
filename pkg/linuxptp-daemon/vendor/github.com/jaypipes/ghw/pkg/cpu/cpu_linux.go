@@ -7,37 +7,42 @@ package cpu
 
 import (
 	"bufio"
+	"context"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/jaypipes/ghw/pkg/context"
+	"github.com/jaypipes/ghw/internal/log"
 	"github.com/jaypipes/ghw/pkg/linuxpath"
 	"github.com/jaypipes/ghw/pkg/util"
 )
 
 var (
 	regexForCpulCore = regexp.MustCompile("^cpu([0-9]+)$")
+	onlineFile       = "online"
 )
 
-func (i *Info) load() error {
-	i.Processors = processorsGet(i.ctx)
+func (i *Info) load(ctx context.Context) error {
+	i.Processors = processorsGet(ctx)
 	var totCores uint32
 	var totThreads uint32
 	for _, p := range i.Processors {
-		totCores += p.NumCores
-		totThreads += p.NumThreads
+		totCores += p.TotalCores
+		totThreads += p.TotalHardwareThreads
 	}
 	i.TotalCores = totCores
+	i.TotalHardwareThreads = totThreads
+	// TODO(jaypipes): Remove TotalThreads before v1.0
 	i.TotalThreads = totThreads
 	return nil
 }
 
-func processorsGet(ctx *context.Context) []*Processor {
+func processorsGet(ctx context.Context) []*Processor {
 	paths := linuxpath.New(ctx)
 
 	lps := logicalProcessorsFromProcCPUInfo(ctx)
@@ -47,9 +52,9 @@ func processorsGet(ctx *context.Context) []*Processor {
 	// /sys/devices/system/cpu pseudodir contains N number of pseudodirs with
 	// information about the logical processors on the host. These logical
 	// processor pseudodirs are of the pattern /sys/devices/system/cpu/cpu{N}
-	fnames, err := ioutil.ReadDir(paths.SysDevicesSystemCPU)
+	fnames, err := os.ReadDir(paths.SysDevicesSystemCPU)
 	if err != nil {
-		ctx.Warn("failed to read /sys/devices/system/cpu: %s", err)
+		log.Warn(ctx, "failed to read /sys/devices/system/cpu: %s", err)
 		return []*Processor{}
 	}
 	for _, fname := range fnames {
@@ -60,17 +65,26 @@ func processorsGet(ctx *context.Context) []*Processor {
 
 		lpID, err := strconv.Atoi(matches[1])
 		if err != nil {
-			ctx.Warn("failed to find numeric logical processor ID: %s", err)
+			log.Warn(ctx, "failed to find numeric logical processor ID: %s", err)
 			continue
 		}
 
+		onlineFilePath := filepath.Join(paths.SysDevicesSystemCPU, fmt.Sprintf("cpu%d", lpID), onlineFile)
+		if _, err := os.Stat(onlineFilePath); err == nil {
+			if util.SafeIntFromFile(ctx, onlineFilePath) == 0 {
+				continue
+			}
+		} else if errors.Is(err, os.ErrNotExist) {
+			// Assume the CPU is online if the online state file doesn't exist
+			// (as is the case with older snapshots)
+		}
 		procID := processorIDFromLogicalProcessorID(ctx, lpID)
 		proc, found := procs[procID]
 		if !found {
 			proc = &Processor{ID: procID}
 			lp, ok := lps[lpID]
 			if !ok {
-				ctx.Warn(
+				log.Warn(ctx,
 					"failed to find attributes for logical processor %d",
 					lpID,
 				)
@@ -81,20 +95,36 @@ func processorsGet(ctx *context.Context) []*Processor {
 			// lps[lpID] describes logical processor `lpID`.
 			// Once got a more robust way of fetching the following info,
 			// can we drop /proc/cpuinfo.
+			// 1. Capabilities (Hardware Features)
 			if len(lp.Attrs["flags"]) != 0 { // x86
 				proc.Capabilities = strings.Split(lp.Attrs["flags"], " ")
 			} else if len(lp.Attrs["Features"]) != 0 { // ARM64
 				proc.Capabilities = strings.Split(lp.Attrs["Features"], " ")
+			} else if len(lp.Attrs["features"]) != 0 { // s390x
+				proc.Capabilities = strings.Split(lp.Attrs["features"], " ")
 			}
+
+			// 2. Model Detection
 			if len(lp.Attrs["model name"]) != 0 {
 				proc.Model = lp.Attrs["model name"]
+			} else if len(lp.Attrs["Processor"]) != 0 { // ARM
+				proc.Model = lp.Attrs["Processor"]
+			} else if len(lp.Attrs["cpu model"]) != 0 { // MIPS, ARM
+				proc.Model = lp.Attrs["cpu model"]
+			} else if len(lp.Attrs["Model Name"]) != 0 { // LoongArch
+				proc.Model = lp.Attrs["Model Name"]
 			} else if len(lp.Attrs["uarch"]) != 0 { // SiFive
 				proc.Model = lp.Attrs["uarch"]
+			} else if len(lp.Attrs["machine"]) != 0 {
+				proc.Model = lp.Attrs["machine"]
 			}
+			// 3. Vendor Detection
 			if len(lp.Attrs["vendor_id"]) != 0 {
 				proc.Vendor = lp.Attrs["vendor_id"]
 			} else if len(lp.Attrs["isa"]) != 0 { // RISCV64
 				proc.Vendor = lp.Attrs["isa"]
+			} else if lp.Attrs["CPU implementer"] == "0x41" { // ARM
+				proc.Vendor = "ARM"
 			}
 			procs[procID] = proc
 		}
@@ -102,17 +132,31 @@ func processorsGet(ctx *context.Context) []*Processor {
 		coreID := coreIDFromLogicalProcessorID(ctx, lpID)
 		core := proc.CoreByID(coreID)
 		if core == nil {
-			core = &ProcessorCore{ID: coreID, NumThreads: 1}
+			core = &ProcessorCore{
+				ID:                   coreID,
+				TotalHardwareThreads: 1,
+				// TODO(jaypipes): Remove NumThreads before v1.0
+				NumThreads: 1,
+			}
 			proc.Cores = append(proc.Cores, core)
+			proc.TotalCores += 1
+			// TODO(jaypipes): Remove NumCores before v1.0
 			proc.NumCores += 1
 		} else {
+			core.TotalHardwareThreads += 1
+			// TODO(jaypipes) Remove NumThreads before v1.0
 			core.NumThreads += 1
 		}
+		proc.TotalHardwareThreads += 1
+		// TODO(jaypipes) Remove NumThreads before v1.0
 		proc.NumThreads += 1
 		core.LogicalProcessors = append(core.LogicalProcessors, lpID)
 	}
 	res := []*Processor{}
 	for _, p := range procs {
+		for _, c := range p.Cores {
+			sort.Ints(c.LogicalProcessors)
+		}
 		res = append(res, p)
 	}
 	return res
@@ -120,7 +164,7 @@ func processorsGet(ctx *context.Context) []*Processor {
 
 // processorIDFromLogicalProcessorID returns the processor physical package ID
 // for the supplied logical processor ID
-func processorIDFromLogicalProcessorID(ctx *context.Context, lpID int) int {
+func processorIDFromLogicalProcessorID(ctx context.Context, lpID int) int {
 	paths := linuxpath.New(ctx)
 	// Fetch CPU ID
 	path := filepath.Join(
@@ -133,7 +177,7 @@ func processorIDFromLogicalProcessorID(ctx *context.Context, lpID int) int {
 
 // coreIDFromLogicalProcessorID returns the core ID for the supplied logical
 // processor ID
-func coreIDFromLogicalProcessorID(ctx *context.Context, lpID int) int {
+func coreIDFromLogicalProcessorID(ctx context.Context, lpID int) int {
 	paths := linuxpath.New(ctx)
 	// Fetch CPU ID
 	path := filepath.Join(
@@ -144,7 +188,7 @@ func coreIDFromLogicalProcessorID(ctx *context.Context, lpID int) int {
 	return util.SafeIntFromFile(ctx, path)
 }
 
-func CoresForNode(ctx *context.Context, nodeID int) ([]*ProcessorCore, error) {
+func CoresForNode(ctx context.Context, nodeID int) ([]*ProcessorCore, error) {
 	// The /sys/devices/system/node/nodeX directory contains a subdirectory
 	// called 'cpuX' for each logical processor assigned to the node. Each of
 	// those subdirectories contains a topology subdirectory which has a
@@ -172,7 +216,7 @@ func CoresForNode(ctx *context.Context, nodeID int) ([]*ProcessorCore, error) {
 		return c
 	}
 
-	files, err := ioutil.ReadDir(path)
+	files, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
@@ -192,11 +236,20 @@ func CoresForNode(ctx *context.Context, nodeID int) ([]*ProcessorCore, error) {
 		cpuPath := filepath.Join(path, filename)
 		procID, err := strconv.Atoi(filename[3:])
 		if err != nil {
-			ctx.Warn(
+			log.Warn(ctx,
 				"failed to determine procID from %s. Expected integer after 3rd char.",
 				filename,
 			)
 			continue
+		}
+		onlineFilePath := filepath.Join(cpuPath, onlineFile)
+		if _, err := os.Stat(onlineFilePath); err == nil {
+			if util.SafeIntFromFile(ctx, onlineFilePath) == 0 {
+				continue
+			}
+		} else if errors.Is(err, os.ErrNotExist) {
+			// Assume the CPU is online if the online state file doesn't exist
+			// (as is the case with older snapshots)
 		}
 		coreIDPath := filepath.Join(cpuPath, "topology", "core_id")
 		coreID := util.SafeIntFromFile(ctx, coreIDPath)
@@ -208,7 +261,9 @@ func CoresForNode(ctx *context.Context, nodeID int) ([]*ProcessorCore, error) {
 	}
 
 	for _, c := range cores {
-		c.NumThreads = uint32(len(c.LogicalProcessors))
+		c.TotalHardwareThreads = uint32(len(c.LogicalProcessors))
+		// TODO(jaypipes): Remove NumThreads before v1.0
+		c.NumThreads = c.TotalHardwareThreads
 	}
 
 	return cores, nil
@@ -293,7 +348,7 @@ type logicalProcessor struct {
 // with blank line-separated blocks of colon-delimited attribute name/value
 // pairs for a specific logical processor on the host.
 func logicalProcessorsFromProcCPUInfo(
-	ctx *context.Context,
+	ctx context.Context,
 ) map[int]*logicalProcessor {
 	paths := linuxpath.New(ctx)
 	r, err := os.Open(paths.ProcCpuinfo)
@@ -314,25 +369,41 @@ func logicalProcessorsFromProcCPUInfo(
 			// Output of /proc/cpuinfo has a blank newline to separate logical
 			// processors, so here we collect up all the attributes we've
 			// collected for this logical processor block
-			lpIDstr, ok := lpAttrs["processor"]
+			// s390x identifies CPUs via "cpu number", while most other
+			// architectures use "processor".
+			idStr, ok := lpAttrs["processor"]
 			if !ok {
-				ctx.Warn("expected to find 'processor' key in /proc/cpuinfo attributes")
-				continue
+				idStr, ok = lpAttrs["cpu number"]
 			}
-			lpID, _ := strconv.Atoi(lpIDstr)
-			lp := &logicalProcessor{
-				ID:    lpID,
-				Attrs: lpAttrs,
+
+			if ok {
+				id, _ := strconv.Atoi(idStr)
+				lps[id] = &logicalProcessor{
+					ID:    id,
+					Attrs: lpAttrs,
+				}
+				// Only reset attributes after a valid processor block is saved.
+				// This ensures that shared header metadata (like vendor_id on s390x)
+				// is carried over and available to the processor entries.
+				lpAttrs = map[string]string{}
+			} else if len(lpAttrs) > 0 {
+				// s390x header check: if we have 'vendor_id' but no 'processor' ID,
+				// it's the summary block. We don't warn and we don't reset lpAttrs
+				// so the vendor_id carries over to the first actual CPU block.
+				if _, isS390Header := lpAttrs["vendor_id"]; !isS390Header {
+					log.Warn(ctx,
+						"expected to find 'processor' or 'cpu number' key "+
+							"in /proc/cpuinfo attributes")
+				}
 			}
-			lps[lpID] = lp
-			// Reset the current set of processor attributes...
-			lpAttrs = map[string]string{}
 			continue
 		}
-		parts := strings.Split(line, ":")
-		key := strings.TrimSpace(parts[0])
-		value := strings.TrimSpace(parts[1])
-		lpAttrs[key] = value
+		parts := strings.SplitN(line, ":", 2)
+		if len(parts) >= 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+			lpAttrs[key] = value
+		}
 	}
 	return lps
 }
