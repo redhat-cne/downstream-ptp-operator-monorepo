@@ -1,11 +1,11 @@
 module github.com/k8snetworkplumbingwg/linuxptp-daemon
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/bigkevmcd/go-configparser v0.0.0-20240624060122-ccd05f93a9d2
-	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
+	github.com/facebook/time v0.0.0-20260806151811-3bff87c74334
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/golang/glog v1.2.5
 	github.com/google/goexpect v0.0.0-20210430020637-ab937bf7fd6f
@@ -67,7 +67,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.51.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect

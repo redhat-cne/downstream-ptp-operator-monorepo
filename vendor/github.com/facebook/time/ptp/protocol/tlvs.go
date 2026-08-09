@@ -40,6 +40,28 @@ func (t TLVHead) Type() TLVType {
 	return t.TLVType
 }
 
+// tlvMinSize maps TLV types to their minimum total marshal size (header + payload)
+var tlvMinSize = map[TLVType]int{
+	TLVRequestUnicastTransmission:           tlvHeadSize + 6,
+	TLVGrantUnicastTransmission:             tlvHeadSize + 8,
+	TLVCancelUnicastTransmission:            tlvHeadSize + 2,
+	TLVAcknowledgeCancelUnicastTransmission: tlvHeadSize + 2,
+	TLVAlternateTimeOffsetIndicator:         tlvHeadSize + 15,
+	TLVAlternateResponsePort:                tlvHeadSize + 2,
+}
+
+// checkTLVBufferSize checks if the buffer is large enough to marshal a TLV of the given type
+func checkTLVBufferSize(tlvType TLVType, b []byte) error {
+	minSize, ok := tlvMinSize[tlvType]
+	if !ok {
+		return fmt.Errorf("unknown TLV type %s (%d)", tlvType, tlvType)
+	}
+	if len(b) < minSize {
+		return fmt.Errorf("not enough buffer to marshal TLV type %s (%d), need %d, have %d", tlvType, tlvType, minSize, len(b))
+	}
+	return nil
+}
+
 func tlvHeadMarshalBinaryTo(t *TLVHead, b []byte) {
 	binary.BigEndian.PutUint16(b, uint16(t.TLVType))
 	binary.BigEndian.PutUint16(b[2:], t.LengthField)
@@ -91,14 +113,12 @@ func writeTLVs(tlvs []TLV, b []byte) (int, error) {
 	return pos, nil
 }
 
+// readTLVs reads TLVs from the bytes.
+// tlvs is passed to save on allocations and it's user's task to ensure it's empty
 func readTLVs(tlvs []TLV, maxLength int, b []byte) ([]TLV, error) {
 	pos := 0
 	var tlvType TLVType
-	for {
-		// packet can have trailing bytes, let's make sure we don't try to read past given length
-		if pos+tlvHeadSize > maxLength {
-			break
-		}
+	for pos+tlvHeadSize <= maxLength {
 		tlvType = TLVType(binary.BigEndian.Uint16(b[pos:]))
 
 		switch tlvType {
@@ -109,7 +129,6 @@ func readTLVs(tlvs []TLV, maxLength int, b []byte) ([]TLV, error) {
 			}
 			tlvs = append(tlvs, tlv)
 			pos += tlvHeadSize + int(tlv.LengthField)
-
 		case TLVGrantUnicastTransmission:
 			tlv := &GrantUnicastTransmissionTLV{}
 			if err := tlv.UnmarshalBinary(b[pos:]); err != nil {
@@ -117,7 +136,6 @@ func readTLVs(tlvs []TLV, maxLength int, b []byte) ([]TLV, error) {
 			}
 			tlvs = append(tlvs, tlv)
 			pos += tlvHeadSize + int(tlv.LengthField)
-
 		case TLVRequestUnicastTransmission:
 			tlv := &RequestUnicastTransmissionTLV{}
 			if err := tlv.UnmarshalBinary(b[pos:]); err != nil {
@@ -146,6 +164,13 @@ func readTLVs(tlvs []TLV, maxLength int, b []byte) ([]TLV, error) {
 			}
 			tlvs = append(tlvs, tlv)
 			pos += tlvHeadSize + int(tlv.LengthField)
+		case TLVAlternateResponsePort:
+			tlv := &AlternateResponsePortTLV{}
+			if err := tlv.UnmarshalBinary(b[pos:]); err != nil {
+				return tlvs, err
+			}
+			tlvs = append(tlvs, tlv)
+			pos += tlvHeadSize + int(tlv.LengthField)
 		default:
 			return tlvs, fmt.Errorf("reading TLV %s (%d) is not yet implemented", tlvType, tlvType)
 		}
@@ -165,6 +190,9 @@ type RequestUnicastTransmissionTLV struct {
 
 // MarshalBinaryTo marshals bytes to RequestUnicastTransmissionTLV
 func (t *RequestUnicastTransmissionTLV) MarshalBinaryTo(b []byte) (int, error) {
+	if err := checkTLVBufferSize(TLVRequestUnicastTransmission, b); err != nil {
+		return 0, err
+	}
 	tlvHeadMarshalBinaryTo(&t.TLVHead, b)
 	b[tlvHeadSize] = byte(t.MsgTypeAndReserved)
 	b[tlvHeadSize+1] = byte(t.LogInterMessagePeriod)
@@ -198,6 +226,9 @@ type GrantUnicastTransmissionTLV struct {
 
 // MarshalBinaryTo marshals bytes to GrantUnicastTransmissionTLV
 func (t *GrantUnicastTransmissionTLV) MarshalBinaryTo(b []byte) (int, error) {
+	if err := checkTLVBufferSize(TLVGrantUnicastTransmission, b); err != nil {
+		return 0, err
+	}
 	tlvHeadMarshalBinaryTo(&t.TLVHead, b)
 	b[tlvHeadSize] = byte(t.MsgTypeAndReserved)
 	b[tlvHeadSize+1] = byte(t.LogInterMessagePeriod)
@@ -232,6 +263,9 @@ type CancelUnicastTransmissionTLV struct {
 
 // MarshalBinaryTo marshals bytes to CancelUnicastTransmissionTLV
 func (t *CancelUnicastTransmissionTLV) MarshalBinaryTo(b []byte) (int, error) {
+	if err := checkTLVBufferSize(TLVCancelUnicastTransmission, b); err != nil {
+		return 0, err
+	}
 	tlvHeadMarshalBinaryTo(&t.TLVHead, b)
 	b[tlvHeadSize] = byte(t.MsgTypeAndFlags)
 	b[tlvHeadSize+1] = t.Reserved
@@ -260,6 +294,9 @@ type AcknowledgeCancelUnicastTransmissionTLV struct {
 
 // MarshalBinaryTo marshals bytes to AcknowledgeCancelUnicastTransmissionTLV
 func (t *AcknowledgeCancelUnicastTransmissionTLV) MarshalBinaryTo(b []byte) (int, error) {
+	if err := checkTLVBufferSize(TLVAcknowledgeCancelUnicastTransmission, b); err != nil {
+		return 0, err
+	}
 	tlvHeadMarshalBinaryTo(&t.TLVHead, b)
 	b[tlvHeadSize] = byte(t.MsgTypeAndFlags)
 	b[tlvHeadSize+1] = t.Reserved
@@ -290,6 +327,10 @@ type PathTraceTLV struct {
 
 // MarshalBinaryTo marshals bytes to PathTraceTLV
 func (t *PathTraceTLV) MarshalBinaryTo(b []byte) (int, error) {
+	size := tlvHeadSize + len(t.PathSequence)*8
+	if len(b) < size {
+		return 0, fmt.Errorf("not enough buffer to marshal TLV type %s (%d), need %d, have %d", TLVPathTrace, TLVPathTrace, size, len(b))
+	}
 	tlvHeadMarshalBinaryTo(&t.TLVHead, b)
 	pos := tlvHeadSize
 	for _, ps := range t.PathSequence {
@@ -308,7 +349,7 @@ func (t *PathTraceTLV) UnmarshalBinary(b []byte) error {
 		return err
 	}
 	t.PathSequence = []ClockIdentity{}
-	for i := 0; i*8 <= int(t.TLVHead.LengthField); i++ {
+	for i := 0; i*8 <= int(t.LengthField); i++ {
 		pos := tlvHeadSize + i*8
 		if pos+8 >= len(b) {
 			break
@@ -331,6 +372,9 @@ type AlternateTimeOffsetIndicatorTLV struct {
 
 // MarshalBinaryTo marshals bytes to AlternateTimeOffsetIndicatorTLV
 func (t *AlternateTimeOffsetIndicatorTLV) MarshalBinaryTo(b []byte) (int, error) {
+	if err := checkTLVBufferSize(TLVAlternateTimeOffsetIndicator, b); err != nil {
+		return 0, err
+	}
 	tlvHeadMarshalBinaryTo(&t.TLVHead, b)
 	b[tlvHeadSize] = t.KeyField
 	binary.BigEndian.PutUint32(b[tlvHeadSize+1:], uint32(t.CurrentOffset))
@@ -341,6 +385,9 @@ func (t *AlternateTimeOffsetIndicatorTLV) MarshalBinaryTo(b []byte) (int, error)
 		dd, err := t.DisplayName.MarshalBinary()
 		if err != nil {
 			return 0, fmt.Errorf("writing AlternateTimeOffsetIndicatorTLV DisplayName: %w", err)
+		}
+		if len(b) < size+len(dd) {
+			return 0, fmt.Errorf("not enough buffer to marshal AlternateTimeOffsetIndicatorTLV with DisplayName, need %d, have %d", size+len(dd), len(b))
 		}
 		copy(b[tlvHeadSize+15:], dd)
 		size += len(dd)
@@ -363,5 +410,39 @@ func (t *AlternateTimeOffsetIndicatorTLV) UnmarshalBinary(b []byte) error {
 	if err := t.DisplayName.UnmarshalBinary(b[tlvHeadSize+15:]); err != nil {
 		return fmt.Errorf("reading AlternateTimeOffsetIndicatorTLV DisplayName: %w", err)
 	}
+	return nil
+}
+
+// AlternateResponsePortTLV is a CSPTP optional TLV to switch response source port of the server
+// Offset flag indicates the number of the port steps, not the port number itself.
+// Ex:
+// 0 means no switch (use default port). For example 1234
+// 1 means next port. For example 4567
+// 2 means next next port. For example 6789
+// etc
+type AlternateResponsePortTLV struct {
+	TLVHead
+	Offset uint16
+}
+
+// MarshalBinaryTo marshals bytes to AlternateResponsePortTLV
+func (a *AlternateResponsePortTLV) MarshalBinaryTo(b []byte) (int, error) {
+	if err := checkTLVBufferSize(TLVAlternateResponsePort, b); err != nil {
+		return 0, err
+	}
+	tlvHeadMarshalBinaryTo(&a.TLVHead, b)
+	binary.BigEndian.PutUint16(b[tlvHeadSize:], a.Offset)
+	return tlvHeadSize + 2, nil
+}
+
+// UnmarshalBinary parses []byte and populates struct fields
+func (a *AlternateResponsePortTLV) UnmarshalBinary(b []byte) error {
+	if err := unmarshalTLVHeader(&a.TLVHead, b); err != nil {
+		return err
+	}
+	if err := checkTLVLength(&a.TLVHead, len(b), 2, true); err != nil {
+		return err
+	}
+	a.Offset = binary.BigEndian.Uint16(b[tlvHeadSize:])
 	return nil
 }

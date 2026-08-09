@@ -1,6 +1,6 @@
 module github.com/k8snetworkplumbingwg/ptp-operator
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/Masterminds/semver v1.5.0
@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/creasty/defaults v1.6.0
-	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
+	github.com/facebook/time v0.0.0-20260806151811-3bff87c74334
 	github.com/go-logr/logr v1.4.3
 	github.com/golang/glog v1.2.4
 	github.com/onsi/ginkgo/v2 v2.28.1
@@ -81,7 +81,7 @@ require (
 	go.uber.org/zap v1.27.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.51.0 // indirect
+	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect

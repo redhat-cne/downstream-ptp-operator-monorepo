@@ -98,6 +98,7 @@ const (
 	TLVAcknowledgeCancelUnicastTransmission TLVType = 0x0007
 	TLVPathTrace                            TLVType = 0x0008
 	TLVAlternateTimeOffsetIndicator         TLVType = 0x0009
+	TLVAlternateResponsePort                TLVType = 0x2007
 	// Remaining 52 tlvType TLVs not implemented
 )
 
@@ -112,6 +113,7 @@ var TLVTypeToString = map[TLVType]string{
 	TLVAcknowledgeCancelUnicastTransmission: "ACKNOWLEDGE_CANCEL_UNICAST_TRANSMISSION",
 	TLVPathTrace:                            "PATH_TRACE",
 	TLVAlternateTimeOffsetIndicator:         "ALTERNATE_TIME_OFFSET_INDICATOR",
+	TLVAlternateResponsePort:                "ALTERNATE_RESPONSE_PORT",
 }
 
 func (t TLVType) String() string {
@@ -705,11 +707,12 @@ func (p *PortAddress) UnmarshalBinary(b []byte) error {
 	}
 	p.NetworkProtocol = TransportType(binary.BigEndian.Uint16(b[0:]))
 	p.AddressLength = binary.BigEndian.Uint16(b[2:])
-	if len(b) < 4+int(p.AddressLength) {
+	addrLen := int(p.AddressLength)
+	if len(b) < 4+addrLen {
 		return fmt.Errorf("not enough data to decode PortAddress address")
 	}
-	p.AddressField = make([]byte, p.AddressLength)
-	copy(p.AddressField, b[4:4+p.AddressLength])
+	p.AddressField = make([]byte, addrLen)
+	copy(p.AddressField, b[4:4+addrLen])
 	return nil
 }
 

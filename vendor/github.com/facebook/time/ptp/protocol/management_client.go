@@ -26,14 +26,21 @@ import (
 
 // MgmtClient talks to ptp server over unix socket
 type MgmtClient struct {
-	Connection io.ReadWriter
-	Sequence   uint16
+	Connection   io.ReadWriter
+	Sequence     uint16
+	DomainNumber uint8
 }
 
-// SendPacket sends packet, incrementing sequence counter
+// SetDomainNumber sets the domain number for the client
+func (c *MgmtClient) SetDomainNumber(domainNumber uint8) {
+	c.DomainNumber = domainNumber
+}
+
+// SendPacket sends packet, incrementing sequence counter and sets the domain number
 func (c *MgmtClient) SendPacket(packet *Management) error {
 	c.Sequence++
 	packet.SetSequence(c.Sequence)
+	packet.SetDomainNumber(c.DomainNumber)
 	b, err := packet.MarshalBinary()
 	if err != nil {
 		return err
@@ -59,7 +66,7 @@ func (c *MgmtClient) Communicate(packet *Management) (*Management, error) {
 	}
 	errorPacket, ok := res.(*ManagementMsgErrorStatus)
 	if ok {
-		return nil, fmt.Errorf("got Management Error in response: %w", errorPacket.ManagementErrorStatusTLV.ManagementErrorID)
+		return nil, fmt.Errorf("got Management Error in response: %w", errorPacket.ManagementErrorID)
 	}
 	p, ok := res.(*Management)
 	if !ok {

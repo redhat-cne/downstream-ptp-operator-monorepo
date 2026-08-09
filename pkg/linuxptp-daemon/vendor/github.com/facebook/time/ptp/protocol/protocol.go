@@ -46,6 +46,22 @@ var (
 	PortGeneral = 320
 )
 
+// PDelay multicast addresses per IEEE1588 spec
+const (
+	// PDelayMulticastIPv6 is the PTP peer delay multicast address for IPv6
+	PDelayMulticastIPv6 = "ff02::6b"
+	// PDelayMulticastIPv4 is the PTP peer delay multicast address for IPv4
+	PDelayMulticastIPv4 = "224.0.0.107"
+)
+
+// TrailingBytes - PTP over UDPv6 requires adding extra two bytes that
+// may be modified by the initiator or an intermediate PTP Instance to ensure that the UDP checksum
+// remains uncompromised after any modification of PTP fields.
+// We simply always add them - in worst case they add extra 2 unused bytes when used over UDPv4.
+const TrailingBytes = 2
+
+var twoZeros = []byte{0, 0}
+
 // MgmtLogMessageInterval is the default LogInterval value used in Management packets
 const MgmtLogMessageInterval LogInterval = 0x7f // as per Table 42 Values of logMessageInterval field
 
@@ -99,6 +115,10 @@ func (p *Header) MessageType() MessageType {
 // SetSequence populates sequence field
 func (p *Header) SetSequence(sequence uint16) {
 	p.SequenceID = sequence
+}
+
+func (p *Header) SetDomainNumber(domainNumber uint8) {
+	p.DomainNumber = domainNumber
 }
 
 func checkPacketLength(p *Header, l int) error {
@@ -242,6 +262,7 @@ type SyncDelayReqBody struct {
 type SyncDelayReq struct {
 	Header
 	SyncDelayReqBody
+	TLVs []TLV
 }
 
 // MarshalBinaryTo marshals bytes to SyncDelayReq
@@ -252,12 +273,14 @@ func (p *SyncDelayReq) MarshalBinaryTo(b []byte) (int, error) {
 	n := headerMarshalBinaryTo(&p.Header, b)
 	copy(b[n:], p.OriginTimestamp.Seconds[:]) //uint48
 	binary.BigEndian.PutUint32(b[n+6:], p.OriginTimestamp.Nanoseconds)
-	return n + 10, nil
+	pos := n + 10
+	tlvLen, err := writeTLVs(p.TLVs, b[pos:])
+	return pos + tlvLen, err
 }
 
 // MarshalBinary converts packet to []bytes
 func (p *SyncDelayReq) MarshalBinary() ([]byte, error) {
-	buf := make([]byte, 44)
+	buf := make([]byte, 64)
 	n, err := p.MarshalBinaryTo(buf)
 	return buf[:n], err
 }
@@ -273,7 +296,11 @@ func (p *SyncDelayReq) UnmarshalBinary(b []byte) error {
 	}
 	copy(p.OriginTimestamp.Seconds[:], b[headerSize:]) //uint48
 	p.OriginTimestamp.Nanoseconds = binary.BigEndian.Uint32(b[headerSize+6:])
-	return nil
+
+	pos := headerSize + 10
+	var err error
+	p.TLVs, err = readTLVs(p.TLVs, int(p.MessageLength)-pos, b[pos:])
+	return err
 }
 
 // FollowUpBody Table 45 Follow_Up message fields
@@ -403,6 +430,70 @@ type PDelayRespFollowUp struct {
 	PDelayRespFollowUpBody
 }
 
+// ReqPDelay builds a Pdelay_Req packet
+func ReqPDelay(clockID ClockIdentity, portID uint16, seq uint16) *PDelayReq {
+	return &PDelayReq{
+		Header: Header{
+			SdoIDAndMsgType: NewSdoIDAndMsgType(MessagePDelayReq, 0),
+			Version:         Version,
+			SequenceID:      seq,
+			MessageLength:   headerSize + uint16(binary.Size(PDelayReqBody{})), //#nosec G115
+			FlagField:       0,
+			SourcePortIdentity: PortIdentity{
+				PortNumber:    portID,
+				ClockIdentity: clockID,
+			},
+			LogMessageInterval: 0x7f,
+		},
+		PDelayReqBody: PDelayReqBody{},
+	}
+}
+
+// RespPDelay builds a Pdelay_Resp packet
+func RespPDelay(clockID ClockIdentity, portID uint16, reqReceiptTS Timestamp, req *PDelayReq) *PDelayResp {
+	return &PDelayResp{
+		Header: Header{
+			SdoIDAndMsgType: NewSdoIDAndMsgType(MessagePDelayResp, 0),
+			Version:         Version,
+			SequenceID:      req.SequenceID,
+			MessageLength:   headerSize + uint16(binary.Size(PDelayRespBody{})), //#nosec G115
+			FlagField:       FlagTwoStep,
+			SourcePortIdentity: PortIdentity{
+				PortNumber:    portID,
+				ClockIdentity: clockID,
+			},
+			LogMessageInterval: 0x7f,
+		},
+		PDelayRespBody: PDelayRespBody{
+			RequestReceiptTimestamp: reqReceiptTS,
+			RequestingPortIdentity:  req.SourcePortIdentity,
+		},
+	}
+}
+
+// RespFollowUpPDelay builds a Pdelay_Resp_Follow_Up packet
+func RespFollowUpPDelay(clockID ClockIdentity, portID uint16, respOriginTS Timestamp, req *PDelayReq) *PDelayRespFollowUp {
+	return &PDelayRespFollowUp{
+		Header: Header{
+			SdoIDAndMsgType: NewSdoIDAndMsgType(MessagePDelayRespFollowUp, 0),
+			Version:         Version,
+			SequenceID:      req.SequenceID,
+			MessageLength:   headerSize + uint16(binary.Size(PDelayRespFollowUpBody{})), //#nosec G115
+			FlagField:       0,
+			SourcePortIdentity: PortIdentity{
+				PortNumber:    portID,
+				ClockIdentity: clockID,
+			},
+			CorrectionField:    req.CorrectionField,
+			LogMessageInterval: 0x7f,
+		},
+		PDelayRespFollowUpBody: PDelayRespFollowUpBody{
+			ResponseOriginTimestamp: respOriginTS,
+			RequestingPortIdentity:  req.SourcePortIdentity,
+		},
+	}
+}
+
 // Packet is an interface to abstract all different packets
 type Packet interface {
 	MessageType() MessageType
@@ -426,13 +517,7 @@ func BytesTo(p BinaryMarshalerTo, buf []byte) (int, error) {
 	return n + 2, nil
 }
 
-var twoZeros = []byte{0, 0}
-
 // Bytes converts any packet to []bytes
-// PTP over UDPv6 requires adding extra two bytes that
-// may be modified by the initiator or an intermediate PTP Instance to ensure that the UDP checksum
-// remains uncompromised after any modification of PTP fields.
-// We simply always add them - in worst case they add extra 2 unused bytes when used over UDPv4.
 func Bytes(p Packet) ([]byte, error) {
 	// interface smuggling
 	if pp, ok := p.(encoding.BinaryMarshaler); ok {
