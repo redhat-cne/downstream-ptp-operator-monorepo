@@ -1,6 +1,6 @@
 module github.com/redhat-cne/cloud-event-proxy
 
-go 1.23.0
+go 1.25.0
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
@@ -61,7 +61,7 @@ require (
 	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/term v0.31.0 // indirect
-	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
