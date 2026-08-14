@@ -187,7 +187,8 @@ spec:
                   BUNDLE_PULLSPEC="${REPO}@${DIGEST}"
                   ;;
               esac
-              BUNDLE_BUILDS_FILE="$$(mktemp)"
+              # Literal path so Tekton admission does not treat mktemp as a variable.
+              BUNDLE_BUILDS_FILE="/tmp/bundle.builds.override.yaml"
               printf '%s\n' '---' "quay: ${BUNDLE_PULLSPEC}" >"${BUNDLE_BUILDS_FILE}"
               echo "Wrote override bundle builds file:"
               cat "${BUNDLE_BUILDS_FILE}"
