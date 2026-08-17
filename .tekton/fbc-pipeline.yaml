@@ -170,16 +170,18 @@ spec:
                 https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
               tar -xzf /tmp/crane.tgz -C /tmp crane
               chmod +x /tmp/crane
+              # Avoid shell command substitution; Tekton validates paren-dollar refs.
               # 180*20s = 60m: on-PR bundle waits for daemon/operator/cep then builds.
               WAIT_ATTEMPTS=180
               i=0
               DIGEST=""
               while [ "${i}" -lt "${WAIT_ATTEMPTS}" ]; do
-                if DIGEST="$$(/tmp/crane digest "${OVERRIDE}" 2>/dev/null)"; then
+                if /tmp/crane digest "${OVERRIDE}" > /tmp/crane-digest.txt 2>/dev/null; then
+                  IFS= read -r DIGEST < /tmp/crane-digest.txt
                   echo "Bundle image available: ${OVERRIDE} -> ${DIGEST}"
                   break
                 fi
-                i=$$((i + 1))
+                i=`expr "${i}" + 1`
                 echo "Waiting for bundle image (${i}/${WAIT_ATTEMPTS})..."
                 sleep 20
               done
@@ -192,12 +194,11 @@ spec:
                   BUNDLE_PULLSPEC="${OVERRIDE}"
                   ;;
                 *)
-                  REPO="$${OVERRIDE%:*}"
+                  REPO="${OVERRIDE%:*}"
                   BUNDLE_PULLSPEC="${REPO}@${DIGEST}"
                   ;;
               esac
-              # Literal path so Tekton admission does not treat mktemp as a variable.
-              BUNDLE_BUILDS_FILE="/tmp/bundle.builds.override.yaml"
+              BUNDLE_BUILDS_FILE="/tmp/ptp-fbc-bundle-builds-override.yaml"
               printf '%s\n' '---' "quay: ${BUNDLE_PULLSPEC}" >"${BUNDLE_BUILDS_FILE}"
               echo "Wrote override bundle builds file:"
               cat "${BUNDLE_BUILDS_FILE}"
