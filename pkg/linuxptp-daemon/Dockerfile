@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9/go-toolset:1.25 AS builder
+FROM registry.access.redhat.com/ubi9/go-toolset:9.8-1787080706 AS builder
 ARG GIT_COMMIT="unknown"
 # Set as root to permission issues as its only for the builder
 USER root
