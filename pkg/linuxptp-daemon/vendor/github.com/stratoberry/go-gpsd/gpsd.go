@@ -61,6 +61,7 @@ type TPVReport struct {
 	Epd    float64   `json:"epd"`
 	Eps    float64   `json:"eps"`
 	Epc    float64   `json:"epc"`
+	Eph    float64   `json:"eph"`
 }
 
 // SKYReport reports sky view of GPS satellites
@@ -184,11 +185,14 @@ type ERRORReport struct {
 
 // Satellite describes a location of a GPS satellite
 type Satellite struct {
-	PRN  float64 `json:"PRN"`
-	Az   float64 `json:"az"`
-	El   float64 `json:"el"`
-	Ss   float64 `json:"ss"`
-	Used bool    `json:"used"`
+	PRN    float64 `json:"PRN"`
+	Az     float64 `json:"az"`
+	El     float64 `json:"el"`
+	Ss     float64 `json:"ss"`
+	Used   bool    `json:"used"`
+	GnssId float64 `json:"gnssid"`
+	SvId   float64 `json:"svid"`
+	Health float64 `json:"health"`
 }
 
 // Dial opens a new connection to GPSD.
