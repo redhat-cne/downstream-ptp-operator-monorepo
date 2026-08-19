@@ -46,6 +46,9 @@ spec:
     # not the digest pinned in .konflux/catalog/bundle.builds.in.yaml.
     - name: bundle-image-override
       value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22:on-pr-{{revision}}
+    # Network is required to wait for the on-PR bundle override.
+    - name: run-opm-pre-actions-hermetic
+      value: "false"
   pipelineRef:
     name: fbc-pipeline
   taskRunTemplate:

@@ -96,6 +96,13 @@ spec:
         same-revision bundle tag so certsuite tests the PR bundle. Leave empty
         on push/release to use the pin file.
       type: string
+    - name: run-opm-pre-actions-hermetic
+      default: 'true'
+      description: >
+        Whether run-opm-pre-actions (run-script-oci-ta) runs hermetically.
+        Push/release must stay true so Conforma hermetic_task.hermetic passes.
+        On-PR sets this false so the task can wait for bundle-image-override.
+      type: string
   results:
     - description: ''
       name: IMAGE_URL
@@ -198,9 +205,9 @@ spec:
             ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh \
               --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml \
               --set-bundle-builds-file "${BUNDLE_BUILDS_FILE}"
-        # Network needed to wait on/resolve the on-PR bundle override.
+        # Push/release: true (Conforma). On-PR: false (network for bundle override).
         - name: HERMETIC
-          value: "false"
+          value: $(params.run-opm-pre-actions-hermetic)
         - name: SOURCE_ARTIFACT
           value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       runAfter:
