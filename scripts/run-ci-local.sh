@@ -41,7 +41,8 @@ if [ -f test/go.mod ] && [ -f go.mod ]; then
     fi
 fi
 
-if [ "$NEEDS_FETCH" = true ]; then
+# Overlay netdevsim scripts from ptp-netdevsim-ci when they are not in this tree.
+if [ "$NEEDS_FETCH" = true ] || [ ! -x scripts/run-on-vm.sh ] || [ ! -d ptp-tools ]; then
     echo ""
     echo ">>> Fetching upstream test infrastructure..."
     if [ ! -f scripts/fetch-upstream-ci.sh ]; then
