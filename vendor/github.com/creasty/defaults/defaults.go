@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"encoding"
 	"encoding/json"
 	"errors"
 	"reflect"
@@ -61,6 +62,10 @@ func setField(field reflect.Value, defaultVal string) error {
 
 	isInitial := isInitialValue(field)
 	if isInitial {
+		if unmarshalByInterface(field, defaultVal) {
+			return nil
+		}
+
 		switch field.Kind() {
 		case reflect.Bool:
 			if val, err := strconv.ParseBool(defaultVal); err == nil {
@@ -164,7 +169,7 @@ func setField(field reflect.Value, defaultVal string) error {
 		}
 	case reflect.Slice:
 		for j := 0; j < field.Len(); j++ {
-			if err := setField(field.Index(j), defaultVal); err != nil {
+			if err := setField(field.Index(j), ""); err != nil {
 				return err
 			}
 		}
@@ -192,6 +197,24 @@ func setField(field reflect.Value, defaultVal string) error {
 	}
 
 	return nil
+}
+
+func unmarshalByInterface(field reflect.Value, defaultVal string) bool {
+	asText, ok := field.Addr().Interface().(encoding.TextUnmarshaler)
+	if ok && defaultVal != "" {
+		// if field implements encode.TextUnmarshaler, try to use it before decode by kind
+		if err := asText.UnmarshalText([]byte(defaultVal)); err == nil {
+			return true
+		}
+	}
+	asJSON, ok := field.Addr().Interface().(json.Unmarshaler)
+	if ok && defaultVal != "" && defaultVal != "{}" && defaultVal != "[]" {
+		// if field implements json.Unmarshaler, try to use it before decode by kind
+		if err := asJSON.UnmarshalJSON([]byte(defaultVal)); err == nil {
+			return true
+		}
+	}
+	return false
 }
 
 func isInitialValue(field reflect.Value) bool {

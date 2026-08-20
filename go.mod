@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/cloudevents/sdk-go/v2 v2.15.2
-	github.com/creasty/defaults v1.6.0
+	github.com/creasty/defaults v1.8.0
 	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
 	github.com/go-logr/logr v1.4.3
 	github.com/golang/glog v1.2.4
