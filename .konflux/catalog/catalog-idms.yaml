@@ -8,4 +8,4 @@ spec:
   imageDigestMirrors:
   - mirrors:
     - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22
-    source: registry.redhat.io/openshift4/ptp-operator-bundle
+    source: registry.redhat.io/experimental-ptp/ptp-operator-bundle-mono-operator-bundle

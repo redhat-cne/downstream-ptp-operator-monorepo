@@ -12,7 +12,8 @@
 # kube-rbac-proxy
 - key: kube_rbac_proxy_image
   source: quay.io/openshift/origin-kube-rbac-proxy:4.22
-  target: quay.io/openshift/origin-kube-rbac-proxy@sha256:c2b4bb716a14c5df2be3237ade5f36091bc0dd9a0d72f78dc7bd26ba8ca74184
+  # OCP 4.22.0-multi payload (linux/amd64, arm64, ppc64le, s390x). Origin tags are amd64-only.
+  target: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:12b1a0717eaaf845f912c1f954756641f5e8f5f36caa55dfb4203e0ce964a03d
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
