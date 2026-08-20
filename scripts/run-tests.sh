@@ -13,10 +13,8 @@
 #   --must-gather-image <url>       Full image URL for the ptp must-gather image.
 #                                   When provided, must-gather runs for oc mode and on failure.
 #
+set -x
 set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-GINKGO_HEADLINE_REWRITE="${SCRIPT_DIR}/ginkgo-headline-rewrite.sh"
 
 usage() {
   echo "Usage: $0 --kind <serial|parallel|both> --mode <modes> [--loglevel <level>] [--linuxptp-daemon-image <url>] [--must-gather-image <url>]"
@@ -58,17 +56,7 @@ JUNIT_OUTPUT_DIR="${JUNIT_OUTPUT_DIR:-/tmp/artifacts}"
 JUNIT_OUTPUT_FILE="${JUNIT_OUTPUT_FILE:-unit_report.xml}"
 SUITE=../test/conformance
 export KUBECONFIG=${KUBECONFIG:-~/.kube/config}
-
-# Install ginkgo (use -mod=mod since vendor directory exists)
-GOFLAGS=-mod=mod go install github.com/onsi/ginkgo/v2/ginkgo
-
-# Sync dependencies for test module (tests have their own go.mod)
-cd ../test
-go mod tidy
-cd -
-
-# Use mod mode for tests - test module has its own go.mod
-export GOFLAGS=-mod=mod
+go install github.com/onsi/ginkgo/v2/ginkgo
 
 mkdir -p "$JUNIT_OUTPUT_DIR"
 
@@ -77,8 +65,7 @@ export MIN_OFFSET_IN_NS="${MIN_OFFSET_IN_NS:--10000}"
 export COLLECT_POD_LOGS="${COLLECT_POD_LOGS:-true}"
 export LOG_ARTIFACTS_DIR="${LOG_ARTIFACTS_DIR:-${JUNIT_OUTPUT_DIR}/pod-logs}"
 
-CONFIG_YAML="$(mktemp "${PTP_RUN_DIR:-/tmp}/ptp-config.XXXXXX.yaml")"
-cat <<EOF >"${CONFIG_YAML}"
+cat <<EOF >config.yaml
 global:
   maxoffset: $MAX_OFFSET_IN_NS
   minoffset: $MIN_OFFSET_IN_NS
@@ -86,10 +73,9 @@ global:
   DisableAllSlaveRTUpdate: true
 EOF
 export USE_CONTAINER_CMDS=
-export PTP_TEST_CONFIG_FILE="${CONFIG_YAML}"
+export PTP_TEST_CONFIG_FILE="$(pwd)/config.yaml"
 export PTP_LOG_LEVEL
-# Use mod mode for tests - test module has its own go.mod
-export GOFLAGS=-mod=mod
+export GOFLAGS=-mod=vendor
 export KEEP_PTPCONFIG="${KEEP_PTPCONFIG:-true}"
 
 export SKIP_INTERFACES="${SKIP_INTERFACES:-eth0}"
@@ -144,7 +130,6 @@ run_must_gather() {
 
 on_exit() {
   local exit_code=$?
-  rm -f "${CONFIG_YAML:-}"
   if [[ ${exit_code} -ne 0 ]]; then
     echo "Script failed with exit code ${exit_code}, collecting must-gather..."
     run_must_gather
@@ -183,7 +168,7 @@ enable_switch_auth() {
 
 disable_switch_auth
 
-systemctl stop chronyd 2>/dev/null || systemctl stop chrony 2>/dev/null || true
+systemctl stop chronyd
 
 set -e
 
@@ -193,7 +178,6 @@ run_ginkgo_suite() {
   local junit_base="${JUNIT_OUTPUT_FILE%.xml}"
   local ginkgo_args=(
     --keep-going
-    --flake-attempts="${FLAKE_ATTEMPTS:-2}"
     --output-dir="${JUNIT_OUTPUT_DIR}"
     --junit-report="${junit_base}_${mode}_${suite_kind}.xml"
     -v
@@ -203,31 +187,11 @@ run_ginkgo_suite() {
     ginkgo_args+=(--skip="${skip}")
   done
 
-  local ginkgo_rc
-  set +e
-  if [[ "${PTP_GINKGO_HEADLINE_REWRITE:-1}" != "0" ]] && [[ -f "${GINKGO_HEADLINE_REWRITE}" ]]; then
-    case "${suite_kind}" in
-      parallel)
-        PTP_TEST_MODE="${mode}" ginkgo -p "${ginkgo_args[@]}" "${SUITE}/parallel" 2>&1 | bash "${GINKGO_HEADLINE_REWRITE}"
-        ;;
-      *)
-        PTP_TEST_MODE="${mode}" ginkgo "${ginkgo_args[@]}" "${SUITE}/serial" 2>&1 | bash "${GINKGO_HEADLINE_REWRITE}"
-        ;;
-    esac
-    ginkgo_rc=${PIPESTATUS[0]}
+  if [[ "${suite_kind}" == "parallel" ]]; then
+    PTP_TEST_MODE="${mode}" ginkgo -p "${ginkgo_args[@]}" "${SUITE}/parallel"
   else
-    case "${suite_kind}" in
-      parallel)
-        PTP_TEST_MODE="${mode}" ginkgo -p "${ginkgo_args[@]}" "${SUITE}/parallel"
-        ;;
-      *)
-        PTP_TEST_MODE="${mode}" ginkgo "${ginkgo_args[@]}" "${SUITE}/serial"
-        ;;
-    esac
-    ginkgo_rc=$?
+    PTP_TEST_MODE="${mode}" ginkgo "${ginkgo_args[@]}" "${SUITE}/serial"
   fi
-  set -e
-  return "${ginkgo_rc}"
 }
 
 for mode in "${TEST_MODES[@]}"; do

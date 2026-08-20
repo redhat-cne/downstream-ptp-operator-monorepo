@@ -1,9 +1,9 @@
 #!/bin/bash
 # Run CI tests locally on a VM using the latest upstream test infrastructure.
 #
-# On release branches, this fetches test/, scripts/, and hack/ from the
-# upstream monorepo main branch. On the upstream main branch, the test
-# infrastructure is already present and the fetch is skipped.
+# On release branches, this fetches test/ from the operator upstream and
+# scripts/ptp-tools from redhat-cne/ptp-netdevsim-ci. On the upstream main
+# branch, the test infrastructure is already present and the fetch is skipped.
 #
 # Usage:
 #   ./scripts/run-ci-local.sh <VM_IP> [UPSTREAM_REPO_URL]
