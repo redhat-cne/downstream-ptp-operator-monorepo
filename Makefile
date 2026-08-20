@@ -109,11 +109,16 @@ help: ## Display this help.
 
 ##@ Development
 
+# Nested modules (pkg/linuxptp-daemon, pkg/cloud-event-proxy, pkg/kube-rbac-proxy)
+# have their own go.mod. kube-rbac-proxy/scripts is a tools module without vendor
+# and controller-gen paths="./..." fails Prow bundle-check with inconsistent vendoring.
+CONTROLLER_GEN_PATHS ?= paths="./api/..." paths="./controllers/..."
+
 manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) crd rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+	$(CONTROLLER_GEN) crd rbac:roleName=manager-role webhook $(CONTROLLER_GEN_PATHS) output:crd:artifacts:config=config/crd/bases
 
 generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" $(CONTROLLER_GEN_PATHS)
 
 .PHONY: fmt
 fmt: ## Go fmt your code
