@@ -15,15 +15,10 @@ ENV GOFLAGS="-mod=vendor"
 ENV CGO_ENABLED=0
 RUN VERSION="$(cat VERSION)" && \
     COMMIT="$(cat .vendor-sha 2>/dev/null || echo vendored)" && \
-    LDFLAGS="-X k8s.io/component-base/version.gitVersion=${VERSION} -X k8s.io/component-base/version.gitCommit=${COMMIT} -X k8s.io/component-base/version/verflag.programName=kube-rbac-proxy" && \
-    if [ -f cmd/kube-rbac-proxy/main.go ]; then \
-      go build --installsuffix cgo -ldflags="${LDFLAGS}" -o /tmp/kube-rbac-proxy ./cmd/kube-rbac-proxy; \
-    elif [ -f main.go ]; then \
-      go build --installsuffix cgo -ldflags="${LDFLAGS}" -o /tmp/kube-rbac-proxy .; \
-    else \
-      echo "no kube-rbac-proxy main package (expected cmd/kube-rbac-proxy or main.go)" >&2; \
-      exit 1; \
-    fi
+    go build --installsuffix cgo \
+      -ldflags="-X k8s.io/component-base/version.gitVersion=${VERSION} -X k8s.io/component-base/version.gitCommit=${COMMIT} -X k8s.io/component-base/version/verflag.programName=kube-rbac-proxy" \
+      -o /tmp/kube-rbac-proxy \
+      github.com/brancz/kube-rbac-proxy/cmd/kube-rbac-proxy
 
 FROM ${RUNTIME_IMAGE}
 COPY --from=builder /tmp/kube-rbac-proxy /usr/bin/kube-rbac-proxy
