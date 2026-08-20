@@ -14,7 +14,13 @@ FROM ${RUNTIME_IMAGE}
 
 # Do not `yum update` here: hermetic builds only have the locked RPM set from
 # .konflux/rpms/linuxptp-daemon. A full update pulls unlocked packages and fails.
-RUN yum --setopt=skip_missing_names_on_install=False -y install \
+# allowed_downgrades: Stream9 base drifts ahead of the lock (e.g. systemd-libs);
+# reinstallPackages puts matching EVRs in the hermetic repo, but yum will not
+# downgrade without this option.
+RUN yum --setopt=skip_missing_names_on_install=False --setopt=allowed_downgrades=1 -y install \
+      libacl \
+      systemd-libs \
+      acl \
       pciutils \
       linuxptp \
       ethtool \

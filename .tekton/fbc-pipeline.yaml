@@ -170,15 +170,17 @@ spec:
                 https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
               tar -xzf /tmp/crane.tgz -C /tmp crane
               chmod +x /tmp/crane
+              # 180*20s = 60m: on-PR bundle waits for daemon/operator/cep then builds.
+              WAIT_ATTEMPTS=180
               i=0
               DIGEST=""
-              while [ "${i}" -lt 90 ]; do
+              while [ "${i}" -lt "${WAIT_ATTEMPTS}" ]; do
                 if DIGEST="$$(/tmp/crane digest "${OVERRIDE}" 2>/dev/null)"; then
                   echo "Bundle image available: ${OVERRIDE} -> ${DIGEST}"
                   break
                 fi
                 i=$$((i + 1))
-                echo "Waiting for bundle image (${i}/90)..."
+                echo "Waiting for bundle image (${i}/${WAIT_ATTEMPTS})..."
                 sleep 20
               done
               if [ -z "${DIGEST}" ]; then

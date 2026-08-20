@@ -23,6 +23,7 @@ packages:
 reinstallPackages:
   - systemd-libs
   - libacl
+  - acl
 contentOrigin:
   repofiles:
     - ./centos.repo
