@@ -298,41 +298,41 @@ arches:
     name: psmisc
     evr: 23.4-3.el9
     sourcerpm: psmisc-23.4-3.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-252-73.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 4146644
-    checksum: sha256:070abb72d752dc57904c2e749abfe307d89e68d7106be7ae5e1f1da28c343621
+    size: 4147251
+    checksum: sha256:0ae26d6e118c9b6480fab6e73722a13093dc13d6cb54e334fc3c3e5c1d54acad
     name: systemd
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-libs-252-73.el9.aarch64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-libs-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 635971
-    checksum: sha256:653b892df0463d81100868bb1346937d1df90ad50b672728fc64eb2a2287b450
+    size: 637115
+    checksum: sha256:17a76067e2da2f2225926056ecc698179f02994b0df55b41fb4591e0a24634f3
     name: systemd-libs
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-pam-252-73.el9.aarch64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-pam-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 255074
-    checksum: sha256:0a3472db111cd13413619df90e753c351144823903733a2f53e7ff690c3fc770
+    size: 256124
+    checksum: sha256:1be545c0c96792732fe2bd16d8774053730fbceed51053bdd2897b9e9f6bbab2
     name: systemd-pam
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-rpm-macros-252-73.el9.noarch.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-rpm-macros-252-76.el9.noarch.rpm
     repoid: baseos
-    size: 48038
-    checksum: sha256:221e27815552eff587336abbc5ead0f987979a3d889acae76ca2417d7df16ff6
+    size: 49015
+    checksum: sha256:87cadce972e5e47b044d5f8c02f8adb23fdd16dff83aa177620178491fa47fdc
     name: systemd-rpm-macros
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-udev-252-73.el9.aarch64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-udev-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 2067389
-    checksum: sha256:aeec50aa2071d3d5e6d7a62be9c49c89b77ac3f22a9a6adb6aecdeda20bbdca9
+    size: 2068141
+    checksum: sha256:80272c895c42e9a81475ecb41fb643337d58ac5231c468a3ac8987d1bb1fe562
     name: systemd-udev
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/util-linux-2.37.4-26.el9.aarch64.rpm
     repoid: baseos
     size: 2382702
@@ -540,12 +540,12 @@ arches:
     checksum: sha256:2329b39afa698fcd32740d79a22aeb3c822e1813ec7fae81f62e3c07c5ee133e
     name: psmisc
     evr: 23.4-3.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-73.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-76.el9.src.rpm
     repoid: baseos-source
-    size: 45031633
-    checksum: sha256:98ab80186ca23f36b590de54fd20b7957555e48b32b76aef1cadcd306b84d076
+    size: 45061473
+    checksum: sha256:51712b7d160a31382a920c00679047905acd4bf9a019f64cd9a578303e7ed4cc
     name: systemd
-    evr: 252-73.el9
+    evr: 252-76.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-26.el9.src.rpm
     repoid: baseos-source
     size: 6286573
@@ -849,41 +849,41 @@ arches:
     name: psmisc
     evr: 23.4-3.el9
     sourcerpm: psmisc-23.4-3.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-252-73.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 4393000
-    checksum: sha256:5d76a673a76554fe3efa3b757e9a23e070bc95a50c426195775ed17478d9bc24
+    size: 4397528
+    checksum: sha256:c214fe776670238e53642248f9bb83a60d32f5b00d1c367b7718142167a291d0
     name: systemd
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-libs-252-73.el9.x86_64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-libs-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 669233
-    checksum: sha256:d0cf83544def555086100cbc345cbf01a9a0159d352b8f280b9301bf1a5f8d6d
+    size: 670242
+    checksum: sha256:88339a324cf8c2862f26a90413bebb4c5ea6446d4b984ddd16c6b443cd391b09
     name: systemd-libs
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-pam-252-73.el9.x86_64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-pam-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 265532
-    checksum: sha256:9d5251bd650e85f1390d0ed445c87c2059dcbf84dbc9d1eda197e15ce4eabcfb
+    size: 266522
+    checksum: sha256:608e96497269804d60632b3c13c07817f12abb08f47f37c485e4869dbf15191e
     name: systemd-pam
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-rpm-macros-252-73.el9.noarch.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-rpm-macros-252-76.el9.noarch.rpm
     repoid: baseos
-    size: 48038
-    checksum: sha256:221e27815552eff587336abbc5ead0f987979a3d889acae76ca2417d7df16ff6
+    size: 49015
+    checksum: sha256:87cadce972e5e47b044d5f8c02f8adb23fdd16dff83aa177620178491fa47fdc
     name: systemd-rpm-macros
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-udev-252-73.el9.x86_64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-udev-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 2115983
-    checksum: sha256:d2870d41e5547d6843baac74d6bf2b1cf55491e12557523ac388d3b01bbb26aa
+    size: 2120062
+    checksum: sha256:ee0b43dbfd5c3c0a8b04e187ea5de4b4e9a6e78902358457bf618831e0ecfb9f
     name: systemd-udev
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/util-linux-2.37.4-26.el9.x86_64.rpm
     repoid: baseos
     size: 2377991
@@ -1091,12 +1091,12 @@ arches:
     checksum: sha256:2329b39afa698fcd32740d79a22aeb3c822e1813ec7fae81f62e3c07c5ee133e
     name: psmisc
     evr: 23.4-3.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-73.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-76.el9.src.rpm
     repoid: baseos-source
-    size: 45031633
-    checksum: sha256:98ab80186ca23f36b590de54fd20b7957555e48b32b76aef1cadcd306b84d076
+    size: 45061473
+    checksum: sha256:51712b7d160a31382a920c00679047905acd4bf9a019f64cd9a578303e7ed4cc
     name: systemd
-    evr: 252-73.el9
+    evr: 252-76.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-26.el9.src.rpm
     repoid: baseos-source
     size: 6286573
