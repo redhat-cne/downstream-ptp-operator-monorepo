@@ -20,7 +20,7 @@ spec:
         - quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22
       source: registry.redhat.io/experimental-ptp/cloud-event-proxy-mono-rhel9
     - mirrors:
-        - quay.io/openshift-release-dev/ocp-v4.0-art-dev
+        - quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-4-22
       source: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
     - mirrors:
         - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-22

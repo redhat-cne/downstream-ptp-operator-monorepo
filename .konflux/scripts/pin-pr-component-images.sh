@@ -4,8 +4,7 @@
 # bundle/FBC/certsuite path embeds freshly built operand images instead of the
 # last committed pins.
 #
-# Only rewrites targets under the Konflux tenant quay prefix. External pins
-# (e.g. kube-rbac-proxy) are left unchanged.
+# Only rewrites targets under the Konflux tenant quay prefix.
 #
 # Usage:
 #   pin-pr-component-images.sh --tag on-pr-<revision> [--pin-file PATH]
