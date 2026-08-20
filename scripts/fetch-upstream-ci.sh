@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# Fetch CI test artifacts from the upstream monorepo main branch and
-# overlay them onto the current downstream monorepo checkout for
-# local testing.
+# Fetch CI test artifacts for local testing of a downstream/release checkout.
+#
+# - test/, hack/, api/, pkg/ come from the operator upstream URL (main by default)
+# - scripts/ and ptp-tools/ come from redhat-cne/ptp-netdevsim-ci (shared netdevsim CI)
 #
 # Usage:
 #   ./scripts/fetch-upstream-ci.sh <upstream-repo-url>
 #
 # Run from the root of a downstream monorepo checkout (any branch).
-# Fetches test/, hack/, scripts/, ptp-tools/, api/ from upstream main,
-# creates a _base/ directory for test module resolution, and adjusts
+# Creates a _base/ directory for test module resolution, and adjusts
 # Go module paths so the test suite compiles against the upstream API
 # without modifying the local operator code.
 #
@@ -18,12 +18,16 @@
 #   ./scripts/fetch-upstream-ci.sh git@github.com:k8snetworkplumbingwg/ptp-operator.git
 #
 # Environment variables:
-#   MAIN_BRANCH  - upstream branch to fetch from (default: main)
+#   MAIN_BRANCH  - operator branch to fetch test/ from (default: main)
+#   CI_REPO_URL  - netdevsim CI repo (default: https://github.com/redhat-cne/ptp-netdevsim-ci.git)
+#   CI_BRANCH    - netdevsim CI branch (default: main)
 #
 set -euo pipefail
 
 UPSTREAM_URL="${1:?Usage: $0 <upstream-repo-url>}"
 MAIN_BRANCH="${MAIN_BRANCH:-main}"
+CI_REPO_URL="${CI_REPO_URL:-https://github.com/redhat-cne/ptp-netdevsim-ci.git}"
+CI_BRANCH="${CI_BRANCH:-main}"
 SOURCE_MODULE="github.com/k8snetworkplumbingwg/ptp-operator"
 
 if [ ! -f go.mod ]; then
@@ -34,26 +38,39 @@ fi
 TARGET_MODULE=$(grep "^module " go.mod | awk '{print $2}')
 
 BASE_DIR=$(mktemp -d)
-trap "rm -rf '$BASE_DIR'" EXIT
+CI_DIR=$(mktemp -d)
+trap "rm -rf '$BASE_DIR' '$CI_DIR'" EXIT
 
 echo "============================================"
 echo "  Fetch upstream CI artifacts"
 echo "============================================"
 echo "  Upstream:  $UPSTREAM_URL"
 echo "  Branch:    $MAIN_BRANCH"
+echo "  CI repo:   $CI_REPO_URL"
+echo "  CI branch: $CI_BRANCH"
 echo "  Target:    $(pwd)"
 echo "  Module:    $TARGET_MODULE"
 echo "============================================"
 
 echo ""
-echo ">>> Sparse-checkout upstream ($MAIN_BRANCH)..."
+echo ">>> Sparse-checkout operator ($MAIN_BRANCH)..."
 git clone --branch "$MAIN_BRANCH" --single-branch --depth 1 --no-checkout \
     "$UPSTREAM_URL" "$BASE_DIR" 2>&1 | tail -1
 cd "$BASE_DIR"
 git sparse-checkout init --cone
-# Full pkg/ is required so monorepo Dockerfiles can COPY pkg/linuxptp-daemon
-# and pkg/cloud-event-proxy when building images locally / via netdevsim CI helpers.
-git sparse-checkout set ptp-tools scripts hack test api pkg
+# Full pkg/ is required so netdevsim Dockerfiles can COPY pkg/linuxptp-daemon
+# and pkg/cloud-event-proxy when building images locally.
+git sparse-checkout set hack test api pkg
+git checkout 2>/dev/null
+cd - >/dev/null
+
+echo ""
+echo ">>> Sparse-checkout netdevsim CI ($CI_BRANCH)..."
+git clone --branch "$CI_BRANCH" --single-branch --depth 1 --no-checkout \
+    "$CI_REPO_URL" "$CI_DIR" 2>&1 | tail -1
+cd "$CI_DIR"
+git sparse-checkout init --cone
+git sparse-checkout set scripts ptp-tools
 git checkout 2>/dev/null
 cd - >/dev/null
 
@@ -61,16 +78,16 @@ echo ""
 echo ">>> Copying CI artifacts..."
 
 mkdir -p scripts
-cp -rf "$BASE_DIR/scripts/"* scripts/
-echo "  scripts/  (replaced from upstream)"
+cp -rf "$CI_DIR/scripts/"* scripts/
+echo "  scripts/  (replaced from $CI_REPO_URL)"
 
 mkdir -p hack
 cp -rf "$BASE_DIR/hack/"* hack/
 echo "  hack/     (replaced from upstream)"
 
 rm -rf ptp-tools
-cp -r "$BASE_DIR/ptp-tools" ptp-tools
-echo "  ptp-tools/ (replaced from upstream)"
+cp -r "$CI_DIR/ptp-tools" ptp-tools
+echo "  ptp-tools/ (replaced from $CI_REPO_URL)"
 
 rm -rf test
 cp -r "$BASE_DIR/test" test
@@ -122,7 +139,6 @@ fi
 echo ""
 echo "============================================"
 echo "  Done. You can now run tests locally with:"
-echo "    cd test && go mod tidy && cd .."
-echo "    ginkgo -v test/conformance/serial"
+echo "    export OPERATOR_ROOT=\$(pwd)"
+echo "    sudo ./scripts/run-on-vm.sh --dkms <VM_IP>"
 echo "============================================"
-

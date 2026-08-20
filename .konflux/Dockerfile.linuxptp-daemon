@@ -1,5 +1,6 @@
 ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.25
-ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9
+# Pin the floating stream9 tag so hermetic RPM lock (systemd-libs 252-76) stays aligned.
+ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9@sha256:64e5a212e4f2e7b706dbd822968914bb8def7de0a7fdfd3bf248241f8758101c
 
 # Built with path-context "." so Hermeto/cachi2 RPM injection (repo root) is
 # visible to yum. Sources are copied from pkg/linuxptp-daemon/.
@@ -14,7 +15,12 @@ FROM ${RUNTIME_IMAGE}
 
 # Do not `yum update` here: hermetic builds only have the locked RPM set from
 # .konflux/rpms/linuxptp-daemon. A full update pulls unlocked packages and fails.
-RUN yum --setopt=skip_missing_names_on_install=False -y install \
+# Install locked libacl/systemd-libs/acl so hermetic yum can satisfy exact EVRs.
+# allowed_downgrades is a safety net if the base ever has a newer matching NEVRA.
+RUN yum --setopt=skip_missing_names_on_install=False --setopt=allowed_downgrades=1 -y install \
+      libacl \
+      systemd-libs \
+      acl \
       pciutils \
       linuxptp \
       ethtool \

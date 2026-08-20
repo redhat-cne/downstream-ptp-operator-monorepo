@@ -23,6 +23,7 @@ packages:
 reinstallPackages:
   - systemd-libs
   - libacl
+  - acl
 contentOrigin:
   repofiles:
     - ./centos.repo
@@ -30,4 +31,4 @@ arches:
   - x86_64
   - aarch64
 context:
-  image: quay.io/centos/centos:stream9
+  image: quay.io/centos/centos:stream9@sha256:64e5a212e4f2e7b706dbd822968914bb8def7de0a7fdfd3bf248241f8758101c

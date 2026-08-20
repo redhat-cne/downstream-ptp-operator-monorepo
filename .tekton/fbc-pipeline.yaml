@@ -96,6 +96,13 @@ spec:
         same-revision bundle tag so certsuite tests the PR bundle. Leave empty
         on push/release to use the pin file.
       type: string
+    - name: run-opm-pre-actions-hermetic
+      default: 'true'
+      description: >
+        Whether run-opm-pre-actions (run-script-oci-ta) runs hermetically.
+        Push/release must stay true so Conforma hermetic_task.hermetic passes.
+        On-PR sets this false so the task can wait for bundle-image-override.
+      type: string
   results:
     - description: ''
       name: IMAGE_URL
@@ -163,15 +170,17 @@ spec:
                 https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
               tar -xzf /tmp/crane.tgz -C /tmp crane
               chmod +x /tmp/crane
+              # 180*20s = 60m: on-PR bundle waits for daemon/operator/cep then builds.
+              WAIT_ATTEMPTS=180
               i=0
               DIGEST=""
-              while [ "${i}" -lt 90 ]; do
+              while [ "${i}" -lt "${WAIT_ATTEMPTS}" ]; do
                 if DIGEST="$$(/tmp/crane digest "${OVERRIDE}" 2>/dev/null)"; then
                   echo "Bundle image available: ${OVERRIDE} -> ${DIGEST}"
                   break
                 fi
                 i=$$((i + 1))
-                echo "Waiting for bundle image (${i}/90)..."
+                echo "Waiting for bundle image (${i}/${WAIT_ATTEMPTS})..."
                 sleep 20
               done
               if [ -z "${DIGEST}" ]; then
@@ -198,9 +207,9 @@ spec:
             ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh \
               --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml \
               --set-bundle-builds-file "${BUNDLE_BUILDS_FILE}"
-        # Network needed to wait on/resolve the on-PR bundle override.
+        # Push/release: true (Conforma). On-PR: false (network for bundle override).
         - name: HERMETIC
-          value: "false"
+          value: $(params.run-opm-pre-actions-hermetic)
         - name: SOURCE_ARTIFACT
           value: $(tasks.clone-repository.results.SOURCE_ARTIFACT)
       runAfter:

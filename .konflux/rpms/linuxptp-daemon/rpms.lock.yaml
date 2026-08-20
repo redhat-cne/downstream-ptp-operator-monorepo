@@ -123,13 +123,13 @@ arches:
     name: ethtool
     evr: 2:6.19-1.el9
     sourcerpm: ethtool-6.19-1.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/hwdata-0.348-9.23.el9.noarch.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/hwdata-0.348-9.24.el9.noarch.rpm
     repoid: baseos
-    size: 1789091
-    checksum: sha256:09bf38157cef58e43785108b6a3dc59a746f3356feec967b6f908e628f4bf137
+    size: 1802687
+    checksum: sha256:ef9ff468eefa5655bc20eb0ace4fa4a54a6181e20b83f27167dd8d344485be9a
     name: hwdata
-    evr: 0.348-9.23.el9
-    sourcerpm: hwdata-0.348-9.23.el9.src.rpm
+    evr: 0.348-9.24.el9
+    sourcerpm: hwdata-0.348-9.24.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/iproute-6.17.0-3.el9.aarch64.rpm
     repoid: baseos
     size: 892216
@@ -207,13 +207,13 @@ arches:
     name: libedit
     evr: 3.1-39.20210216cvs.el9
     sourcerpm: libedit-3.1-39.20210216cvs.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libfdisk-2.37.4-26.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libfdisk-2.37.4-27.el9.aarch64.rpm
     repoid: baseos
-    size: 149753
-    checksum: sha256:9c956a9682e6e4f0deb73615569de274580da380f88af0672d9fbcf4e0dacd52
+    size: 149831
+    checksum: sha256:2ae747206879c75f0b14e08eda7460eee4f87c347b5b8933a031b75c6ee27c8b
     name: libfdisk
-    evr: 2.37.4-26.el9
-    sourcerpm: util-linux-2.37.4-26.el9.src.rpm
+    evr: 2.37.4-27.el9
+    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libmnl-1.0.4-16.el9.aarch64.rpm
     repoid: baseos
     size: 28385
@@ -256,13 +256,13 @@ arches:
     name: libutempter
     evr: 1.2.1-6.el9
     sourcerpm: libutempter-1.2.1-6.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/openssl-3.5.7-2.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/openssl-3.5.7-3.el9.aarch64.rpm
     repoid: baseos
-    size: 1537279
-    checksum: sha256:56ff7e328cb66a757a59c11e4176029d93c0c3586928268a7c6355cc6814e75f
+    size: 1537492
+    checksum: sha256:2a9e0201940a8bc4f47e457271985397f82e25576bebc94a4026c257a21b53f1
     name: openssl
-    evr: 1:3.5.7-2.el9
-    sourcerpm: openssl-3.5.7-2.el9.src.rpm
+    evr: 1:3.5.7-3.el9
+    sourcerpm: openssl-3.5.7-3.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/pam-1.5.1-30.el9.aarch64.rpm
     repoid: baseos
     size: 637557
@@ -298,55 +298,55 @@ arches:
     name: psmisc
     evr: 23.4-3.el9
     sourcerpm: psmisc-23.4-3.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-252-73.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 4146644
-    checksum: sha256:070abb72d752dc57904c2e749abfe307d89e68d7106be7ae5e1f1da28c343621
+    size: 4147251
+    checksum: sha256:0ae26d6e118c9b6480fab6e73722a13093dc13d6cb54e334fc3c3e5c1d54acad
     name: systemd
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-libs-252-73.el9.aarch64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-libs-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 635971
-    checksum: sha256:653b892df0463d81100868bb1346937d1df90ad50b672728fc64eb2a2287b450
+    size: 637115
+    checksum: sha256:17a76067e2da2f2225926056ecc698179f02994b0df55b41fb4591e0a24634f3
     name: systemd-libs
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-pam-252-73.el9.aarch64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-pam-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 255074
-    checksum: sha256:0a3472db111cd13413619df90e753c351144823903733a2f53e7ff690c3fc770
+    size: 256124
+    checksum: sha256:1be545c0c96792732fe2bd16d8774053730fbceed51053bdd2897b9e9f6bbab2
     name: systemd-pam
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-rpm-macros-252-73.el9.noarch.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-rpm-macros-252-76.el9.noarch.rpm
     repoid: baseos
-    size: 48038
-    checksum: sha256:221e27815552eff587336abbc5ead0f987979a3d889acae76ca2417d7df16ff6
+    size: 49015
+    checksum: sha256:87cadce972e5e47b044d5f8c02f8adb23fdd16dff83aa177620178491fa47fdc
     name: systemd-rpm-macros
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-udev-252-73.el9.aarch64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-udev-252-76.el9.aarch64.rpm
     repoid: baseos
-    size: 2067389
-    checksum: sha256:aeec50aa2071d3d5e6d7a62be9c49c89b77ac3f22a9a6adb6aecdeda20bbdca9
+    size: 2068141
+    checksum: sha256:80272c895c42e9a81475ecb41fb643337d58ac5231c468a3ac8987d1bb1fe562
     name: systemd-udev
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/util-linux-2.37.4-26.el9.aarch64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/util-linux-2.37.4-27.el9.aarch64.rpm
     repoid: baseos
-    size: 2382702
-    checksum: sha256:252e48bf1124c8f9b6c61b50b7ad9b3fd93169378bc90fb40515677e6b3b3e8d
+    size: 2382280
+    checksum: sha256:5e38d7b9b460d714e833889d1c49272feb40f0eb190ae936b5a0265d95c51df2
     name: util-linux
-    evr: 2.37.4-26.el9
-    sourcerpm: util-linux-2.37.4-26.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/util-linux-core-2.37.4-26.el9.aarch64.rpm
+    evr: 2.37.4-27.el9
+    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/util-linux-core-2.37.4-27.el9.aarch64.rpm
     repoid: baseos
-    size: 464975
-    checksum: sha256:774ef57a3b3bd1fb3ac8b112789f48f02ad18867e0e0589c582d36002481f652
+    size: 466061
+    checksum: sha256:30796f54ae7f633cc724739c9ae147b9cecfd55bf92b980d8461c394ce0a05b0
     name: util-linux-core
-    evr: 2.37.4-26.el9
-    sourcerpm: util-linux-2.37.4-26.el9.src.rpm
+    evr: 2.37.4-27.el9
+    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
   source:
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-2.el9.src.rpm
     repoid: appstream-source
@@ -420,12 +420,12 @@ arches:
     checksum: sha256:4115b7dfc7027b3e1cf6d8bc526d782692d98d36921a4d661a4b6aaea4411edb
     name: ethtool
     evr: 2:6.19-1.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/hwdata-0.348-9.23.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/hwdata-0.348-9.24.el9.src.rpm
     repoid: baseos-source
-    size: 2629578
-    checksum: sha256:80c98adc4e54be97ed399f1d29add9466344d499a40dd0c8f22d695a0ab24867
+    size: 2646536
+    checksum: sha256:9b494c73efc7535def746ae462b1a665c7f2cb04c00253a4acb2571a65ceb1d6
     name: hwdata
-    evr: 0.348-9.23.el9
+    evr: 0.348-9.24.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/iproute-6.17.0-3.el9.src.rpm
     repoid: baseos-source
     size: 976273
@@ -510,12 +510,12 @@ arches:
     checksum: sha256:6a7b894505d75a14077ab5734217c958d9054fa87f7b05d15f4f37681bee13ff
     name: lvm2
     evr: 9:2.03.33-6.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/openssl-3.5.7-2.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/openssl-3.5.7-3.el9.src.rpm
     repoid: baseos-source
-    size: 53364003
-    checksum: sha256:003cbc5c4ba4af2713cbc36b7381d3e71b68d1306294a4c17d59e6f17f214b1a
+    size: 53364303
+    checksum: sha256:f92853c179981de8cd132b1c19f9b764274a0840704da5de6c9b9bd517878017
     name: openssl
-    evr: 1:3.5.7-2.el9
+    evr: 1:3.5.7-3.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/pam-1.5.1-30.el9.src.rpm
     repoid: baseos-source
     size: 1139408
@@ -540,18 +540,18 @@ arches:
     checksum: sha256:2329b39afa698fcd32740d79a22aeb3c822e1813ec7fae81f62e3c07c5ee133e
     name: psmisc
     evr: 23.4-3.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-73.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-76.el9.src.rpm
     repoid: baseos-source
-    size: 45031633
-    checksum: sha256:98ab80186ca23f36b590de54fd20b7957555e48b32b76aef1cadcd306b84d076
+    size: 45061473
+    checksum: sha256:51712b7d160a31382a920c00679047905acd4bf9a019f64cd9a578303e7ed4cc
     name: systemd
-    evr: 252-73.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-26.el9.src.rpm
+    evr: 252-76.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-27.el9.src.rpm
     repoid: baseos-source
-    size: 6286573
-    checksum: sha256:55edeec4f36dde36bb70a53432722f159a2f16fcb8d7171d1a026e41bc127b14
+    size: 6287668
+    checksum: sha256:b9e7540ef979655bf778c2f32bb486b3e908565e033037f22122805496273f5c
     name: util-linux
-    evr: 2.37.4-26.el9
+    evr: 2.37.4-27.el9
   module_metadata: []
 - arch: x86_64
   packages:
@@ -674,13 +674,13 @@ arches:
     name: ethtool
     evr: 2:6.19-1.el9
     sourcerpm: ethtool-6.19-1.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/hwdata-0.348-9.23.el9.noarch.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/hwdata-0.348-9.24.el9.noarch.rpm
     repoid: baseos
-    size: 1789091
-    checksum: sha256:09bf38157cef58e43785108b6a3dc59a746f3356feec967b6f908e628f4bf137
+    size: 1802687
+    checksum: sha256:ef9ff468eefa5655bc20eb0ace4fa4a54a6181e20b83f27167dd8d344485be9a
     name: hwdata
-    evr: 0.348-9.23.el9
-    sourcerpm: hwdata-0.348-9.23.el9.src.rpm
+    evr: 0.348-9.24.el9
+    sourcerpm: hwdata-0.348-9.24.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/iproute-6.17.0-3.el9.x86_64.rpm
     repoid: baseos
     size: 887737
@@ -758,13 +758,13 @@ arches:
     name: libedit
     evr: 3.1-39.20210216cvs.el9
     sourcerpm: libedit-3.1-39.20210216cvs.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libfdisk-2.37.4-26.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libfdisk-2.37.4-27.el9.x86_64.rpm
     repoid: baseos
-    size: 154973
-    checksum: sha256:277978f3a04ea91c9529734ab0af5e0a825df05a3b545d1aa4344afd9c5f1926
+    size: 154919
+    checksum: sha256:b548802a8ca756bd0968969beeb5c1bb7836ec22755faed921b748b8c3b6828a
     name: libfdisk
-    evr: 2.37.4-26.el9
-    sourcerpm: util-linux-2.37.4-26.el9.src.rpm
+    evr: 2.37.4-27.el9
+    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libmnl-1.0.4-16.el9.x86_64.rpm
     repoid: baseos
     size: 28865
@@ -807,13 +807,13 @@ arches:
     name: libutempter
     evr: 1.2.1-6.el9
     sourcerpm: libutempter-1.2.1-6.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-3.5.7-2.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-3.5.7-3.el9.x86_64.rpm
     repoid: baseos
-    size: 1560448
-    checksum: sha256:f300e9e401691c215d3a09d90c6d71bf11e4028824c1f996139da7afb89f0c22
+    size: 1560549
+    checksum: sha256:3ec16bd697b1e8925ffb3577dafc6a69732f14016fd0921a9395ce9d9f2bc0fe
     name: openssl
-    evr: 1:3.5.7-2.el9
-    sourcerpm: openssl-3.5.7-2.el9.src.rpm
+    evr: 1:3.5.7-3.el9
+    sourcerpm: openssl-3.5.7-3.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/pam-1.5.1-30.el9.x86_64.rpm
     repoid: baseos
     size: 638724
@@ -849,55 +849,55 @@ arches:
     name: psmisc
     evr: 23.4-3.el9
     sourcerpm: psmisc-23.4-3.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-252-73.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 4393000
-    checksum: sha256:5d76a673a76554fe3efa3b757e9a23e070bc95a50c426195775ed17478d9bc24
+    size: 4397528
+    checksum: sha256:c214fe776670238e53642248f9bb83a60d32f5b00d1c367b7718142167a291d0
     name: systemd
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-libs-252-73.el9.x86_64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-libs-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 669233
-    checksum: sha256:d0cf83544def555086100cbc345cbf01a9a0159d352b8f280b9301bf1a5f8d6d
+    size: 670242
+    checksum: sha256:88339a324cf8c2862f26a90413bebb4c5ea6446d4b984ddd16c6b443cd391b09
     name: systemd-libs
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-pam-252-73.el9.x86_64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-pam-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 265532
-    checksum: sha256:9d5251bd650e85f1390d0ed445c87c2059dcbf84dbc9d1eda197e15ce4eabcfb
+    size: 266522
+    checksum: sha256:608e96497269804d60632b3c13c07817f12abb08f47f37c485e4869dbf15191e
     name: systemd-pam
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-rpm-macros-252-73.el9.noarch.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-rpm-macros-252-76.el9.noarch.rpm
     repoid: baseos
-    size: 48038
-    checksum: sha256:221e27815552eff587336abbc5ead0f987979a3d889acae76ca2417d7df16ff6
+    size: 49015
+    checksum: sha256:87cadce972e5e47b044d5f8c02f8adb23fdd16dff83aa177620178491fa47fdc
     name: systemd-rpm-macros
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-udev-252-73.el9.x86_64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-udev-252-76.el9.x86_64.rpm
     repoid: baseos
-    size: 2115983
-    checksum: sha256:d2870d41e5547d6843baac74d6bf2b1cf55491e12557523ac388d3b01bbb26aa
+    size: 2120062
+    checksum: sha256:ee0b43dbfd5c3c0a8b04e187ea5de4b4e9a6e78902358457bf618831e0ecfb9f
     name: systemd-udev
-    evr: 252-73.el9
-    sourcerpm: systemd-252-73.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/util-linux-2.37.4-26.el9.x86_64.rpm
+    evr: 252-76.el9
+    sourcerpm: systemd-252-76.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/util-linux-2.37.4-27.el9.x86_64.rpm
     repoid: baseos
-    size: 2377991
-    checksum: sha256:8900d11b64c15eeaac1708915d71745b610ce7a99f6515f6de4d3b5e718ce4af
+    size: 2375710
+    checksum: sha256:3cfa4add546aa6f87319c685980c1e451e9772d12fcd95cea6237288cc299eb7
     name: util-linux
-    evr: 2.37.4-26.el9
-    sourcerpm: util-linux-2.37.4-26.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/util-linux-core-2.37.4-26.el9.x86_64.rpm
+    evr: 2.37.4-27.el9
+    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/util-linux-core-2.37.4-27.el9.x86_64.rpm
     repoid: baseos
-    size: 466948
-    checksum: sha256:fa242f819e1ec7b39b016d41003a904a24a88308c2ea0417414506fe66660c87
+    size: 467005
+    checksum: sha256:dafdde295a33cea8ac397372808d2a958020790045be6cf1fefae1ce81919a77
     name: util-linux-core
-    evr: 2.37.4-26.el9
-    sourcerpm: util-linux-2.37.4-26.el9.src.rpm
+    evr: 2.37.4-27.el9
+    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
   source:
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-2.el9.src.rpm
     repoid: appstream-source
@@ -971,12 +971,12 @@ arches:
     checksum: sha256:4115b7dfc7027b3e1cf6d8bc526d782692d98d36921a4d661a4b6aaea4411edb
     name: ethtool
     evr: 2:6.19-1.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/hwdata-0.348-9.23.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/hwdata-0.348-9.24.el9.src.rpm
     repoid: baseos-source
-    size: 2629578
-    checksum: sha256:80c98adc4e54be97ed399f1d29add9466344d499a40dd0c8f22d695a0ab24867
+    size: 2646536
+    checksum: sha256:9b494c73efc7535def746ae462b1a665c7f2cb04c00253a4acb2571a65ceb1d6
     name: hwdata
-    evr: 0.348-9.23.el9
+    evr: 0.348-9.24.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/iproute-6.17.0-3.el9.src.rpm
     repoid: baseos-source
     size: 976273
@@ -1061,12 +1061,12 @@ arches:
     checksum: sha256:6a7b894505d75a14077ab5734217c958d9054fa87f7b05d15f4f37681bee13ff
     name: lvm2
     evr: 9:2.03.33-6.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/openssl-3.5.7-2.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/openssl-3.5.7-3.el9.src.rpm
     repoid: baseos-source
-    size: 53364003
-    checksum: sha256:003cbc5c4ba4af2713cbc36b7381d3e71b68d1306294a4c17d59e6f17f214b1a
+    size: 53364303
+    checksum: sha256:f92853c179981de8cd132b1c19f9b764274a0840704da5de6c9b9bd517878017
     name: openssl
-    evr: 1:3.5.7-2.el9
+    evr: 1:3.5.7-3.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/pam-1.5.1-30.el9.src.rpm
     repoid: baseos-source
     size: 1139408
@@ -1091,16 +1091,16 @@ arches:
     checksum: sha256:2329b39afa698fcd32740d79a22aeb3c822e1813ec7fae81f62e3c07c5ee133e
     name: psmisc
     evr: 23.4-3.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-73.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-76.el9.src.rpm
     repoid: baseos-source
-    size: 45031633
-    checksum: sha256:98ab80186ca23f36b590de54fd20b7957555e48b32b76aef1cadcd306b84d076
+    size: 45061473
+    checksum: sha256:51712b7d160a31382a920c00679047905acd4bf9a019f64cd9a578303e7ed4cc
     name: systemd
-    evr: 252-73.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-26.el9.src.rpm
+    evr: 252-76.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-27.el9.src.rpm
     repoid: baseos-source
-    size: 6286573
-    checksum: sha256:55edeec4f36dde36bb70a53432722f159a2f16fcb8d7171d1a026e41bc127b14
+    size: 6287668
+    checksum: sha256:b9e7540ef979655bf778c2f32bb486b3e908565e033037f22122805496273f5c
     name: util-linux
-    evr: 2.37.4-26.el9
+    evr: 2.37.4-27.el9
   module_metadata: []
