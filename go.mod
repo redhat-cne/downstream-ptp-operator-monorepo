@@ -25,8 +25,8 @@ require (
 	github.com/redhat-cne/privileged-daemonset v1.0.34
 	github.com/redhat-cne/ptp-listener-exports v0.0.7
 	github.com/redhat-cne/sdk-go v1.22.4
-	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.11.1
+	github.com/sirupsen/logrus v1.10.1
+	github.com/stretchr/testify v1.12.0
 	gopkg.in/yaml.v3 v3.0.1
 	k8s.io/api v0.35.2
 	k8s.io/apiextensions-apiserver v0.35.2
