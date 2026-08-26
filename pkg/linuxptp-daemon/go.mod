@@ -17,7 +17,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stratoberry/go-gpsd v1.1.0
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/sync v0.20.0
+	golang.org/x/sync v0.22.0
 	gonum.org/v1/gonum v0.16.0
 	k8s.io/api v0.35.2
 	k8s.io/apimachinery v0.35.2
