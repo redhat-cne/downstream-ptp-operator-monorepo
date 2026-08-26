@@ -1,0 +1,64 @@
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/redhat-cne/downstream-ptp-operator-monorepo?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/pull_request_number: '{{pull_request_number}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "true"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "pull_request" && target_branch == "release-5.0"
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: ptp-operator-mono-5-0
+    appstudio.openshift.io/component: cloud-event-proxy-mono-5-0
+    pipelines.appstudio.openshift.io/type: build
+  name: cloud-event-proxy-mono-5-0-on-pull-request
+  namespace: experimental-ptp-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: output-image
+      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-5-0:on-pr-{{revision}}
+    - name: image-expires-after
+      value: 5d
+    - name: build-platforms
+      value:
+        - linux/x86_64
+        - linux/arm64
+    - name: path-context
+      value: pkg/cloud-event-proxy
+    - name: dockerfile
+      value: .konflux/Dockerfile.cloud-event-proxy
+    - name: build-args-file
+      value: .konflux/container_build_args.conf
+    - name: hermetic
+      value: "true"
+    - name: dev-package-managers
+      value: "true"
+    - name: prefetch-input
+      value: '[{"type": "gomod", "path": "pkg/cloud-event-proxy"}]'
+    - name: build-source-image
+      value: "true"
+    - name: skip-sast-coverity
+      value: "true"
+    - name: additional-tags
+      value: ["on-pr-latest"]
+    - name: additional-labels
+      value:
+        - name=experimental-ptp/cloud-event-proxy-mono-rhel9
+  pipelineRef:
+    name: build-pipeline
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-cloud-event-proxy-mono-5-0
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{ git_auth_secret }}'
+status: {}
