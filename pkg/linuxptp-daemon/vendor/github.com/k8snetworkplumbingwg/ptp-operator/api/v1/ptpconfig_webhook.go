@@ -23,7 +23,6 @@ import (
 	"slices"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -133,25 +132,9 @@ func (r *PtpConfig) validate() error {
 						return errors.New("stdoutFilter='" + v + "' is invalid; " + err.Error())
 					}
 				case k == "logReduce":
-					logReduceMode := "false"
-					logReduceSettings := strings.Fields(v)
-					if len(logReduceSettings) >= 1 {
-						logReduceMode = strings.ToLower(logReduceSettings[0])
-					}
-					if logReduceMode != "true" && logReduceMode != "false" && logReduceMode != "basic" && logReduceMode != "enhanced" {
-						return errors.New("logReduce mode '" + logReduceMode + "' is invalid; mode must be in 'true', 'false, 'basic', or 'enhanced'")
-					}
-					if logReduceMode == "enhanced" {
-						if len(logReduceSettings) >= 2 {
-							if _, err := time.ParseDuration(logReduceSettings[1]); err != nil {
-								return errors.New("logReduce time " + logReduceSettings[1] + "' is invalid; must be a valid time duration (e.g. '30s')")
-							}
-						}
-						if len(logReduceSettings) >= 3 {
-							if threshold, err := strconv.Atoi(logReduceSettings[2]); err != nil || threshold < 0 {
-								return errors.New("logReduce threshold " + logReduceSettings[2] + "' is invalid; must be a non-negative integer")
-							}
-						}
+					v = strings.ToLower(v)
+					if v != "true" && v != "false" {
+						return errors.New("logReduce='" + v + "' is invalid; must be in 'true' or 'false'")
 					}
 				case k == "haProfiles":
 					if !profileRegEx.MatchString(v) {
@@ -161,30 +144,6 @@ func (r *PtpConfig) validate() error {
 					if !slices.Contains(clockTypes, v) {
 						return errors.New("clockType='" + v + "' is invalid; must be one of ['" + strings.Join(clockTypes, "', '") + "']")
 					}
-				case k == "inSyncConditionTimes":
-					// Validate inSyncConditionTimes is an unsigned integer
-					if _, err := strconv.ParseUint(v, 10, 32); err != nil {
-						return errors.New("inSyncConditionTimes='" + v + "' is invalid; must be an unsigned integer")
-					}
-				case k == "inSyncConditionThreshold":
-					// Validate inSyncConditionThreshold is an unsigned integer
-					if _, err := strconv.ParseUint(v, 10, 32); err != nil {
-						return errors.New("inSyncConditionThreshold='" + v + "' is invalid; must be an unsigned integer")
-					}
-
-				case strings.Contains(k, "clockId"):
-					// Allow explicit clockId
-					if _, err := strconv.ParseUint(v, 10, 64); err != nil {
-						if _, err := strconv.ParseUint(v, 16, 64); err != nil {
-							return errors.New("clockId='" + v + "' is invalid; must be an unsigned integer")
-						}
-					}
-				case k == "controllingProfile":
-					// Allow controllingProfile setting - no specific validation required for string
-				case k == "upstreamPort":
-					// Temporary allow upstreamPort setting - no specific validation required for string
-				case k == "leadingInterface":
-					// Temporary allow leadingInterface setting - no specific validation required for string
 				default:
 					return errors.New("profile.PtpSettings '" + k + "' is not a configurable setting")
 				}
