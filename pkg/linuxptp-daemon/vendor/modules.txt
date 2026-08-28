@@ -96,7 +96,7 @@ github.com/google/goexpect
 ## explicit; go 1.12
 github.com/google/gofuzz
 github.com/google/gofuzz/bytesource
-# github.com/google/goterm v0.0.0-20190703233501-fc88cf888a3f
+# github.com/google/goterm v0.0.0-20200907032337-555d40f16ae2
 ## explicit
 github.com/google/goterm/term
 # github.com/google/uuid v1.6.0
