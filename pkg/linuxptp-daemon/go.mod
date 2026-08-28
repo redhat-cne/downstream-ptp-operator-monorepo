@@ -1,6 +1,6 @@
 module github.com/openshift/linuxptp-daemon
 
-go 1.21
+go 1.25
 
 require github.com/openshift/ptp-operator v0.0.0-20230207052655-ede9197d99ca
 
@@ -18,7 +18,7 @@ require (
 	k8s.io/api v0.28.3
 	k8s.io/apimachinery v0.28.3
 	k8s.io/client-go v0.28.3
-	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
+	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
 )
 
 require (
