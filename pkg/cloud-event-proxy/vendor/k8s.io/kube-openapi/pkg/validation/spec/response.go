@@ -20,12 +20,22 @@ import (
 	"github.com/go-openapi/swag"
 	"k8s.io/kube-openapi/pkg/internal"
 	jsonv2 "k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json"
+	"k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/jsontext"
 )
 
 // ResponseProps properties specific to a response
 type ResponseProps struct {
 	Description string                 `json:"description,omitempty"`
 	Schema      *Schema                `json:"schema,omitempty"`
+	Headers     map[string]Header      `json:"headers,omitempty"`
+	Examples    map[string]interface{} `json:"examples,omitempty"`
+}
+
+// Marshaling structure only, always edit along with corresponding
+// struct (or compilation will fail).
+type responsePropsOmitZero struct {
+	Description string                 `json:"description,omitempty"`
+	Schema      *Schema                `json:"schema,omitzero"`
 	Headers     map[string]Header      `json:"headers,omitempty"`
 	Examples    map[string]interface{} `json:"examples,omitempty"`
 }
@@ -58,33 +68,30 @@ func (r *Response) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (r *Response) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.Decoder) error {
+func (r *Response) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 	var x struct {
 		ResponseProps
-		Extensions
+		Extensions Extensions `json:",inline"`
 	}
 
-	if err := opts.UnmarshalNext(dec, &x); err != nil {
+	if err := jsonv2.UnmarshalDecode(dec, &x); err != nil {
 		return err
 	}
 
-	r.Extensions = x.Extensions
+	if err := r.Refable.Ref.fromMap(x.Extensions); err != nil {
+		return err
+	}
+	r.Extensions = internal.SanitizeExtensions(x.Extensions)
 	r.ResponseProps = x.ResponseProps
-
-	if err := r.Refable.Ref.fromMap(r.Extensions); err != nil {
-		return err
-	}
-
-	r.Extensions.sanitize()
-	if len(r.Extensions) == 0 {
-		r.Extensions = nil
-	}
 
 	return nil
 }
 
 // MarshalJSON converts this items object to JSON
 func (r Response) MarshalJSON() ([]byte, error) {
+	if internal.UseOptimizedJSONMarshaling {
+		return internal.DeterministicMarshal(r)
+	}
 	b1, err := json.Marshal(r.ResponseProps)
 	if err != nil {
 		return nil, err
@@ -98,6 +105,18 @@ func (r Response) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	return swag.ConcatJSON(b1, b2, b3), nil
+}
+
+func (r Response) MarshalJSONTo(enc *jsontext.Encoder) error {
+	var x struct {
+		Ref           string                `json:"$ref,omitempty"`
+		Extensions    Extensions            `json:",inline"`
+		ResponseProps responsePropsOmitZero `json:",inline"`
+	}
+	x.Ref = r.Refable.Ref.String()
+	x.Extensions = internal.SanitizeExtensions(r.Extensions)
+	x.ResponseProps = responsePropsOmitZero(r.ResponseProps)
+	return jsonv2.MarshalEncode(enc, x)
 }
 
 // NewResponse creates a new response instance
