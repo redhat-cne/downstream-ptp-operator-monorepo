@@ -20,6 +20,7 @@ import (
 	"github.com/go-openapi/swag"
 	"k8s.io/kube-openapi/pkg/internal"
 	jsonv2 "k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json"
+	"k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/jsontext"
 )
 
 // ParamProps describes the specific attributes of an operation parameter
@@ -34,6 +35,17 @@ type ParamProps struct {
 	Required        bool    `json:"required,omitempty"`
 	Schema          *Schema `json:"schema,omitempty"`
 	AllowEmptyValue bool    `json:"allowEmptyValue,omitempty"`
+}
+
+// Marshaling structure only, always edit along with corresponding
+// struct (or compilation will fail).
+type paramPropsOmitZero struct {
+	Description     string  `json:"description,omitempty"`
+	Name            string  `json:"name,omitempty"`
+	In              string  `json:"in,omitempty"`
+	Required        bool    `json:"required,omitzero"`
+	Schema          *Schema `json:"schema,omitzero"`
+	AllowEmptyValue bool    `json:"allowEmptyValue,omitzero"`
 }
 
 // Parameter a unique parameter is defined by a combination of a [name](#parameterName) and [location](#parameterIn).
@@ -96,32 +108,31 @@ func (p *Parameter) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &p.ParamProps)
 }
 
-func (p *Parameter) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.Decoder) error {
+func (p *Parameter) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 	var x struct {
 		CommonValidations
 		SimpleSchema
-		Extensions
+		Extensions Extensions `json:",inline"`
 		ParamProps
 	}
-	if err := opts.UnmarshalNext(dec, &x); err != nil {
+	if err := jsonv2.UnmarshalDecode(dec, &x); err != nil {
 		return err
 	}
 	if err := p.Refable.Ref.fromMap(x.Extensions); err != nil {
 		return err
 	}
-	x.Extensions.sanitize()
-	if len(x.Extensions) == 0 {
-		x.Extensions = nil
-	}
 	p.CommonValidations = x.CommonValidations
 	p.SimpleSchema = x.SimpleSchema
-	p.VendorExtensible.Extensions = x.Extensions
+	p.Extensions = internal.SanitizeExtensions(x.Extensions)
 	p.ParamProps = x.ParamProps
 	return nil
 }
 
 // MarshalJSON converts this items object to JSON
 func (p Parameter) MarshalJSON() ([]byte, error) {
+	if internal.UseOptimizedJSONMarshaling {
+		return internal.DeterministicMarshal(p)
+	}
 	b1, err := json.Marshal(p.CommonValidations)
 	if err != nil {
 		return nil, err
@@ -143,4 +154,20 @@ func (p Parameter) MarshalJSON() ([]byte, error) {
 		return nil, err
 	}
 	return swag.ConcatJSON(b3, b1, b2, b4, b5), nil
+}
+
+func (p Parameter) MarshalJSONTo(enc *jsontext.Encoder) error {
+	var x struct {
+		CommonValidations commonValidationsOmitZero `json:",inline"`
+		SimpleSchema      simpleSchemaOmitZero      `json:",inline"`
+		ParamProps        paramPropsOmitZero        `json:",inline"`
+		Ref               string                    `json:"$ref,omitempty"`
+		Extensions        Extensions                `json:",inline"`
+	}
+	x.CommonValidations = commonValidationsOmitZero(p.CommonValidations)
+	x.SimpleSchema = simpleSchemaOmitZero(p.SimpleSchema)
+	x.Extensions = internal.SanitizeExtensions(p.Extensions)
+	x.ParamProps = paramPropsOmitZero(p.ParamProps)
+	x.Ref = p.Refable.Ref.String()
+	return jsonv2.MarshalEncode(enc, x)
 }

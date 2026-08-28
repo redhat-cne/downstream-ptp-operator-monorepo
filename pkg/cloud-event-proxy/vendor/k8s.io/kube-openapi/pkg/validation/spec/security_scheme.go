@@ -18,7 +18,9 @@ import (
 	"encoding/json"
 
 	"github.com/go-openapi/swag"
+	"k8s.io/kube-openapi/pkg/internal"
 	jsonv2 "k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json"
+	"k8s.io/kube-openapi/pkg/internal/third_party/go-json-experiment/json/jsontext"
 )
 
 // SecuritySchemeProps describes a swagger security scheme in the securityDefinitions section
@@ -45,6 +47,9 @@ type SecurityScheme struct {
 
 // MarshalJSON marshal this to JSON
 func (s SecurityScheme) MarshalJSON() ([]byte, error) {
+	if internal.UseOptimizedJSONMarshaling {
+		return internal.DeterministicMarshal(s)
+	}
 	b1, err := json.Marshal(s.SecuritySchemeProps)
 	if err != nil {
 		return nil, err
@@ -56,6 +61,16 @@ func (s SecurityScheme) MarshalJSON() ([]byte, error) {
 	return swag.ConcatJSON(b1, b2), nil
 }
 
+func (s SecurityScheme) MarshalJSONTo(enc *jsontext.Encoder) error {
+	var x struct {
+		Extensions Extensions `json:",inline"`
+		SecuritySchemeProps
+	}
+	x.Extensions = internal.SanitizeExtensions(s.Extensions)
+	x.SecuritySchemeProps = s.SecuritySchemeProps
+	return jsonv2.MarshalEncode(enc, x)
+}
+
 // UnmarshalJSON marshal this from JSON
 func (s *SecurityScheme) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &s.SecuritySchemeProps); err != nil {
@@ -64,19 +79,15 @@ func (s *SecurityScheme) UnmarshalJSON(data []byte) error {
 	return json.Unmarshal(data, &s.VendorExtensible)
 }
 
-func (s *SecurityScheme) UnmarshalNextJSON(opts jsonv2.UnmarshalOptions, dec *jsonv2.Decoder) error {
+func (s *SecurityScheme) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 	var x struct {
-		Extensions
+		Extensions Extensions `json:",inline"`
 		SecuritySchemeProps
 	}
-	if err := opts.UnmarshalNext(dec, &x); err != nil {
+	if err := jsonv2.UnmarshalDecode(dec, &x); err != nil {
 		return err
 	}
-	x.Extensions.sanitize()
-	if len(x.Extensions) == 0 {
-		x.Extensions = nil
-	}
-	s.VendorExtensible.Extensions = x.Extensions
+	s.Extensions = internal.SanitizeExtensions(x.Extensions)
 	s.SecuritySchemeProps = x.SecuritySchemeProps
 	return nil
 }
