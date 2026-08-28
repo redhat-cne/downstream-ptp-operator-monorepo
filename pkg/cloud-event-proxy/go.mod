@@ -1,6 +1,6 @@
 module github.com/redhat-cne/cloud-event-proxy
 
-go 1.19
+go 1.25
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
@@ -21,7 +21,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.24.2
 	k8s.io/apimachinery v0.26.3
 	k8s.io/client-go v0.24.2
-	k8s.io/utils v0.0.0-20221107191617-1a15be271d1d
+	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
 	sigs.k8s.io/controller-runtime v0.12.3
 )
 
