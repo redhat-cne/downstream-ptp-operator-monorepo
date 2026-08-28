@@ -10,7 +10,7 @@ require (
 	github.com/creasty/defaults v1.6.0
 	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
 	github.com/go-logr/logr v1.4.3
-	github.com/golang/glog v1.2.4
+	github.com/golang/glog v1.2.5
 	github.com/onsi/ginkgo/v2 v2.28.1
 	github.com/onsi/gomega v1.39.1
 	github.com/openshift/api v0.0.1
