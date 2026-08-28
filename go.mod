@@ -1,6 +1,6 @@
 module github.com/openshift/ptp-operator
 
-go 1.19
+go 1.25
 
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
@@ -22,7 +22,7 @@ require (
 	k8s.io/apimachinery v0.26.10-0.20231013031804-4eaec8069337
 	k8s.io/client-go v0.26.3
 	k8s.io/klog v1.0.0
-	k8s.io/utils v0.0.0-20230313181309-38a27ef9d749
+	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
 	sigs.k8s.io/controller-runtime v0.14.7-0.20231013144025-0e9da2e3cab7
 )
 
