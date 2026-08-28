@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	github.com/Masterminds/semver/v3 v3.3.0
-	github.com/bigkevmcd/go-configparser v0.0.0-20240624060122-ccd05f93a9d2
+	github.com/bigkevmcd/go-configparser v0.0.0-20260823144315-8f2e819df55d
 	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
 	github.com/golang/glog v1.2.4
 	github.com/google/goexpect v0.0.0-20210430020637-ab937bf7fd6f
