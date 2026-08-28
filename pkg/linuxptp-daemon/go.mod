@@ -1,8 +1,6 @@
 module github.com/k8snetworkplumbingwg/linuxptp-daemon
 
-go 1.23.0
-
-toolchain go1.24.1
+go 1.25
 
 require (
 	github.com/Masterminds/semver/v3 v3.3.0
@@ -23,7 +21,7 @@ require (
 	k8s.io/api v0.28.3
 	k8s.io/apimachinery v0.28.3
 	k8s.io/client-go v0.28.3
-	k8s.io/utils v0.0.0-20240902221715-702e33fdd3c3
+	k8s.io/utils v0.0.0-20260707023825-cf1189d6abe3
 	sigs.k8s.io/yaml v1.4.0
 )
 
