@@ -10,7 +10,7 @@ require (
 	github.com/jaypipes/ghw v0.12.0
 	github.com/mdlayher/genetlink v1.3.2
 	github.com/mdlayher/netlink v1.7.2
-	github.com/openshift/ptp-operator v0.0.0-20260130144609-2312fffc395b
+	github.com/openshift/ptp-operator v0.0.0-20260825074328-9b766f3f9e73
 	github.com/prometheus/client_golang v1.16.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stratoberry/go-gpsd v1.1.0
