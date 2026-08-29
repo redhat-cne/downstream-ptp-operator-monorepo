@@ -13,6 +13,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -69,6 +70,18 @@ type Protocol struct {
 	// If 0, DefaultShutdownTimeout is used.
 	ShutdownTimeout time.Duration
 
+	// readTimeout defines the http.Server ReadTimeout It is the maximum duration
+	// for reading the entire request, including the body. If not overwritten by an
+	// option, the default value (600s) is used
+	readTimeout *time.Duration
+
+	// writeTimeout defines the http.Server WriteTimeout It is the maximum duration
+	// before timing out writes of the response. It is reset whenever a new
+	// request's header is read. Like ReadTimeout, it does not let Handlers make
+	// decisions on a per-request basis. If not overwritten by an option, the
+	// default value (600s) is used
+	writeTimeout *time.Duration
+
 	// Port is the port configured to bind the receiver to. Defaults to 8080.
 	// If you want to know the effective port you're listening to, use GetListeningPort()
 	Port int
@@ -86,6 +99,7 @@ type Protocol struct {
 	server            *http.Server
 	handlerRegistered bool
 	middleware        []Middleware
+	limiter           RateLimiter
 
 	isRetriableFunc IsRetriable
 }
@@ -100,7 +114,10 @@ func New(opts ...Option) (*Protocol, error) {
 	}
 
 	if p.Client == nil {
-		p.Client = http.DefaultClient
+		// This is how http.DefaultClient is initialized. We do not just use
+		// that because when WithRoundTripper is used, it will change the client's
+		// transport, which would cause that transport to be used process-wide.
+		p.Client = &http.Client{}
 	}
 
 	if p.roundTripper != nil {
@@ -111,8 +128,23 @@ func New(opts ...Option) (*Protocol, error) {
 		p.ShutdownTimeout = DefaultShutdownTimeout
 	}
 
+	// use default timeout from abuse protection value
+	defaultTimeout := DefaultTimeout
+
+	if p.readTimeout == nil {
+		p.readTimeout = &defaultTimeout
+	}
+
+	if p.writeTimeout == nil {
+		p.writeTimeout = &defaultTimeout
+	}
+
 	if p.isRetriableFunc == nil {
 		p.isRetriableFunc = defaultIsRetriableFunc
+	}
+
+	if p.limiter == nil {
+		p.limiter = noOpLimiter{}
 	}
 
 	return p, nil
@@ -151,7 +183,14 @@ func (p *Protocol) Send(ctx context.Context, m binding.Message, transformers ...
 				buf := new(bytes.Buffer)
 				buf.ReadFrom(message.BodyReader)
 				errorStr := buf.String()
-				err = NewResult(res.StatusCode, "%s", errorStr)
+				// If the error is not wrapped, then append the original error string.
+				if og, ok := err.(*Result); ok {
+					og.Format = og.Format + "%s"
+					og.Args = append(og.Args, errorStr)
+					err = og
+				} else {
+					err = NewResult(res.StatusCode, "%w: %s", err, errorStr)
+				}
 			}
 		}
 	}
@@ -277,6 +316,20 @@ func (p *Protocol) Respond(ctx context.Context) (binding.Message, protocol.Respo
 // ServeHTTP implements http.Handler.
 // Blocks until ResponseFn is invoked.
 func (p *Protocol) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	// always apply limiter first using req context
+	ok, reset, err := p.limiter.Allow(req.Context(), req)
+	if err != nil {
+		p.incoming <- msgErr{msg: nil, err: fmt.Errorf("unable to acquire rate limit token: %w", err)}
+		rw.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if !ok {
+		rw.Header().Add("Retry-After", strconv.Itoa(int(reset)))
+		http.Error(rw, "limit exceeded", http.StatusTooManyRequests)
+		return
+	}
+
 	// Filter the GET style methods:
 	switch req.Method {
 	case http.MethodOptions:
@@ -332,6 +385,7 @@ func (p *Protocol) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		status := http.StatusOK
+		var errMsg string
 		if res != nil {
 			var result *Result
 			switch {
@@ -339,7 +393,7 @@ func (p *Protocol) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 				if result.StatusCode > 100 && result.StatusCode < 600 {
 					status = result.StatusCode
 				}
-
+				errMsg = fmt.Errorf(result.Format, result.Args...).Error()
 			case !protocol.IsACK(res):
 				// Map client errors to http status code
 				validationError := event.ValidationError{}
@@ -363,6 +417,9 @@ func (p *Protocol) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		rw.WriteHeader(status)
+		if _, err := rw.Write([]byte(errMsg)); err != nil {
+			return err
+		}
 		return nil
 	}
 
