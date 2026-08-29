@@ -2,7 +2,7 @@ module github.com/k8snetworkplumbingwg/linuxptp-daemon
 
 go 1.23.0
 
-toolchain go1.24.1
+toolchain go1.27.0
 
 require (
 	github.com/Masterminds/semver/v3 v3.3.0
