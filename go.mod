@@ -14,7 +14,7 @@ require (
 	github.com/openshift/library-go v0.0.0-20221011111038-5f521a3b6124
 	github.com/pkg/errors v0.9.1
 	github.com/redhat-cne/ptp-listener-exports v0.0.7
-	github.com/redhat-cne/ptp-listener-lib v0.1.6
+	github.com/redhat-cne/ptp-listener-lib v0.1.7
 	github.com/redhat-cne/sdk-go v0.1.1-0.20221202175356-6d25e1b3c0be
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.0

@@ -254,7 +254,7 @@ github.com/redhat-cne/channel-pubsub
 # github.com/redhat-cne/ptp-listener-exports v0.0.7
 ## explicit; go 1.19
 github.com/redhat-cne/ptp-listener-exports
-# github.com/redhat-cne/ptp-listener-lib v0.1.6
+# github.com/redhat-cne/ptp-listener-lib v0.1.7
 ## explicit; go 1.19
 github.com/redhat-cne/ptp-listener-lib
 # github.com/redhat-cne/sdk-go v0.1.1-0.20221202175356-6d25e1b3c0be
