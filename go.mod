@@ -24,7 +24,7 @@ require (
 	github.com/redhat-cne/graphsolver-lib v0.0.5
 	github.com/redhat-cne/l2discovery-exports v0.0.4
 	github.com/redhat-cne/l2discovery-lib v0.0.13
-	github.com/redhat-cne/privileged-daemonset v1.0.34
+	github.com/redhat-cne/privileged-daemonset v1.0.35
 	github.com/redhat-cne/ptp-listener-exports v0.0.7
 	github.com/redhat-cne/sdk-go v1.22.4
 	github.com/sirupsen/logrus v1.9.3
