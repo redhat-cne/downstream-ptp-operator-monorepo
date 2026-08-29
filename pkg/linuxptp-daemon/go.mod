@@ -1,6 +1,6 @@
 module github.com/openshift/linuxptp-daemon
 
-go 1.20
+go 1.21
 
 require github.com/openshift/ptp-operator v0.0.0-20230207052655-ede9197d99ca
 
@@ -39,7 +39,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/goterm v0.0.0-20190703233501-fc88cf888a3f // indirect
 	github.com/google/uuid v1.6.0 // indirect
