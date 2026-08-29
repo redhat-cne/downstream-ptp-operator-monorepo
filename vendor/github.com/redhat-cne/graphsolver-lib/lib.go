@@ -67,9 +67,17 @@ func (config configObject) PrintSolutions(all bool) {
 	}
 }
 
-// Prints the first solution for each scenario, if found
+// Prints only the first solution for each scenario, if found
 func (config configObject) PrintFirstSolution() {
-	config.PrintSolutions(false)
+	for index, solutions := range config.solutions {
+		if len(*solutions) == 0 {
+			logrus.Infof("Solution for %s problem does not exists", index)
+			continue
+		}
+		logrus.Infof("First solution for %s problem", index)
+		PrintSolution(config.l2Config, (*solutions)[0])
+		logrus.Infof("---")
+	}
 }
 
 // Prints the all solutions for each scenario, if found
@@ -104,9 +112,41 @@ const (
 	StepSameLan2 AlgoFunction2 = iota
 	StepSameNic
 	StepSameNode
-	StepDifferentNode
-	StepDifferentNic
 )
+
+// Negation constants for step functions
+// Use these as the last element in the step definition array
+const (
+	Positive = 0 // Normal/positive test (e.g., SameNode returns true if nodes match)
+	Negative = 1 // Negated test (e.g., SameNode with Negative returns true if nodes DON'T match)
+)
+
+// Helper functions to create step definitions with optional negation
+// These make it easier to build problem definitions
+
+// Step0 creates a step with 0 parameters
+// negate: use Positive for normal test, Negative for inverted test
+func Step0(fn AlgoFunction0, negate int) []int {
+	return []int{int(fn), 0, negate}
+}
+
+// Step1 creates a step with 1 parameter
+// negate: use Positive for normal test, Negative for inverted test
+func Step1(fn AlgoFunction1, param1 int, negate int) []int {
+	return []int{int(fn), 1, param1, negate}
+}
+
+// Step2 creates a step with 2 parameters
+// negate: use Positive for normal test, Negative for inverted test
+func Step2(fn AlgoFunction2, param1, param2 int, negate int) []int {
+	return []int{int(fn), 2, param1, param2, negate}
+}
+
+// Step3 creates a step with 3 parameters
+// negate: use Positive for normal test, Negative for inverted test
+func Step3(fn AlgoFunction3, param1, param2, param3 int, negate int) []int {
+	return []int{int(fn), 3, param1, param2, param3, negate}
+}
 
 const WPCNICSubsystemID = "E810-XXV-4T"
 
@@ -192,6 +232,20 @@ func IsPTPWrapper(config export.L2Info, if1 int) bool {
 	return IsPTP(config, config.GetPtpIfList()[if1])
 }
 
+// IsWPCNicFunc is a configurable function to check if an interface is a WPC NIC
+// This should be set by the test code since it requires cluster access
+var IsWPCNicFunc func(config export.L2Info, ifIndex int) bool
+
+// IsWPCNicWrapper checks if an interface belongs to a WPC-enabled NIC
+// Returns false if IsWPCNicFunc is not set
+func IsWPCNicWrapper(config export.L2Info, if1 int) bool {
+	if IsWPCNicFunc == nil {
+		logrus.Warn("IsWPCNicFunc not set, returning false")
+		return false
+	}
+	return IsWPCNicFunc(config, if1)
+}
+
 // Checks if 2 interfaces are on the same node
 func SameNode(if1, if2 *l2lib.PtpIf) bool {
 	return if1.NodeName == if2.NodeName
@@ -200,16 +254,6 @@ func SameNode(if1, if2 *l2lib.PtpIf) bool {
 // algo Wrapper for SameNode
 func SameNodeWrapper(config export.L2Info, if1, if2 int) bool {
 	return SameNode(config.GetPtpIfList()[if1], config.GetPtpIfList()[if2])
-}
-
-// algo wrapper for !SameNode
-func DifferentNodeWrapper(config export.L2Info, if1, if2 int) bool {
-	return !SameNode(config.GetPtpIfList()[if1], config.GetPtpIfList()[if2])
-}
-
-// Algo wrapper for !SameNic
-func DifferentNicWrapper(config export.L2Info, if1, if2 int) bool {
-	return !SameNic(config.GetPtpIfList()[if1], config.GetPtpIfList()[if2])
 }
 
 // Checks if 3 interfaces are connected to the same LAN
@@ -247,9 +291,6 @@ func SameLan3Wrapper(config export.L2Info, if1, if2, if3 int) bool {
 
 // Checks if 2 interfaces are connected to the same LAN
 func SameLan2(config export.L2Info, if1, if2 int, lans *[][]int) bool {
-	if SameNode(config.GetPtpIfList()[if1], config.GetPtpIfList()[if2]) {
-		return false
-	}
 	for _, Lan := range *lans {
 		if1Present := false
 		if2Present := false
@@ -302,6 +343,9 @@ func NilWrapper() bool {
 }
 
 // Applies a single step (constraint) in the backtracking algorithm
+// Step format: [FunctionCode, ParamCount, Param1, Param2, ..., NegationFlag]
+// NegationFlag: 0 = Positive (normal), 1 = Negative (inverted result)
+// If NegationFlag is omitted, defaults to Positive (0)
 func applyStep(config export.L2Info, step [][]int, combinations []int) bool {
 	type paramNum int
 
@@ -321,29 +365,43 @@ func applyStep(config export.L2Info, step [][]int, combinations []int) bool {
 
 	var AlgoCode1 [2]ConfigFunc1
 	AlgoCode1[StepIsPTP] = IsPTPWrapper
-	AlgoCode1[StepIsWPCNic] = isWPCNicWrapper
+	AlgoCode1[StepIsWPCNic] = IsWPCNicWrapper
 
-	var AlgoCode2 [5]ConfigFunc2
+	var AlgoCode2 [3]ConfigFunc2
 	AlgoCode2[StepSameLan2] = SameLan2Wrapper
 	AlgoCode2[StepSameNic] = SameNicWrapper
 	AlgoCode2[StepSameNode] = SameNodeWrapper
-	AlgoCode2[StepDifferentNode] = DifferentNodeWrapper
-	AlgoCode2[StepDifferentNic] = DifferentNicWrapper
 
 	var AlgoCode3 [1]ConfigFunc3
 	AlgoCode3[StepSameLan3] = SameLan3Wrapper
 	result := true
 	for _, test := range step {
+		var stepResult bool
+		// Get negation flag - it's the last element after all params
+		// Position depends on param count: NoParam=2, OneParam=3, TwoParams=4, ThreeParams=5
+		negationIdx := 2 + test[1] // index of negation flag
+		negate := false
+		if len(test) > negationIdx {
+			negate = test[negationIdx] == Negative
+		}
+
 		switch test[1] {
 		case int(NoParam):
-			result = result && AlgoCode0[test[0]]()
+			stepResult = AlgoCode0[test[0]]()
 		case int(OneParam):
-			result = result && AlgoCode1[test[0]](config, combinations[test[2]])
+			stepResult = AlgoCode1[test[0]](config, combinations[test[2]])
 		case int(TwoParams):
-			result = result && AlgoCode2[test[0]](config, combinations[test[2]], combinations[test[3]])
+			stepResult = AlgoCode2[test[0]](config, combinations[test[2]], combinations[test[3]])
 		case int(ThreeParams):
-			result = result && AlgoCode3[test[0]](config, combinations[test[2]], combinations[test[3]], combinations[test[4]])
+			stepResult = AlgoCode3[test[0]](config, combinations[test[2]], combinations[test[3]], combinations[test[4]])
 		}
+
+		// Apply negation if requested
+		if negate {
+			stepResult = !stepResult
+		}
+
+		result = result && stepResult
 	}
 	return result
 }

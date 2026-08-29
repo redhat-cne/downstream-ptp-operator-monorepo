@@ -21,7 +21,7 @@ require (
 	github.com/prometheus-operator/prometheus-operator/pkg/client v0.57.0
 	github.com/prometheus/common v0.44.0
 	github.com/redhat-cne/channel-pubsub v0.0.8
-	github.com/redhat-cne/graphsolver-lib v0.0.5
+	github.com/redhat-cne/graphsolver-lib v0.0.6
 	github.com/redhat-cne/l2discovery-exports v0.0.4
 	github.com/redhat-cne/l2discovery-lib v0.0.14
 	github.com/redhat-cne/privileged-daemonset v1.0.34

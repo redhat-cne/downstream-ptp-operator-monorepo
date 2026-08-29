@@ -475,8 +475,8 @@ github.com/redhat-cne/channel-pubsub v0.0.8 h1:5UzwMev+pjIIfzHDyCsx8HlG4a/ahHpRO
 github.com/redhat-cne/channel-pubsub v0.0.8/go.mod h1:mzF6XIdwFXrQ0JmvVA4UtflirDIM+q9Dj/1YGevGnOU=
 github.com/redhat-cne/graphsolver-exports v0.0.2 h1:xpswAtA6J4BVIrZfytRUBzG9icQw71lIUa6NMHQ1FN4=
 github.com/redhat-cne/graphsolver-exports v0.0.2/go.mod h1:ZXxUEsVGE+ND/ODQ28nIcSJfTTYAB5bjs2HrTjPiIQI=
-github.com/redhat-cne/graphsolver-lib v0.0.5 h1:M/C07yZQFQCA9AStdwvlNrjWYcQuObVGiPT06ZriE1Y=
-github.com/redhat-cne/graphsolver-lib v0.0.5/go.mod h1:hOlp1RlLrwb9ZqmX4lcknGobuKFQxIByx+ugTtAwfj4=
+github.com/redhat-cne/graphsolver-lib v0.0.6 h1:rYZRjMLR50xvlwvxjEeD99ZXHLPp5l8+OrMVpVFGJGk=
+github.com/redhat-cne/graphsolver-lib v0.0.6/go.mod h1:hOlp1RlLrwb9ZqmX4lcknGobuKFQxIByx+ugTtAwfj4=
 github.com/redhat-cne/l2discovery-exports v0.0.4 h1:oYZlk0lXEnLTO8nxnL1G54L+KdQ1WyA5zZFJln9/8uA=
 github.com/redhat-cne/l2discovery-exports v0.0.4/go.mod h1:hYvCYXSfngU/j+auFobgvKcwiu5DurO2BnUBoSmg/NA=
 github.com/redhat-cne/l2discovery-lib v0.0.14 h1:qiOWV25h+Ym/7XtutpoGw8Gmi3oAsyMpumvbnMloV0s=
