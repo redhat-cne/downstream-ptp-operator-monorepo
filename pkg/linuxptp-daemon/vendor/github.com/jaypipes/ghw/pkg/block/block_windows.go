@@ -6,10 +6,11 @@
 package block
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
-	"github.com/StackExchange/wmi"
+	"github.com/yusufpapurcu/wmi"
 
 	"github.com/jaypipes/ghw/pkg/util"
 )
@@ -17,24 +18,24 @@ import (
 type physicalDiskMediaType int
 
 const (
-	PHYSICAL_DISK_MEDIA_TYPE_UNSPECIFIED physicalDiskMediaType = 0
-	PHYSICAL_DISK_MEDIA_TYPE_HDD         physicalDiskMediaType = 3
-	PHYSICAL_DISK_MEDIA_TYPE_SSD         physicalDiskMediaType = 4
-	PHYSICAL_DISK_MEDIA_TYPE_SCM         physicalDiskMediaType = 5
+	physicalDiskMediaTypeUnspecified physicalDiskMediaType = 0
+	physicalDiskMediaTypeHDD         physicalDiskMediaType = 3
+	physicalDiskMediaTypeSSD         physicalDiskMediaType = 4
+	physicalDiskMediaTypeSCM         physicalDiskMediaType = 5
 )
 
 func (dt physicalDiskMediaType) ToDriveType() DriveType {
 	switch dt {
-	case PHYSICAL_DISK_MEDIA_TYPE_UNSPECIFIED:
-		return DRIVE_TYPE_UNKNOWN
-	case PHYSICAL_DISK_MEDIA_TYPE_HDD:
-		return DRIVE_TYPE_HDD
-	case PHYSICAL_DISK_MEDIA_TYPE_SSD:
-		return DRIVE_TYPE_SSD
-	case PHYSICAL_DISK_MEDIA_TYPE_SCM:
-		return DRIVE_TYPE_UNKNOWN
+	case physicalDiskMediaTypeUnspecified:
+		return DriveTypeUnknown
+	case physicalDiskMediaTypeHDD:
+		return DriveTypeHDD
+	case physicalDiskMediaTypeSSD:
+		return DriveTypeSSD
+	case physicalDiskMediaTypeSCM:
+		return DriveTypeUnknown
 	}
-	return DRIVE_TYPE_UNKNOWN
+	return DriveTypeUnknown
 }
 
 const wqlDiskDrive = "SELECT Caption, CreationClassName, DefaultBlockSize, Description, DeviceID, Index, InterfaceType, Manufacturer, MediaType, Model, Name, Partitions, SerialNumber, Size, TotalCylinders, TotalHeads, TotalSectors, TotalTracks, TracksPerCylinder FROM Win32_DiskDrive"
@@ -85,18 +86,20 @@ type win32LogicalDiskToPartition struct {
 	Dependent  *string
 }
 
-const wqlLogicalDisk = "SELECT Caption, CreationClassName, Description, DeviceID, FileSystem, FreeSpace, Name, Size, SystemName FROM Win32_LogicalDisk"
+const wqlLogicalDisk = "SELECT Caption, CreationClassName, Description, DeviceID, FileSystem, FreeSpace, Name, Size, SystemName, VolumeName, VolumeSerialNumber  FROM Win32_LogicalDisk"
 
 type win32LogicalDisk struct {
-	Caption           *string
-	CreationClassName *string
-	Description       *string
-	DeviceID          *string
-	FileSystem        *string
-	FreeSpace         *uint64
-	Name              *string
-	Size              *uint64
-	SystemName        *string
+	Caption            *string
+	CreationClassName  *string
+	Description        *string
+	DeviceID           *string
+	FileSystem         *string
+	FreeSpace          *uint64
+	Name               *string
+	Size               *uint64
+	SystemName         *string
+	VolumeName         *string
+	VolumeSerialNumber *string
 }
 
 const wqlPhysicalDisk = "SELECT DeviceId, MediaType FROM MSFT_PhysicalDisk"
@@ -106,7 +109,7 @@ type win32PhysicalDisk struct {
 	MediaType physicalDiskMediaType
 }
 
-func (i *Info) load() error {
+func (i *Info) load(ctx context.Context) error {
 	win32DiskDriveDescriptions, err := getDiskDrives()
 	if err != nil {
 		return err
@@ -155,6 +158,7 @@ func (i *Info) load() error {
 			Model:                  strings.TrimSpace(*diskdrive.Caption),
 			SerialNumber:           strings.TrimSpace(*diskdrive.SerialNumber),
 			WWN:                    util.UNKNOWN, // TODO: add information
+			WWNNoExtension:         util.UNKNOWN, // TODO: add information
 			Partitions:             make([]*Partition, 0),
 		}
 		for _, diskpartition := range win32DiskPartitionDescriptions {
@@ -172,13 +176,14 @@ func (i *Info) load() error {
 						if *logicaldisktodiskpartition.Antecedent == desiredAntecedent && *logicaldisktodiskpartition.Dependent == desiredDependent {
 							// Appending Partition
 							p := &Partition{
-								Name:       strings.TrimSpace(*logicaldisk.Caption),
+								Disk:       disk,
+								Name:       strings.TrimSpace(*logicaldisk.VolumeName),
 								Label:      strings.TrimSpace(*logicaldisk.Caption),
 								SizeBytes:  *logicaldisk.Size,
 								MountPoint: *logicaldisk.DeviceID,
 								Type:       *diskpartition.Type,
 								IsReadOnly: toReadOnly(*diskpartition.Access),
-								UUID:       "",
+								UUID:       *logicaldisk.VolumeSerialNumber,
 							}
 							disk.Partitions = append(disk.Partitions, p)
 							break
@@ -191,11 +196,12 @@ func (i *Info) load() error {
 	}
 
 	i.Disks = disks
-	var tpb uint64
+	var tsb uint64
 	for _, d := range i.Disks {
-		tpb += d.SizeBytes
+		tsb += d.SizeBytes
 	}
-	i.TotalPhysicalBytes = tpb
+	i.TotalSizeBytes = tsb
+	i.TotalPhysicalBytes = tsb
 	return nil
 }
 
@@ -245,18 +251,18 @@ func getPhysicalDisks() ([]win32PhysicalDisk, error) {
 }
 
 func toDriveType(physicalDiskMediaType physicalDiskMediaType, mediaType string, caption string) DriveType {
-	if driveType := physicalDiskMediaType.ToDriveType(); driveType != DRIVE_TYPE_UNKNOWN {
+	if driveType := physicalDiskMediaType.ToDriveType(); driveType != DriveTypeUnknown {
 		return driveType
 	}
 
 	mediaType = strings.ToLower(mediaType)
 	caption = strings.ToLower(caption)
 	if strings.Contains(mediaType, "fixed") || strings.Contains(mediaType, "ssd") || strings.Contains(caption, "ssd") {
-		return DRIVE_TYPE_SSD
+		return DriveTypeSSD
 	} else if strings.ContainsAny(mediaType, "hdd") {
-		return DRIVE_TYPE_HDD
+		return DriveTypeHDD
 	}
-	return DRIVE_TYPE_UNKNOWN
+	return DriveTypeUnknown
 }
 
 // TODO: improve
@@ -264,11 +270,11 @@ func toStorageController(interfaceType string) StorageController {
 	var storageController StorageController
 	switch interfaceType {
 	case "SCSI":
-		storageController = STORAGE_CONTROLLER_SCSI
+		storageController = StorageControllerSCSI
 	case "IDE":
-		storageController = STORAGE_CONTROLLER_IDE
+		storageController = StorageControllerIDE
 	default:
-		storageController = STORAGE_CONTROLLER_UNKNOWN
+		storageController = StorageControllerUnknown
 	}
 	return storageController
 }
