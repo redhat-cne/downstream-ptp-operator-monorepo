@@ -470,8 +470,8 @@ github.com/prometheus/procfs v0.7.3/go.mod h1:cz+aTbrPOrUb4q7XlbU9ygM+/jj0fzG6c1
 github.com/prometheus/procfs v0.8.0 h1:ODq8ZFEaYeCaZOJlZZdJA2AbQR98dSHSM1KW/You5mo=
 github.com/prometheus/procfs v0.8.0/go.mod h1:z7EfXMXOkbkqb9IINtpCn86r/to3BnA0uaxHdg830/4=
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
-github.com/redhat-cne/channel-pubsub v0.0.7 h1:Ynr4Op3NIlwZs+9KreD13qtBwQoP9E3sS6dKSj2JwYU=
-github.com/redhat-cne/channel-pubsub v0.0.7/go.mod h1:mzF6XIdwFXrQ0JmvVA4UtflirDIM+q9Dj/1YGevGnOU=
+github.com/redhat-cne/channel-pubsub v0.0.8 h1:5UzwMev+pjIIfzHDyCsx8HlG4a/ahHpRO+EXMFDa7YQ=
+github.com/redhat-cne/channel-pubsub v0.0.8/go.mod h1:mzF6XIdwFXrQ0JmvVA4UtflirDIM+q9Dj/1YGevGnOU=
 github.com/redhat-cne/ptp-listener-exports v0.0.7 h1:OndW4kSKym5LK9bbEqJPE/LW/LGMDPw5IzXdmrGMRhI=
 github.com/redhat-cne/ptp-listener-exports v0.0.7/go.mod h1:oDdWZOsl2wP1WUECbyLvva0ld/JOvWzNWLJOSCOlOAI=
 github.com/redhat-cne/ptp-listener-lib v0.1.6 h1:HP5ckt7LaHHRKYMC/oYnc7e6F3ssG5XDXSQyblS2O04=
