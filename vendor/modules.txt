@@ -246,7 +246,7 @@ github.com/redhat-cne/channel-pubsub
 # github.com/redhat-cne/graphsolver-exports v0.0.2
 ## explicit; go 1.22
 github.com/redhat-cne/graphsolver-exports
-# github.com/redhat-cne/graphsolver-lib v0.0.5
+# github.com/redhat-cne/graphsolver-lib v0.0.6
 ## explicit; go 1.22
 github.com/redhat-cne/graphsolver-lib
 # github.com/redhat-cne/l2discovery-exports v0.0.4
