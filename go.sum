@@ -481,8 +481,8 @@ github.com/redhat-cne/l2discovery-exports v0.0.6 h1:CP6A+O2ITI21nnMZGAYeQgWaflHr
 github.com/redhat-cne/l2discovery-exports v0.0.6/go.mod h1:hYvCYXSfngU/j+auFobgvKcwiu5DurO2BnUBoSmg/NA=
 github.com/redhat-cne/l2discovery-lib v0.0.15 h1:dB0h0Y/wTWHeI8MhArsHob0JuIcBmeJ6u8F73F/mmoU=
 github.com/redhat-cne/l2discovery-lib v0.0.15/go.mod h1:SmcN21gDHXIV/3WVyA7xp5pH4mkB2g+O0ipoSGeWDiY=
-github.com/redhat-cne/privileged-daemonset v1.0.34 h1:wcffXvaz5PwvAZfq62WiMXi0N+gXFlEFXkK4CcdjshU=
-github.com/redhat-cne/privileged-daemonset v1.0.34/go.mod h1:poRO1Giq9rH4JD8/KLxRJobOARGxmPr8xAIwhSrZGRQ=
+github.com/redhat-cne/privileged-daemonset v1.0.35 h1:zfJyrK5bp7STIs1s9niKPTo36h69f4kSxfd6DnGq6oU=
+github.com/redhat-cne/privileged-daemonset v1.0.35/go.mod h1:poRO1Giq9rH4JD8/KLxRJobOARGxmPr8xAIwhSrZGRQ=
 github.com/redhat-cne/ptp-listener-exports v0.0.7 h1:OndW4kSKym5LK9bbEqJPE/LW/LGMDPw5IzXdmrGMRhI=
 github.com/redhat-cne/ptp-listener-exports v0.0.7/go.mod h1:oDdWZOsl2wP1WUECbyLvva0ld/JOvWzNWLJOSCOlOAI=
 github.com/redhat-cne/sdk-go v1.22.4 h1:blyFVvP6MwY7y0jLBW8CnDayaZjbbJ9BsIhWMMHujxQ=
