@@ -69,11 +69,11 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.20.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.20.0 // indirect
 	go.opentelemetry.io/otel v0.20.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp v0.20.0 // indirect
-	go.opentelemetry.io/otel/metric v0.20.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp v0.20.1 // indirect
+	go.opentelemetry.io/otel/metric v0.38.1 // indirect
 	go.opentelemetry.io/otel/sdk v0.20.0 // indirect
-	go.opentelemetry.io/otel/sdk/export/metric v0.20.0 // indirect
-	go.opentelemetry.io/otel/sdk/metric v0.20.0 // indirect
+	go.opentelemetry.io/otel/sdk/export/metric v0.28.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v0.41.0 // indirect
 	go.opentelemetry.io/otel/trace v0.20.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.7.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
