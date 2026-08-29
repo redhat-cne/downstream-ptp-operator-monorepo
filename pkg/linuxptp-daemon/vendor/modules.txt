@@ -160,8 +160,8 @@ github.com/mdlayher/genetlink
 ## explicit; go 1.23.0
 github.com/mdlayher/netlink
 github.com/mdlayher/netlink/nlenc
-# github.com/mdlayher/socket v0.5.1
-## explicit; go 1.20
+# github.com/mdlayher/socket v0.6.1
+## explicit; go 1.25.0
 github.com/mdlayher/socket
 # github.com/mitchellh/go-homedir v1.1.0
 ## explicit
