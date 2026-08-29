@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023 Uber Technologies, Inc.
+// Copyright (c) 2023 Uber Technologies, Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,31 +18,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-//go:build go1.20
-// +build go1.20
+package zapcore
 
-package multierr
+import "sync"
 
-// Unwrap returns a list of errors wrapped by this multierr.
-func (merr *multiError) Unwrap() []error {
-	return merr.Errors()
+type lazyWithCore struct {
+	Core
+	sync.Once
+	fields []Field
 }
 
-type multipleErrors interface {
-	Unwrap() []error
+// NewLazyWith wraps a Core with a "lazy" Core that will only encode fields if
+// the logger is written to (or is further chained in a lon-lazy manner).
+func NewLazyWith(core Core, fields []Field) Core {
+	return &lazyWithCore{
+		Core:   core,
+		fields: fields,
+	}
 }
 
-func extractErrors(err error) []error {
-	if err == nil {
-		return nil
-	}
+func (d *lazyWithCore) initOnce() {
+	d.Once.Do(func() {
+		d.Core = d.Core.With(d.fields)
+	})
+}
 
-	// check if the given err is an Unwrapable error that
-	// implements multipleErrors interface.
-	eg, ok := err.(multipleErrors)
-	if !ok {
-		return []error{err}
-	}
+func (d *lazyWithCore) With(fields []Field) Core {
+	d.initOnce()
+	return d.Core.With(fields)
+}
 
-	return append(([]error)(nil), eg.Unwrap()...)
+func (d *lazyWithCore) Check(e Entry, ce *CheckedEntry) *CheckedEntry {
+	d.initOnce()
+	return d.Core.Check(e, ce)
 }
