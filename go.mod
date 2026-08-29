@@ -22,7 +22,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.2
 	github.com/test-network-function/graphsolver-lib v0.0.3
-	github.com/test-network-function/l2discovery-exports v0.0.3
+	github.com/test-network-function/l2discovery-exports v0.0.5
 	github.com/test-network-function/l2discovery-lib v0.0.9
 	github.com/test-network-function/privileged-daemonset v1.0.2
 	gopkg.in/yaml.v3 v3.0.1
