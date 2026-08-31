@@ -25,7 +25,7 @@ require (
 )
 
 require (
-	github.com/Azure/go-amqp v0.17.5 // indirect
+	github.com/Azure/go-amqp v0.19.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cloudevents/sdk-go/protocol/amqp/v2 v2.13.0 // indirect
