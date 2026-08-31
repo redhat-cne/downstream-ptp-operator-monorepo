@@ -14,8 +14,8 @@ require (
 	github.com/prometheus/client_model v0.3.0
 	github.com/redhat-cne/rest-api v1.23.6
 	github.com/redhat-cne/sdk-go v1.23.6
-	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.8.1
+	github.com/sirupsen/logrus v1.10.2
+	github.com/stretchr/testify v1.12.1
 	golang.org/x/net v0.39.0
 	k8s.io/api v0.26.0
 	k8s.io/apiextensions-apiserver v0.24.2
@@ -52,12 +52,12 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	go.uber.org/multierr v1.10.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	golang.org/x/oauth2 v0.27.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/term v0.31.0 // indirect
