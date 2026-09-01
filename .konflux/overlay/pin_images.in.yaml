@@ -23,5 +23,5 @@
 # must-gather
 - key: must_gather_image
   source: quay.io/openshift/origin-ptp-operator-must-gather:5.0
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-5-0@sha256:b6e4a6686e0afc27a7c029d2ac0c530cc439331a9c4fb918957883991c876c1c
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-5-0@sha256:3c00b7fb3b7aab4b928d7961cea1ff3d7f0043c9231cc325f6f477aab8c10114
 #
