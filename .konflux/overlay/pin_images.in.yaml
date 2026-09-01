@@ -2,26 +2,26 @@
 # Operator (manager)
 - key: manager
   source: quay.io/openshift/origin-ptp-operator:5.0
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-5-0@sha256:8b86529dfe2e312f9839bc5ac899797bd3f49c62724975c1d70d31550ad687bd
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-5-0@sha256:5f6a3a34a9bd0b665e5a417e44f5a40c0799655fc3695c776c35906bc3cc9f11
 #
 # linuxptp-daemon
 - key: linuxptp_daemon_image
   source: quay.io/openshift/origin-ptp:5.0
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-5-0@sha256:b01316ea2dc3944b6e616c67312a7223b3a5a97e9e32f53a4420b35d9ac8b8d0
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-5-0@sha256:e3183932878e965dc0cc9baa3f0f8a2de888f0f37197a7860af69ca0b520b2cf
 #
 # kube-rbac-proxy (tenant-built multi-arch from vendored openshift/kube-rbac-proxy)
 - key: kube_rbac_proxy_image
   source: quay.io/openshift/origin-kube-rbac-proxy:5.0
-  # Digest is rewritten on PR by pin-pr-component-images.sh; refresh after the first push build.
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-5-0@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  # From #144 on-pr images (dc7478592). Refresh from push :latest when those exist.
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-5-0@sha256:c8888485822b442da66929a0478c84412d90e25dbb88b46724eacaf2c1c5ce93
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:5.0
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-5-0@sha256:5d1b40db7effe5f999b0bdfa84389ee38182270cd76bd245e9b1af1780e7cab4
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-5-0@sha256:69ed4ddab2c57f026b604c8bcb4f24dd7bcc449fe768648f3b09d4f7d7343fce
 #
 # must-gather
 - key: must_gather_image
   source: quay.io/openshift/origin-ptp-operator-must-gather:5.0
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-5-0@sha256:b6e4a6686e0afc27a7c029d2ac0c530cc439331a9c4fb918957883991c876c1c
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-5-0@sha256:009f81da7c21828d6db08faff3a5165dbe68a2c22e364ea05ed09dc3105f3811
 #
