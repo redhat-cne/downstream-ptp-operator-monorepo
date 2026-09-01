@@ -5,7 +5,7 @@ go 1.18
 require github.com/openshift/ptp-operator v0.0.0-20230103155704-9008db80f78e
 
 require (
-	github.com/golang/glog v1.2.4
+	github.com/golang/glog v1.2.5
 	github.com/google/goexpect v0.0.0-20210430020637-ab937bf7fd6f
 	github.com/jaypipes/ghw v0.12.0
 	github.com/prometheus/client_golang v1.14.0
