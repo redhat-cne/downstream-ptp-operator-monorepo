@@ -7,7 +7,7 @@
 # linuxptp-daemon
 - key: linuxptp_daemon_image
   source: quay.io/openshift/origin-ptp:5.0
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-5-0@sha256:b01316ea2dc3944b6e616c67312a7223b3a5a97e9e32f53a4420b35d9ac8b8d0
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-5-0@sha256:71afd73482f51713b83c285261c3c06b89348449d95382d55e60f28630d51453
 #
 # kube-rbac-proxy (tenant-built multi-arch from vendored openshift/kube-rbac-proxy)
 - key: kube_rbac_proxy_image
