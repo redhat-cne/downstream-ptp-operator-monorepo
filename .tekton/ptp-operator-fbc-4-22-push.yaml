@@ -53,7 +53,6 @@ spec:
       value: "true"
     # run-opm-pre-actions-hermetic defaults to true on the fbc-pipeline.
     # Leave it unset here so Conforma hermetic_task.hermetic passes on push.
-    # On-PR PipelineRuns set it false so the task can wait for the bundle.
   pipelineRef:
     name: fbc-pipeline
   taskRunTemplate:
