@@ -20,12 +20,18 @@ packages:
 # Force matching libs into the hermetic repo. CentOS Stream base images drift
 # ahead of pinned transitive deps (e.g. acl needing libacl=EVR); without these
 # reinstalls, hermetic yum fails with "nothing provides libacl…".
-# This is a safety net. The lock must still match util-linux/openssl/systemd/
-# hwdata already in context.image; relock with scripts/relock-linuxptp-daemon-rpms.sh.
+# rpm-lockfile-prototype omits RPMs already in context.image unless they are
+# listed here. util-linux/openssl/systemd must stay locked to the image NEVRAs.
+# Relock with scripts/relock-linuxptp-daemon-rpms.sh.
 reinstallPackages:
   - systemd-libs
   - libacl
   - acl
+  - util-linux
+  - util-linux-core
+  - libfdisk
+  - openssl
+  - systemd
 contentOrigin:
   repofiles:
     - ./centos.repo
@@ -33,4 +39,4 @@ arches:
   - x86_64
   - aarch64
 context:
-  image: quay.io/centos/centos:stream9@sha256:64e5a212e4f2e7b706dbd822968914bb8def7de0a7fdfd3bf248241f8758101c
+  image: quay.io/centos/centos:stream9@sha256:0ae48e0618d4e26d6d43406f923170160c72d8681ff42df9f26b2c8f3f500a94
