@@ -84,7 +84,7 @@ require (
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/redhat-cne/channel-pubsub v0.0.7 // indirect
 	github.com/spf13/cobra v1.6.0 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/test-network-function/graphsolver-exports v0.0.1 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869 // indirect
