@@ -54,10 +54,8 @@ spec:
     - name: additional-labels
       value:
         - name=experimental-ptp/ptp-operator-bundle-mono-operator-bundle
-    # Wait for same-revision component images and pin them into the CSV so
-    # FBC/certsuite exercise PR-built operands, not committed pin digests.
-    - name: pr-component-image-tag
-      value: on-pr-{{revision}}
+    # pr-component-image-tag stays unset (pipeline default ""). CSV uses
+    # committed .konflux/overlay/pin_images.in.yaml, same as push.
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
