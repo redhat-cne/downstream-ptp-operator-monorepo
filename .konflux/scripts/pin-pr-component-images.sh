@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Rewrite .konflux/overlay/pin_images.in.yaml targets to digests of same-revision
-# PR component tags (on-pr-<sha>). Used by the bundle PipelineRun so the PR
-# bundle/FBC/certsuite path embeds freshly built operand images instead of the
-# last committed pins.
+# PR component tags (on-pr-<sha>). Optional: the default bundle PipelineRun
+# leaves --tag empty so committed pins stay in the CSV.
 #
 # Only rewrites targets under the Konflux tenant quay prefix.
 #
@@ -10,7 +9,7 @@
 #   pin-pr-component-images.sh --tag on-pr-<revision> [--pin-file PATH]
 #   pin-pr-component-images.sh --tag on-pr-latest --dry-run
 #
-# When --tag is empty, exits 0 without modifying the pin file (push/release).
+# When --tag is empty, exits 0 without modifying the pin file.
 
 set -euo pipefail
 

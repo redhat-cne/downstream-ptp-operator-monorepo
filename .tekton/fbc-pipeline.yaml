@@ -92,16 +92,17 @@ spec:
       default: ''
       description: >
         Optional bundle pullspec to embed in the catalog instead of
-        .konflux/catalog/bundle.builds.in.yaml. On-PR builds set this to the
-        same-revision bundle tag so certsuite tests the PR bundle. Leave empty
-        on push/release to use the pin file.
+        .konflux/catalog/bundle.builds.in.yaml. Leave empty (the default) to
+        use the pin file. Set only if a PR must catalog a same-revision
+        bundle (e.g. certsuite); that also requires hermetic false.
       type: string
     - name: run-opm-pre-actions-hermetic
       default: 'true'
       description: >
         Whether run-opm-pre-actions (run-script-oci-ta) runs hermetically.
-        Push/release must stay true so Conforma hermetic_task.hermetic passes.
-        On-PR sets this false so the task can wait for bundle-image-override.
+        Must stay true so Conforma hermetic_task.hermetic passes. Set false
+        only when bundle-image-override is set and the task must wait on
+        the network for that tag.
       type: string
   results:
     - description: ''
@@ -171,7 +172,7 @@ spec:
               tar -xzf /tmp/crane.tgz -C /tmp crane
               chmod +x /tmp/crane
               # Avoid shell command substitution; Tekton validates paren-dollar refs.
-              # 180*20s = 60m: on-PR bundle waits for daemon/operator/cep then builds.
+              # 180*20s = 60m: optional wait when bundle-image-override is set.
               WAIT_ATTEMPTS=180
               i=0
               DIGEST=""
