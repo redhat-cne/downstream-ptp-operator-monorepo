@@ -1,4 +1,7 @@
-# The opm image is expected to contain /bin/opm (with a serve subcommand) and /bin/grpc_health_probe
+# The opm image is expected to contain /bin/opm (with a serve subcommand) and /bin/grpc_health_probe.
+# ose-operator-registry-rhel9 is published as OpenShift 4.y tags.
+# PTP 5.x and unreleased 4.y must not use the PTP branch number (that tag 404s).
+# apply_konflux sets 4.19 to the branch 4.y, or the last published 4.y.
 ARG OPM_IMAGE=registry.redhat.io/openshift4/ose-operator-registry-rhel9:v4.19
 
 FROM ${OPM_IMAGE}
