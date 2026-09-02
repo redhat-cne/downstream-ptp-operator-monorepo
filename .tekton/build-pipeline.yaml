@@ -127,9 +127,9 @@ spec:
       type: string
       description: >
         Optional tag (e.g. on-pr-<sha>) used to rewrite tenant pins in
-        .konflux/overlay/pin_images.in.yaml before the image build. Bundle
-        on-PR builds set this so the bundle embeds same-revision component
-        images. Leave empty on push/release to keep committed pins.
+        .konflux/overlay/pin_images.in.yaml before the image build. Leave
+        empty (the default) so the bundle keeps committed pins. Set only if
+        a PR must embed same-revision operand images (e.g. certsuite).
   results:
     - description: ''
       name: IMAGE_URL
@@ -229,9 +229,8 @@ spec:
           workspace: git-auth
         - name: netrc
           workspace: netrc
-    # On-PR bundle builds set pr-component-image-tag so the CSV pins resolve to
-    # same-revision component images (wait + rewrite pin_images.in.yaml).
-    # No-op when the param is empty (component builds and push/release).
+    # No-op when pr-component-image-tag is empty (the default: PR/push/release
+    # keep committed pin_images.in.yaml). Optional rewrite if a PR sets the tag.
     - name: pin-pr-component-images
       params:
         - name: ociStorage
