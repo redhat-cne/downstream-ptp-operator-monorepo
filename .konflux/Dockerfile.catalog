@@ -1,5 +1,6 @@
 # The opm image is expected to contain /bin/opm (with a serve subcommand) and /bin/grpc_health_probe
-ARG OPM_IMAGE=registry.redhat.io/openshift4/ose-operator-registry-rhel9:v5.0
+# ose-operator-registry follows OpenShift 4.y tags; v5.0 is not published.
+ARG OPM_IMAGE=registry.redhat.io/openshift4/ose-operator-registry-rhel9:v4.22
 
 FROM ${OPM_IMAGE}
 
