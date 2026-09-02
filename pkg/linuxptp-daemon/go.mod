@@ -3,7 +3,7 @@ module github.com/k8snetworkplumbingwg/linuxptp-daemon
 go 1.25.0
 
 require (
-	github.com/Masterminds/semver/v3 v3.4.0
+	github.com/Masterminds/semver/v3 v3.5.0
 	github.com/bigkevmcd/go-configparser v0.0.0-20240624060122-ccd05f93a9d2
 	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
 	github.com/fsnotify/fsnotify v1.9.0
