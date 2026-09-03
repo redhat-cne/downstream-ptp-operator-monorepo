@@ -1,0 +1,74 @@
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/nudge_renovate_config_map: namespace-wide-nudging-renovate-config
+    build.appstudio.openshift.io/repo: https://github.com/redhat-cne/downstream-ptp-operator-monorepo?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "push" &&
+      target_branch == "release-5.0" &&
+      (
+        '.konflux/container_build_args.conf'.pathChanged() ||
+        '.tekton/build-pipeline.yaml'.pathChanged() ||
+        '.tekton/linuxptp-daemon-mono-5-0-push.yaml'.pathChanged() ||
+        '.konflux/Dockerfile.linuxptp-daemon'.pathChanged() ||
+        'pkg/linuxptp-daemon/***'.pathChanged() ||
+        'telco5g-konflux'.pathChanged() ||
+        'telco5g-konflux/***'.pathChanged()
+      )
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: ptp-operator-mono-5-0
+    appstudio.openshift.io/component: linuxptp-daemon-mono-5-0
+    pipelines.appstudio.openshift.io/type: build
+  name: linuxptp-daemon-mono-5-0-on-push
+  namespace: experimental-ptp-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: output-image
+      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-5-0:{{revision}}
+    - name: build-platforms
+      value:
+        - linux/x86_64
+        - linux/arm64
+    # Repo root so hermetic RPM injection from prefetch is in the build context.
+    # Dockerfile copies sources from pkg/linuxptp-daemon/.
+    - name: path-context
+      value: .
+    - name: dockerfile
+      value: .konflux/Dockerfile.linuxptp-daemon
+    - name: build-args-file
+      value: .konflux/container_build_args.conf
+    - name: hermetic
+      value: "true"
+    - name: dev-package-managers
+      value: "true"
+    - name: prefetch-input
+      value: '[{"type": "gomod", "path": "pkg/linuxptp-daemon"}, {"type": "rpm", "path": ".konflux/rpms/linuxptp-daemon", "options": {"dnf": {"appstream": {"gpgcheck": "0"}, "baseos": {"gpgcheck": "0"}, "appstream-source": {"gpgcheck": "0"}, "baseos-source": {"gpgcheck": "0"}}}}]'
+    - name: build-source-image
+      value: "true"
+    - name: skip-sast-coverity
+      value: "true"
+    - name: additional-tags
+      value: ["latest"]
+    - name: additional-labels
+      value:
+        - name=experimental-ptp/linuxptp-daemon-mono-rhel9
+  pipelineRef:
+    name: build-pipeline
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-linuxptp-daemon-mono-5-0
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{ git_auth_secret }}'
+status: {}
