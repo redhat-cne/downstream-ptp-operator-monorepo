@@ -1,0 +1,69 @@
+---
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  annotations:
+    build.appstudio.openshift.io/repo: https://github.com/redhat-cne/downstream-ptp-operator-monorepo?rev={{revision}}
+    build.appstudio.redhat.com/commit_sha: '{{revision}}'
+    build.appstudio.redhat.com/target_branch: '{{target_branch}}'
+    pipelinesascode.tekton.dev/cancel-in-progress: "false"
+    pipelinesascode.tekton.dev/max-keep-runs: "3"
+    pipelinesascode.tekton.dev/on-cel-expression: |
+      event == "push" &&
+      target_branch == "release-4.22" &&
+      (
+        '.konflux/container_build_args.conf'.pathChanged() ||
+        '.tekton/build-pipeline.yaml'.pathChanged() ||
+        '.tekton/ptp-must-gather-mono-4-22-push.yaml'.pathChanged() ||
+        '.konflux/Dockerfile.must-gather'.pathChanged() ||
+        'must-gather/***'.pathChanged() ||
+        'telco5g-konflux'.pathChanged() ||
+        'telco5g-konflux/***'.pathChanged()
+      )
+  creationTimestamp: null
+  labels:
+    appstudio.openshift.io/application: ptp-operator-mono-4-22
+    appstudio.openshift.io/component: ptp-must-gather-mono-4-22
+    pipelines.appstudio.openshift.io/type: build
+  name: ptp-must-gather-mono-4-22-on-push
+  namespace: experimental-ptp-tenant
+spec:
+  params:
+    - name: git-url
+      value: '{{source_url}}'
+    - name: revision
+      value: '{{revision}}'
+    - name: output-image
+      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-22:{{revision}}
+    - name: build-platforms
+      value:
+        - linux/x86_64
+        - linux/arm64
+    - name: path-context
+      value: .
+    - name: dockerfile
+      value: .konflux/Dockerfile.must-gather
+    - name: build-args-file
+      value: .konflux/container_build_args.conf
+    - name: hermetic
+      value: "true"
+    - name: prefetch-input
+      value: '{"type": "rpm", "path": ".konflux/rpms/must-gather", "options": {"dnf": {"ubi-9-baseos-rpms": {"gpgcheck": "0"}, "ubi-9-baseos-source-rpms": {"gpgcheck": "0"}}}}'
+    - name: build-source-image
+      value: "true"
+    - name: skip-sast-coverity
+      value: "true"
+    - name: additional-tags
+      value: ["latest"]
+    - name: additional-labels
+      value:
+        - name=experimental-ptp/ptp-must-gather-mono-rhel9
+  pipelineRef:
+    name: build-pipeline
+  taskRunTemplate:
+    serviceAccountName: build-pipeline-ptp-must-gather-mono-4-22
+  workspaces:
+    - name: git-auth
+      secret:
+        secretName: '{{ git_auth_secret }}'
+status: {}
