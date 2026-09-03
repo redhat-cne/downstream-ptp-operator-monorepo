@@ -1,11 +1,11 @@
 module github.com/redhat-cne/cloud-event-proxy
 
-go 1.21
+go 1.23
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cloudevents/sdk-go/v2 v2.15.2
-	github.com/fsnotify/fsnotify v1.6.0
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/golang/glog v1.2.4
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.0
