@@ -52,9 +52,10 @@ github.com/evanphx/json-patch/v5
 ## explicit; go 1.22
 github.com/facebook/time/hostendian
 github.com/facebook/time/ptp/protocol
-# github.com/fsnotify/fsnotify v1.6.0
-## explicit; go 1.16
+# github.com/fsnotify/fsnotify v1.10.1
+## explicit; go 1.23
 github.com/fsnotify/fsnotify
+github.com/fsnotify/fsnotify/internal
 # github.com/go-logr/logr v1.4.2
 ## explicit; go 1.18
 github.com/go-logr/logr
