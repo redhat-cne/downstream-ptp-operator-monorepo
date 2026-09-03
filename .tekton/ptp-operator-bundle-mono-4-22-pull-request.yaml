@@ -55,8 +55,8 @@ spec:
     - name: additional-labels
       value:
         - name=experimental-ptp/ptp-operator-bundle-mono-operator-bundle
-    # pr-component-image-tag and pin-pr-component-images-hermetic stay at
-    # pipeline defaults (empty / true). CSV uses committed pin_images.in.yaml.
+    # pr-component-image-tag stays at the pipeline default (empty). CSV uses
+    # committed pin_images.in.yaml. pin-pr HERMETIC is true on the pipeline.
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:

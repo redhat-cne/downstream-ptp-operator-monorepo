@@ -129,16 +129,9 @@ spec:
         Optional tag (e.g. on-pr-<sha>) used to rewrite tenant pins in
         .konflux/overlay/pin_images.in.yaml before the image build. Leave
         empty (the default) so the bundle keeps committed pins. Set only if
-        a PR must embed same-revision operand images (e.g. certsuite); that
-        also requires pin-pr-component-images-hermetic false.
-    - name: pin-pr-component-images-hermetic
-      default: 'true'
-      type: string
-      description: >
-        Whether pin-pr-component-images (run-script-oci-ta) runs hermetically.
-        Must stay true so Conforma hermetic_task.hermetic passes. Set false
-        only when pr-component-image-tag is set and the task must wait on
-        the network for those tags.
+        a PR must embed same-revision operand images (e.g. certsuite). That
+        path needs network; do not enable it while HERMETIC is hardcoded
+        true on pin-pr-component-images.
   results:
     - description: ''
       name: IMAGE_URL
@@ -241,8 +234,8 @@ spec:
     # No-op when pr-component-image-tag is empty (the default: PR/push/release
     # keep committed pin_images.in.yaml). Optional rewrite if a PR sets the tag.
     # Always runs so SCRIPT_ARTIFACT stays in the source chain (same as FBC
-    # run-opm-pre-actions). HERMETIC defaults true; on-PR only sets false when
-    # the tag is set and the script must wait on the network.
+    # run-opm-pre-actions). HERMETIC is true here for every PipelineRun so
+    # Conforma hermetic_task.hermetic passes without a per-component param.
     - name: pin-pr-component-images
       params:
         - name: ociStorage
@@ -257,10 +250,8 @@ spec:
             TAG="$(params.pr-component-image-tag)"
             chmod +x .konflux/scripts/pin-pr-component-images.sh
             .konflux/scripts/pin-pr-component-images.sh --tag "${TAG}"
-        # Push/release and default PRs: true (Conforma). Set false only when
-        # pr-component-image-tag is set (network wait for component tags).
         - name: HERMETIC
-          value: $(params.pin-pr-component-images-hermetic)
+          value: "true"
         - name: SOURCE_ARTIFACT
           value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       runAfter:
