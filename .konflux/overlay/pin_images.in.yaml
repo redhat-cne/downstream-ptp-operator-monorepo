@@ -1,0 +1,27 @@
+---
+# Operator (manager)
+- key: manager
+  source: quay.io/openshift/origin-ptp-operator:4.13
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-13@sha256:8b86529dfe2e312f9839bc5ac899797bd3f49c62724975c1d70d31550ad687bd
+#
+# linuxptp-daemon
+- key: linuxptp_daemon_image
+  source: quay.io/openshift/origin-ptp:4.13
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-13@sha256:b01316ea2dc3944b6e616c67312a7223b3a5a97e9e32f53a4420b35d9ac8b8d0
+#
+# kube-rbac-proxy (tenant-built multi-arch from vendored openshift/kube-rbac-proxy)
+- key: kube_rbac_proxy_image
+  source: quay.io/openshift/origin-kube-rbac-proxy:4.13
+  # Digest is rewritten on PR by pin-pr-component-images.sh; refresh after the first push build.
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-4-13@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+#
+# cloud-event-proxy
+- key: cloud_event_proxy_image
+  source: quay.io/openshift/origin-cloud-event-proxy:4.13
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-13@sha256:5d1b40db7effe5f999b0bdfa84389ee38182270cd76bd245e9b1af1780e7cab4
+#
+# must-gather
+- key: must_gather_image
+  source: quay.io/openshift/origin-ptp-operator-must-gather:4.13
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-13@sha256:b6e4a6686e0afc27a7c029d2ac0c530cc439331a9c4fb918957883991c876c1c
+#
