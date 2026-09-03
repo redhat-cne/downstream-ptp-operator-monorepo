@@ -1,0 +1,18 @@
+---
+variables:
+  # PLACEHOLDER_ variables will be substituted by ad-hoc overlay logic
+  containerImage: PLACEHOLDER_CONTAINER_IMAGE
+  description: |
+      PTP Operator for OpenShift
+      The PTP Operator for OpenShift manages cluster-wide Precision Time Protocol
+      configuration. It detects hardware capable PTP devices on each node and configures
+      linuxptp processes such as ptp4l, phc2sys and timemaster.
+
+      Upstream repository: https://github.com/k8snetworkplumbingwg/ptp-operator
+  display_name: "PTP Operator"
+  manager_version: "ptp-operator.v4.22.0"
+  # min_kube_version should match ocp
+  # https://access.redhat.com/solutions/4870701
+  min_kube_version: "1.35.0"
+  subscription_badges: '["OpenShift Container Platform", "OpenShift Platform Plus"]'
+  version: "4.22.0"
