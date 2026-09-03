@@ -1,0 +1,42 @@
+packages:
+  - pciutils
+  - linuxptp
+  - ethtool
+  - hwdata
+  - synce4l
+  - iproute
+  - procps-ng
+  - chrony
+  - name: gpsd-minimal
+    arches:
+      only:
+        - x86_64
+        - aarch64
+  - name: gpsd-minimal-clients
+    arches:
+      only:
+        - x86_64
+        - aarch64
+# Force matching libs into the hermetic repo. CentOS Stream base images drift
+# ahead of pinned transitive deps (e.g. acl needing libacl=EVR); without these
+# reinstalls, hermetic yum fails with "nothing provides libacl…".
+# rpm-lockfile-prototype omits RPMs already in context.image unless they are
+# listed here. util-linux/openssl/systemd must stay locked to the image NEVRAs.
+# Relock with scripts/relock-linuxptp-daemon-rpms.sh.
+reinstallPackages:
+  - systemd-libs
+  - libacl
+  - acl
+  - util-linux
+  - util-linux-core
+  - libfdisk
+  - openssl
+  - systemd
+contentOrigin:
+  repofiles:
+    - ./centos.repo
+arches:
+  - x86_64
+  - aarch64
+context:
+  image: quay.io/centos/centos:stream9@sha256:d323b7623e947245a8eb506fbb0ad0e55eb2ae2d2407b66741a15f372caf9bdc
