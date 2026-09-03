@@ -13,11 +13,12 @@ import (
 	"io/ioutil"
 	"mime"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
 	"golang.org/x/oauth2"
-	jose "gopkg.in/square/go-jose.v2"
+	jose "gopkg.in/go-jose/go-jose.v2"
 )
 
 const (
@@ -45,12 +46,11 @@ var (
 // This method sets the same context key used by the golang.org/x/oauth2 package,
 // so the returned context works for that package too.
 //
-//    myClient := &http.Client{}
-//    ctx := oidc.ClientContext(parentContext, myClient)
+//	myClient := &http.Client{}
+//	ctx := oidc.ClientContext(parentContext, myClient)
 //
-//    // This will use the custom client
-//    provider, err := oidc.NewProvider(ctx, "https://accounts.example.com")
-//
+//	// This will use the custom client
+//	provider, err := oidc.NewProvider(ctx, "https://accounts.example.com")
 func ClientContext(ctx context.Context, client *http.Client) context.Context {
 	return context.WithValue(ctx, oauth2.HTTPClient, client)
 }
@@ -69,6 +69,7 @@ type Provider struct {
 	authURL     string
 	tokenURL    string
 	userInfoURL string
+	algorithms  []string
 
 	// Raw claims returned by the server.
 	rawClaims []byte
@@ -82,11 +83,27 @@ type cachedKeys struct {
 }
 
 type providerJSON struct {
-	Issuer      string `json:"issuer"`
-	AuthURL     string `json:"authorization_endpoint"`
-	TokenURL    string `json:"token_endpoint"`
-	JWKSURL     string `json:"jwks_uri"`
-	UserInfoURL string `json:"userinfo_endpoint"`
+	Issuer      string   `json:"issuer"`
+	AuthURL     string   `json:"authorization_endpoint"`
+	TokenURL    string   `json:"token_endpoint"`
+	JWKSURL     string   `json:"jwks_uri"`
+	UserInfoURL string   `json:"userinfo_endpoint"`
+	Algorithms  []string `json:"id_token_signing_alg_values_supported"`
+}
+
+// supportedAlgorithms is a list of algorithms explicitly supported by this
+// package. If a provider supports other algorithms, such as HS256 or none,
+// those values won't be passed to the IDTokenVerifier.
+var supportedAlgorithms = map[string]bool{
+	RS256: true,
+	RS384: true,
+	RS512: true,
+	ES256: true,
+	ES384: true,
+	ES512: true,
+	PS256: true,
+	PS384: true,
+	PS512: true,
 }
 
 // NewProvider uses the OpenID Connect discovery mechanism to construct a Provider.
@@ -123,11 +140,18 @@ func NewProvider(ctx context.Context, issuer string) (*Provider, error) {
 	if p.Issuer != issuer {
 		return nil, fmt.Errorf("oidc: issuer did not match the issuer returned by provider, expected %q got %q", issuer, p.Issuer)
 	}
+	var algs []string
+	for _, a := range p.Algorithms {
+		if supportedAlgorithms[a] {
+			algs = append(algs, a)
+		}
+	}
 	return &Provider{
 		issuer:       p.Issuer,
 		authURL:      p.AuthURL,
 		tokenURL:     p.TokenURL,
 		userInfoURL:  p.UserInfoURL,
+		algorithms:   algs,
 		rawClaims:    body,
 		remoteKeySet: NewRemoteKeySet(ctx, p.JWKSURL),
 	}, nil
@@ -135,14 +159,14 @@ func NewProvider(ctx context.Context, issuer string) (*Provider, error) {
 
 // Claims unmarshals raw fields returned by the server during discovery.
 //
-//    var claims struct {
-//        ScopesSupported []string `json:"scopes_supported"`
-//        ClaimsSupported []string `json:"claims_supported"`
-//    }
+//	var claims struct {
+//	    ScopesSupported []string `json:"scopes_supported"`
+//	    ClaimsSupported []string `json:"claims_supported"`
+//	}
 //
-//    if err := provider.Claims(&claims); err != nil {
-//        // handle unmarshaling error
-//    }
+//	if err := provider.Claims(&claims); err != nil {
+//	    // handle unmarshaling error
+//	}
 //
 // For a list of fields defined by the OpenID Connect spec see:
 // https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
@@ -166,6 +190,16 @@ type UserInfo struct {
 	EmailVerified bool   `json:"email_verified"`
 
 	claims []byte
+}
+
+type userInfoRaw struct {
+	Subject string `json:"sub"`
+	Profile string `json:"profile"`
+	Email   string `json:"email"`
+	// Handle providers that return email_verified as a string
+	// https://forums.aws.amazon.com/thread.jspa?messageID=949441&#949441 and
+	// https://discuss.elastic.co/t/openid-error-after-authenticating-against-aws-cognito/206018/11
+	EmailVerified stringAsBool `json:"email_verified"`
 }
 
 // Claims unmarshals the raw JSON object claims into the provided object.
@@ -206,12 +240,27 @@ func (p *Provider) UserInfo(ctx context.Context, tokenSource oauth2.TokenSource)
 		return nil, fmt.Errorf("%s: %s", resp.Status, body)
 	}
 
-	var userInfo UserInfo
+	ct := resp.Header.Get("Content-Type")
+	mediaType, _, parseErr := mime.ParseMediaType(ct)
+	if parseErr == nil && mediaType == "application/jwt" {
+		payload, err := p.remoteKeySet.VerifySignature(ctx, string(body))
+		if err != nil {
+			return nil, fmt.Errorf("oidc: invalid userinfo jwt signature %v", err)
+		}
+		body = payload
+	}
+
+	var userInfo userInfoRaw
 	if err := json.Unmarshal(body, &userInfo); err != nil {
 		return nil, fmt.Errorf("oidc: failed to decode userinfo: %v", err)
 	}
-	userInfo.claims = body
-	return &userInfo, nil
+	return &UserInfo{
+		Subject:       userInfo.Subject,
+		Profile:       userInfo.Profile,
+		Email:         userInfo.Email,
+		EmailVerified: bool(userInfo.EmailVerified),
+		claims:        body,
+	}, nil
 }
 
 // IDToken is an OpenID Connect extension that provides a predictable representation
@@ -268,18 +317,17 @@ type IDToken struct {
 
 // Claims unmarshals the raw JSON payload of the ID Token into a provided struct.
 //
-//		idToken, err := idTokenVerifier.Verify(rawIDToken)
-//		if err != nil {
-//			// handle error
-//		}
-//		var claims struct {
-//			Email         string `json:"email"`
-//			EmailVerified bool   `json:"email_verified"`
-//		}
-//		if err := idToken.Claims(&claims); err != nil {
-//			// handle error
-//		}
-//
+//	idToken, err := idTokenVerifier.Verify(rawIDToken)
+//	if err != nil {
+//		// handle error
+//	}
+//	var claims struct {
+//		Email         string `json:"email"`
+//		EmailVerified bool   `json:"email_verified"`
+//	}
+//	if err := idToken.Claims(&claims); err != nil {
+//		// handle error
+//	}
 func (i *IDToken) Claims(v interface{}) error {
 	if i.claims == nil {
 		return errors.New("oidc: claims not set")
@@ -331,6 +379,28 @@ type idToken struct {
 type claimSource struct {
 	Endpoint    string `json:"endpoint"`
 	AccessToken string `json:"access_token"`
+}
+
+type stringAsBool bool
+
+func (sb *stringAsBool) UnmarshalJSON(b []byte) error {
+	var result bool
+	err := json.Unmarshal(b, &result)
+	if err == nil {
+		*sb = stringAsBool(result)
+		return nil
+	}
+	var s string
+	err = json.Unmarshal(b, &s)
+	if err != nil {
+		return err
+	}
+	result, err = strconv.ParseBool(s)
+	if err != nil {
+		return err
+	}
+	*sb = stringAsBool(result)
+	return nil
 }
 
 type audience []string
