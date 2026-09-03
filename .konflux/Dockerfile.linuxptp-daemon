@@ -2,7 +2,7 @@ ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_
 # Digest-pin stream9. Must match rpms.in.yaml context.image. Do not set
 # RUNTIME_IMAGE in the shared container_build_args.conf. Relock with
 # scripts/relock-linuxptp-daemon-rpms.sh after changing this digest.
-ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9@sha256:0ae48e0618d4e26d6d43406f923170160c72d8681ff42df9f26b2c8f3f500a94
+ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9@sha256:d323b7623e947245a8eb506fbb0ad0e55eb2ae2d2407b66741a15f372caf9bdc
 
 # Built with path-context "." so Hermeto/cachi2 RPM injection (repo root) is
 # visible to yum. Sources are copied from pkg/linuxptp-daemon/.
