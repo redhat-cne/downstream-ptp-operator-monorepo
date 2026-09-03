@@ -1,0 +1,11 @@
+---
+# We use this IDMS to map the quay.io build to registry.redhat.io in the catalog.json post rendering
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: catalog-idms
+spec:
+  imageDigestMirrors:
+  - mirrors:
+    - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-14
+    source: registry.redhat.io/experimental-ptp/ptp-operator-bundle-mono-operator-bundle

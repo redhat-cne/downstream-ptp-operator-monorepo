@@ -1,0 +1,18 @@
+# The opm image is expected to contain /bin/opm (with a serve subcommand) and /bin/grpc_health_probe.
+# ose-operator-registry-rhel9 is published as OpenShift 4.y tags.
+# PTP 5.x and unreleased 4.y must not use the PTP branch number (that tag 404s).
+# apply_konflux sets 4.14 to the branch 4.y, or the last published 4.y.
+ARG OPM_IMAGE=registry.redhat.io/openshift4/ose-operator-registry-rhel9:v4.14
+
+FROM ${OPM_IMAGE}
+
+ENTRYPOINT ["/bin/opm"]
+CMD ["serve", "/configs", "--cache-dir=/tmp/cache"]
+
+ENV PACKAGE_NAME=ptp-operator
+
+COPY .konflux/catalog/$PACKAGE_NAME/ /configs/$PACKAGE_NAME
+
+RUN ["/bin/opm", "serve", "/configs", "--cache-dir=/tmp/cache", "--cache-only"]
+
+LABEL operators.operatorframework.io.index.configs.v1=/configs
