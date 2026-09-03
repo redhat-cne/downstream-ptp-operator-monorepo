@@ -129,7 +129,16 @@ spec:
         Optional tag (e.g. on-pr-<sha>) used to rewrite tenant pins in
         .konflux/overlay/pin_images.in.yaml before the image build. Leave
         empty (the default) so the bundle keeps committed pins. Set only if
-        a PR must embed same-revision operand images (e.g. certsuite).
+        a PR must embed same-revision operand images (e.g. certsuite); that
+        also requires pin-pr-component-images-hermetic false.
+    - name: pin-pr-component-images-hermetic
+      default: 'true'
+      type: string
+      description: >
+        Whether pin-pr-component-images (run-script-oci-ta) runs hermetically.
+        Must stay true so Conforma hermetic_task.hermetic passes. Set false
+        only when pr-component-image-tag is set and the task must wait on
+        the network for those tags.
   results:
     - description: ''
       name: IMAGE_URL
@@ -231,6 +240,9 @@ spec:
           workspace: netrc
     # No-op when pr-component-image-tag is empty (the default: PR/push/release
     # keep committed pin_images.in.yaml). Optional rewrite if a PR sets the tag.
+    # Always runs so SCRIPT_ARTIFACT stays in the source chain (same as FBC
+    # run-opm-pre-actions). HERMETIC defaults true; on-PR only sets false when
+    # the tag is set and the script must wait on the network.
     - name: pin-pr-component-images
       params:
         - name: ociStorage
@@ -245,9 +257,10 @@ spec:
             TAG="$(params.pr-component-image-tag)"
             chmod +x .konflux/scripts/pin-pr-component-images.sh
             .konflux/scripts/pin-pr-component-images.sh --tag "${TAG}"
-        # Network needed to wait on/resolve on-PR component image tags.
+        # Push/release and default PRs: true (Conforma). Set false only when
+        # pr-component-image-tag is set (network wait for component tags).
         - name: HERMETIC
-          value: "false"
+          value: $(params.pin-pr-component-images-hermetic)
         - name: SOURCE_ARTIFACT
           value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       runAfter:
@@ -291,6 +304,9 @@ spec:
           value: $(params.privileged-nested)
         - name: SOURCE_ARTIFACT
           value: $(tasks.pin-pr-component-images.results.SCRIPT_ARTIFACT)
+        - name: ADDITIONAL_BASE_IMAGES
+          value:
+            - $(tasks.pin-pr-component-images.results.SCRIPT_RUNNER_IMAGE_REFERENCE)
         - name: CACHI2_ARTIFACT
           value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
         - name: IMAGE_APPEND_PLATFORM

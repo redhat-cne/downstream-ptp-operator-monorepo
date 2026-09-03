@@ -54,8 +54,8 @@ spec:
     - name: additional-labels
       value:
         - name=experimental-ptp/ptp-operator-bundle-mono-operator-bundle
-    # pr-component-image-tag stays unset (pipeline default ""). CSV uses
-    # committed .konflux/overlay/pin_images.in.yaml, same as push.
+    # pr-component-image-tag and pin-pr-component-images-hermetic stay at
+    # pipeline defaults (empty / true). CSV uses committed pin_images.in.yaml.
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
