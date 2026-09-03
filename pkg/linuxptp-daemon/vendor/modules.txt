@@ -11,7 +11,7 @@ github.com/beorn7/perks/quantile
 ## explicit; go 1.21
 github.com/bigkevmcd/go-configparser
 github.com/bigkevmcd/go-configparser/chainmap
-# github.com/cespare/xxhash/v2 v2.2.0
+# github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
 # github.com/davecgh/go-spew v1.1.1
