@@ -5,7 +5,11 @@
   "prConcurrentLimit": 0,
   "pruneBranchAfterAutomerge": true,
   "ignorePaths": [
-    "**/vendor/**"
+    "**/vendor/**",
+    "go.mod",
+    "go.sum",
+    "pkg/*/go.mod",
+    "pkg/*/go.sum"
   ],
   "schedule": [
     "at any time"
@@ -46,5 +50,11 @@
   },
   "gomod": {
     "enabled": false
-  }
+  },
+  "packageRules": [
+    {
+      "matchManagers": ["gomod"],
+      "enabled": false
+    }
+  ]
 }
