@@ -6,10 +6,8 @@
   "pruneBranchAfterAutomerge": true,
   "ignorePaths": [
     "**/vendor/**",
-    "go.mod",
-    "go.sum",
-    "pkg/*/go.mod",
-    "pkg/*/go.sum"
+    "**/go.mod",
+    "**/go.sum"
   ],
   "schedule": [
     "at any time"
@@ -49,12 +47,17 @@
     ]
   },
   "gomod": {
-    "enabled": false
-  },
-  "packageRules": [
-    {
-      "matchManagers": ["gomod"],
-      "enabled": false
-    }
-  ]
+    "enabled": false,
+    "packageRules": [
+      {
+        "matchManagers": ["gomod"],
+        "enabled": false
+      },
+      {
+        "matchManagers": ["gomod"],
+        "matchDepTypes": ["indirect"],
+        "enabled": false
+      }
+    ]
+  }
 }
