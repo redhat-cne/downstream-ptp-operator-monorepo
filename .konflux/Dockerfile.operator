@@ -1,0 +1,22 @@
+ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.25
+ARG RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi-minimal:latest
+
+FROM ${BUILDER_IMAGE} AS builder
+USER root
+WORKDIR /go/src/github.com/k8snetworkplumbingwg/ptp-operator
+COPY . .
+ENV CGO_ENABLED=0
+RUN make
+
+FROM ${RUNTIME_IMAGE}
+COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/ptp-operator/build/_output/bin/ptp-operator /usr/local/bin/
+COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/ptp-operator/manifests /manifests
+COPY bindata /bindata
+
+LABEL io.k8s.display-name="OpenShift ptp-operator" \
+      io.k8s.description="This is a component that manages cluster PTP configuration." \
+      io.openshift.tags="openshift,ptp" \
+      com.redhat.delivery.appregistry=true \
+      maintainer="PTP Team <ptp-dev@redhat.com>"
+
+ENTRYPOINT ["/usr/local/bin/ptp-operator"]
