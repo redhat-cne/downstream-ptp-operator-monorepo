@@ -1,0 +1,28 @@
+reviewers:
+  - zshi-redhat
+  - pliurh
+  - dougbtv
+  - dcbw
+  - squeed
+  - fepan
+  - s1061123
+  - SchSeba
+  - josephdrichard
+  - aneeshkp
+  - nishant-parekh
+  - vitus133
+approvers:
+  - zshi-redhat
+  - pliurh
+  - dougbtv
+  - dcbw
+  - squeed
+  - fepan
+  - s1061123
+  - SchSeba
+  - josephdrichard
+  - aneeshkp
+  - nishant-parekh
+  - vitus133
+component: "Networking"
+subcomponent: "ptp"
