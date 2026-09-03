@@ -7,7 +7,7 @@ require (
 	github.com/bigkevmcd/go-configparser v0.0.0-20240624060122-ccd05f93a9d2
 	github.com/cloudevents/sdk-go/v2 v2.15.2
 	github.com/facebook/time v0.0.0-20241030181404-3e1b98825c29
-	github.com/fsnotify/fsnotify v1.9.0
+	github.com/fsnotify/fsnotify v1.10.1
 	github.com/golang/glog v1.2.5
 	github.com/google/goexpect v0.0.0-20210430020637-ab937bf7fd6f
 	github.com/google/uuid v1.6.0
