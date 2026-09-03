@@ -11,6 +11,7 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "pull_request" && target_branch == "release-4.22"
+    # Retrigger all 4.22 components so staging Conforma sees hermetic pin-pr builds (2026-09-03).
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: ptp-operator-mono-4-22
