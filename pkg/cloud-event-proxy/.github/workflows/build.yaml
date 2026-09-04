@@ -39,7 +39,7 @@ jobs:
           password: ${{ secrets.QUAY_ROBOT_TOKEN }}
       - name: Build and Push
         if: ${{ github.repository_owner == 'redhat-cne' }}
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: examples/consumer.Dockerfile
