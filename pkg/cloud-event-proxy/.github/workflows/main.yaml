@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v7
         with:
           go-version: '1.19'
       - name: tidy
@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v7
         with:
           go-version: '1.19'
       - name: tidy
