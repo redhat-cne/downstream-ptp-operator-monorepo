@@ -148,7 +148,7 @@ jobs:
           echo "RAM: $(free -h | awk '/Mem:/{print $2}')"
           echo "Kernel: $(uname -r)"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Install podman 5.x
         run: |
@@ -205,7 +205,7 @@ jobs:
           echo "RAM: $(free -h | awk '/Mem:/{print $2}')"
           echo "Kernel: $(uname -r)"
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Install podman 5.x
         run: |
