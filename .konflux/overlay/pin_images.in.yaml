@@ -13,7 +13,7 @@
 - key: kube_rbac_proxy_image
   source: quay.io/openshift/origin-kube-rbac-proxy:4.21
   # Digest is rewritten on PR by pin-pr-component-images.sh; refresh after the first push build.
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-4-21@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-4-21@sha256:4d43a25016dc3c77d77f08dc58e622dcf6835870b721e78f6179d9d0badcc247
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
