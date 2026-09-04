@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Check license
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - run: make check-license
   generate:
     runs-on: ubuntu-latest
     name: Generate
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - uses: actions/setup-go@v2
       with:
         go-version: ${{ env.go-version }}
@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Lint
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - name: golangci-lint
       uses: golangci/golangci-lint-action@v2
       with:
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - uses: actions/setup-go@v2
       with:
         go-version: ${{ env.go-version }}
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Unit tests
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - uses: actions/setup-go@v2
       with:
         go-version: ${{ env.go-version }}
@@ -56,7 +56,7 @@ jobs:
     name: E2E tests
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v7
     - name: Start kind & create cluster
       uses: engineerd/setup-kind@v0.5.0
       with:
@@ -90,7 +90,7 @@ jobs:
       - e2e-tests
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
       - name: Setup golang for building
         uses: actions/setup-go@v2
         with:
