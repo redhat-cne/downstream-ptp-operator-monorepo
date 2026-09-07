@@ -1,4 +1,4 @@
-FROM golang:1.18 AS builder
+FROM golang:1.27 AS builder
 WORKDIR /go/src/github.com/openshift/linuxptp-daemon
 COPY . .
 RUN make clean && make
