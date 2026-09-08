@@ -231,9 +231,11 @@ spec:
             TAG="$(params.pr-component-image-tag)"
             chmod +x .konflux/scripts/pin-pr-component-images.sh
             .konflux/scripts/pin-pr-component-images.sh --tag "${TAG}"
-        # Network needed to wait on/resolve on-PR component image tags.
+        # Keep this task hermetic so Conforma accepts the attestation. The
+        # default PR build does not set pr-component-image-tag, so the script
+        # is a no-op; digest pinning is handled from the committed pin file.
         - name: HERMETIC
-          value: "false"
+          value: "true"
         - name: SOURCE_ARTIFACT
           value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       runAfter:
