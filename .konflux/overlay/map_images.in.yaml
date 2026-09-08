@@ -9,10 +9,10 @@
   production: registry.redhat.io/experimental-ptp/linuxptp-daemon-mono-rhel9
   staging: registry.stage.redhat.io/experimental-ptp/linuxptp-daemon-mono-rhel9
 #
-# kube-rbac-proxy
+# kube-rbac-proxy (tenant-built; use experimental-ptp delivery path like other operands)
 - key: kube_rbac_proxy_image
-  production: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
-  staging: registry.stage.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
+  production: registry.redhat.io/experimental-ptp/kube-rbac-proxy-mono-rhel9
+  staging: registry.stage.redhat.io/experimental-ptp/kube-rbac-proxy-mono-rhel9
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
