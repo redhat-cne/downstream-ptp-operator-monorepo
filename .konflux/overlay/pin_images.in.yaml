@@ -9,11 +9,10 @@
   source: quay.io/openshift/origin-ptp:4.22
   target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-22@sha256:b01316ea2dc3944b6e616c67312a7223b3a5a97e9e32f53a4420b35d9ac8b8d0
 #
-# kube-rbac-proxy (tenant-built multi-arch from vendored openshift/kube-rbac-proxy)
+# kube-rbac-proxy (OCP 4.22.12 multi-arch release payload)
 - key: kube_rbac_proxy_image
   source: quay.io/openshift/origin-kube-rbac-proxy:4.22
-  # Digest is rewritten on PR by pin-pr-component-images.sh; refresh after the first push build.
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-4-22@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+  target: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:3bd7f9c5f1e88c7330d645cdc9f43bc72617f917751bd34314f36f4682b95585
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
