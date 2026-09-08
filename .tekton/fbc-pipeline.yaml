@@ -505,6 +505,8 @@ spec:
           value: $(tasks.build-image-index.results.IMAGE_DIGEST)
         - name: image-url
           value: $(tasks.build-image-index.results.IMAGE_URL)
+        - name: image-mirror-set-path
+          value: .tekton/images-mirror-set.yaml
         - name: SOURCE_ARTIFACT
           value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       runAfter:
