@@ -21,6 +21,7 @@ MAX_ATTEMPTS=90
 SLEEP_SECONDS=20
 TENANT_PREFIX="quay.io/redhat-user-workloads/experimental-ptp-tenant/"
 CRANE_BIN=""
+USE_SKOPEO=false
 
 # Logs must go to stderr: wait_digest is captured via $(), and stdout pollution
 # would corrupt pin digests (breaking the bundle CSV YAML).
@@ -66,14 +67,12 @@ ensure_crane() {
     CRANE_BIN=$(command -v crane)
     return 0
   fi
-  local tmp
-  tmp="$(mktemp -d)"
-  log "crane not on PATH; downloading to ${tmp}"
-  curl -fsSL -o "${tmp}/crane.tgz" \
-    https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
-  tar -xzf "${tmp}/crane.tgz" -C "${tmp}" crane
-  chmod +x "${tmp}/crane"
-  CRANE_BIN="${tmp}/crane"
+  if command -v skopeo >/dev/null 2>&1; then
+    USE_SKOPEO=true
+    log "crane not found; using preinstalled skopeo"
+    return 0
+  fi
+  die "need crane or skopeo to resolve image digests"
 }
 
 resolve_digest() {
@@ -103,14 +102,9 @@ wait_digest() {
   return 1
 }
 
-# Prefer crane in CI; allow skopeo locally without download.
-if command -v crane >/dev/null 2>&1 || [[ "$(uname -s)" == "Linux" ]]; then
-  ensure_crane
-elif command -v skopeo >/dev/null 2>&1; then
-  log "Using skopeo to resolve digests"
-else
-  die "need crane or skopeo to resolve image digests"
-fi
+# Prefer an installed crane, then an installed skopeo. Never download tools
+# at runtime: this task runs hermetically and has no network access to GitHub.
+ensure_crane
 
 log "Rewriting tenant pins in ${PIN_FILE} to tag ${TAG}"
 
