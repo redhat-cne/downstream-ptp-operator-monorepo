@@ -18,7 +18,7 @@
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22@sha256:9208d5da66780a3e191561a929e9e3ff59cc4cd3b99421f8903948868bc60a2b
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22@sha256:ffa80a2524f6eae98604a8bb030e7a7e08ac5947c37b8008ec7c60c171dbf9f0
 #
 # must-gather
 - key: must_gather_image
