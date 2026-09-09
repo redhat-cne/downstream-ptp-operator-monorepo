@@ -60,6 +60,9 @@ spec:
     # file, which can point at older release-branch images.
     - name: pr-component-image-tag
       value: on-pr-{{revision}}
+    # Wait for operand on-pr-* images and rewrite pin_images.in.yaml before build.
+    - name: pin-pr-component-images-hermetic
+      value: "false"
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:

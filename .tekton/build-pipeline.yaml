@@ -116,6 +116,13 @@ spec:
         .konflux/overlay/pin_images.in.yaml before the image build. Leave
         empty (the default) so the bundle keeps committed pins. Set only if
         a PR must embed same-revision operand images (e.g. certsuite).
+    - name: pin-pr-component-images-hermetic
+      default: 'true'
+      type: string
+      description: >
+        Whether pin-pr-component-images runs hermetically. Must be false when
+        pr-component-image-tag is set so the task can resolve on-pr-* tags from
+        the registry. Push/release builds leave pr-component-image-tag empty.
   results:
     - description: ''
       name: IMAGE_URL
@@ -231,11 +238,10 @@ spec:
             TAG="$(params.pr-component-image-tag)"
             chmod +x .konflux/scripts/pin-pr-component-images.sh
             .konflux/scripts/pin-pr-component-images.sh --tag "${TAG}"
-        # Keep this task hermetic so Conforma accepts the attestation. The
-        # default PR build does not set pr-component-image-tag, so the script
-        # is a no-op; digest pinning is handled from the committed pin file.
+        # Hermetic when pr-component-image-tag is empty (no-op). Bundle PR builds
+        # set pin-pr-component-images-hermetic=false so on-pr-* tags resolve.
         - name: HERMETIC
-          value: "true"
+          value: $(params.pin-pr-component-images-hermetic)
         - name: SOURCE_ARTIFACT
           value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       runAfter:
