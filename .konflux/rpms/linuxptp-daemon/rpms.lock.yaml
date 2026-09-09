@@ -18,13 +18,13 @@ arches:
     name: gpsd-minimal-clients
     evr: 1:3.26.1-2.el9
     sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/linuxptp-4.4-5.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/linuxptp-4.4-6.el9.aarch64.rpm
     repoid: appstream
-    size: 311285
-    checksum: sha256:e0b659d138465a65b6afb1859df2a5e14ba4064337bd82a479ca60405f7c2c43
+    size: 316932
+    checksum: sha256:187e26906000e4583ca68e7d4fd3854d9b994c3f4cd92c1b4b3d831808a74884
     name: linuxptp
-    evr: 4.4-5.el9
-    sourcerpm: linuxptp-4.4-5.el9.src.rpm
+    evr: 4.4-6.el9
+    sourcerpm: linuxptp-4.4-6.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/python3-pyserial-3.4-12.el9.noarch.rpm
     repoid: appstream
     size: 185055
@@ -67,6 +67,27 @@ arches:
     name: cryptsetup-libs
     evr: 2.8.6-2.el9
     sourcerpm: cryptsetup-2.8.6-2.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/dbus-1.12.20-10.el9.aarch64.rpm
+    repoid: baseos
+    size: 2997
+    checksum: sha256:3628a340989bddcecd2c490ad9a7ce3fecb85a1ca28d154bf4c82db804eac6b0
+    name: dbus
+    evr: 1:1.12.20-10.el9
+    sourcerpm: dbus-1.12.20-10.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/dbus-broker-28-10.el9.aarch64.rpm
+    repoid: baseos
+    size: 167947
+    checksum: sha256:101950b78684129b309aba96ac2cf5a4f7187ba9ac5184576494704451577f6a
+    name: dbus-broker
+    evr: 28-10.el9
+    sourcerpm: dbus-broker-28-10.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/dbus-common-1.12.20-10.el9.noarch.rpm
+    repoid: baseos
+    size: 13541
+    checksum: sha256:6e522cb85f206cdac3e1c6d9ed7400a35364c7e014687c17b17431a8d10d07e2
+    name: dbus-common
+    evr: 1:1.12.20-10.el9
+    sourcerpm: dbus-1.12.20-10.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/device-mapper-1.02.207-6.el9.aarch64.rpm
     repoid: baseos
     size: 141089
@@ -130,6 +151,13 @@ arches:
     name: kmod
     evr: 28-11.el9
     sourcerpm: kmod-28-11.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/kmod-libs-28-11.el9.aarch64.rpm
+    repoid: baseos
+    size: 62114
+    checksum: sha256:68bd119a65b2d37388623c0e4a0a717b74787e1243244c8ffa0a448f42718ee4
+    name: kmod-libs
+    evr: 28-11.el9
+    sourcerpm: kmod-28-11.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libacl-2.4.0-2.el9.aarch64.rpm
     repoid: baseos
     size: 24963
@@ -172,6 +200,13 @@ arches:
     name: libnl3
     evr: 3.11.0-1.el9
     sourcerpm: libnl3-3.11.0-1.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libseccomp-2.5.6-1.el9.aarch64.rpm
+    repoid: baseos
+    size: 70875
+    checksum: sha256:74a99b069ffe2fdd6f2ee19c73197c0ad1b71353df39c5af8c404932a5817974
+    name: libseccomp
+    evr: 2.5.6-1.el9
+    sourcerpm: libseccomp-2.5.6-1.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libusbx-1.0.30-1.el9.aarch64.rpm
     repoid: baseos
     size: 77732
@@ -228,6 +263,20 @@ arches:
     name: systemd-libs
     evr: 252-78.el9
     sourcerpm: systemd-252-78.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-pam-252-78.el9.aarch64.rpm
+    repoid: baseos
+    size: 243897
+    checksum: sha256:6845e3290cf7ce8085ea6f160681070df506b031deb1a2d1acd79b36ce5a00d6
+    name: systemd-pam
+    evr: 252-78.el9
+    sourcerpm: systemd-252-78.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-rpm-macros-252-78.el9.noarch.rpm
+    repoid: baseos
+    size: 36797
+    checksum: sha256:a0ee77264681d14a9298dc6d9e3ca4c4abb4a546619d2075b6c666e376cf78d0
+    name: systemd-rpm-macros
+    evr: 252-78.el9
+    sourcerpm: systemd-252-78.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-udev-252-78.el9.aarch64.rpm
     repoid: baseos
     size: 2057057
@@ -256,12 +305,12 @@ arches:
     checksum: sha256:2928e36a9067a6e987ec2cae547bad50ebde3f906998fcc04a21013fc7a4f539
     name: gpsd-minimal
     evr: 1:3.26.1-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-5.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-6.el9.src.rpm
     repoid: appstream-source
-    size: 385631
-    checksum: sha256:cad25cbf012118086900bdcafc7121cfa27f05190c65abf7cf6c413f8251a2d0
+    size: 408175
+    checksum: sha256:b12de67183a45f40506fbcdf6480a798c6cf67788c740d8d1057e2cfe82cf056
     name: linuxptp
-    evr: 4.4-5.el9
+    evr: 4.4-6.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/pyserial-3.4-12.el9.src.rpm
     repoid: appstream-source
     size: 162928
@@ -298,6 +347,18 @@ arches:
     checksum: sha256:0eaa1623e4e8db6595fadd0c030e4f281c56e6f8795ec7e690cbedfa5e0be399
     name: cryptsetup
     evr: 2.8.6-2.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-1.12.20-10.el9.src.rpm
+    repoid: baseos-source
+    size: 2143421
+    checksum: sha256:a0f99f3a65a5aaae070f37b08387089dc8e9f346d657674131a641d8a57a0cdf
+    name: dbus
+    evr: 1:1.12.20-10.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-broker-28-10.el9.src.rpm
+    repoid: baseos-source
+    size: 252707
+    checksum: sha256:1a0f77933ff82be8853c6d568f5234f77ae8cb228ea9c12075e0b8792292af0b
+    name: dbus-broker
+    evr: 28-10.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/ethtool-6.19-1.el9.src.rpm
     repoid: baseos-source
     size: 468515
@@ -352,6 +413,12 @@ arches:
     checksum: sha256:8382ea2d585f3f0c5e0a6f4eea20bc7e5b30e1f78bc5fb35e570c80585461dfa
     name: libnl3
     evr: 3.11.0-1.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/libseccomp-2.5.6-1.el9.src.rpm
+    repoid: baseos-source
+    size: 641578
+    checksum: sha256:7b28246c41d520aefdda32ca76504a9927d11e78a690d370e4d49ae72fc7e814
+    name: libseccomp
+    evr: 2.5.6-1.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/libusbx-1.0.30-1.el9.src.rpm
     repoid: baseos-source
     size: 666408
@@ -417,13 +484,13 @@ arches:
     name: gpsd-minimal-clients
     evr: 1:3.26.1-2.el9
     sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/linuxptp-4.4-5.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/linuxptp-4.4-6.el9.x86_64.rpm
     repoid: appstream
-    size: 307859
-    checksum: sha256:2c9e2c25f14d4e2990a8a3061450cc7be3c9182104a149988f51e3bb7d5c8409
+    size: 312193
+    checksum: sha256:78813ccd071cbaf32dabe47ee34ae69c806db1e2da62e92e3aa17e9039ce8e77
     name: linuxptp
-    evr: 4.4-5.el9
-    sourcerpm: linuxptp-4.4-5.el9.src.rpm
+    evr: 4.4-6.el9
+    sourcerpm: linuxptp-4.4-6.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/python3-pyserial-3.4-12.el9.noarch.rpm
     repoid: appstream
     size: 185055
@@ -466,6 +533,27 @@ arches:
     name: cryptsetup-libs
     evr: 2.8.6-2.el9
     sourcerpm: cryptsetup-2.8.6-2.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/dbus-1.12.20-10.el9.x86_64.rpm
+    repoid: baseos
+    size: 3045
+    checksum: sha256:c36fc19c6d1cd8d9d10499f5c9b6ac42db27b5cd525cb0b6480b16a476f2df5d
+    name: dbus
+    evr: 1:1.12.20-10.el9
+    sourcerpm: dbus-1.12.20-10.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/dbus-broker-28-10.el9.x86_64.rpm
+    repoid: baseos
+    size: 173733
+    checksum: sha256:40743c77bb6514893e4aab880ad34b4cad500927b0afd4bf74a94d14e0bcbf9f
+    name: dbus-broker
+    evr: 28-10.el9
+    sourcerpm: dbus-broker-28-10.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/dbus-common-1.12.20-10.el9.noarch.rpm
+    repoid: baseos
+    size: 13541
+    checksum: sha256:6e522cb85f206cdac3e1c6d9ed7400a35364c7e014687c17b17431a8d10d07e2
+    name: dbus-common
+    evr: 1:1.12.20-10.el9
+    sourcerpm: dbus-1.12.20-10.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/device-mapper-1.02.207-6.el9.x86_64.rpm
     repoid: baseos
     size: 143027
@@ -529,6 +617,13 @@ arches:
     name: kmod
     evr: 28-11.el9
     sourcerpm: kmod-28-11.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/kmod-libs-28-11.el9.x86_64.rpm
+    repoid: baseos
+    size: 63583
+    checksum: sha256:29d2fd267498f3e12d420a3d867483d32ce97d544327de983872f8ee89ec02b3
+    name: kmod-libs
+    evr: 28-11.el9
+    sourcerpm: kmod-28-11.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libacl-2.4.0-2.el9.x86_64.rpm
     repoid: baseos
     size: 25007
@@ -571,6 +666,13 @@ arches:
     name: libnl3
     evr: 3.11.0-1.el9
     sourcerpm: libnl3-3.11.0-1.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libseccomp-2.5.6-1.el9.x86_64.rpm
+    repoid: baseos
+    size: 70501
+    checksum: sha256:73779d9eb83b4334fb312a7a6bcf7764780777f168724d7e57f6477fd912ac0a
+    name: libseccomp
+    evr: 2.5.6-1.el9
+    sourcerpm: libseccomp-2.5.6-1.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libusbx-1.0.30-1.el9.x86_64.rpm
     repoid: baseos
     size: 79074
@@ -627,6 +729,20 @@ arches:
     name: systemd-libs
     evr: 252-78.el9
     sourcerpm: systemd-252-78.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-pam-252-78.el9.x86_64.rpm
+    repoid: baseos
+    size: 254261
+    checksum: sha256:a1fce5fb7bf0c6ac86e738dbb21c5e02361015f1858d22b0c368de76e8a152c7
+    name: systemd-pam
+    evr: 252-78.el9
+    sourcerpm: systemd-252-78.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-rpm-macros-252-78.el9.noarch.rpm
+    repoid: baseos
+    size: 36797
+    checksum: sha256:a0ee77264681d14a9298dc6d9e3ca4c4abb4a546619d2075b6c666e376cf78d0
+    name: systemd-rpm-macros
+    evr: 252-78.el9
+    sourcerpm: systemd-252-78.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-udev-252-78.el9.x86_64.rpm
     repoid: baseos
     size: 2106454
@@ -655,12 +771,12 @@ arches:
     checksum: sha256:2928e36a9067a6e987ec2cae547bad50ebde3f906998fcc04a21013fc7a4f539
     name: gpsd-minimal
     evr: 1:3.26.1-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-5.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-6.el9.src.rpm
     repoid: appstream-source
-    size: 385631
-    checksum: sha256:cad25cbf012118086900bdcafc7121cfa27f05190c65abf7cf6c413f8251a2d0
+    size: 408175
+    checksum: sha256:b12de67183a45f40506fbcdf6480a798c6cf67788c740d8d1057e2cfe82cf056
     name: linuxptp
-    evr: 4.4-5.el9
+    evr: 4.4-6.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/pyserial-3.4-12.el9.src.rpm
     repoid: appstream-source
     size: 162928
@@ -697,6 +813,18 @@ arches:
     checksum: sha256:0eaa1623e4e8db6595fadd0c030e4f281c56e6f8795ec7e690cbedfa5e0be399
     name: cryptsetup
     evr: 2.8.6-2.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-1.12.20-10.el9.src.rpm
+    repoid: baseos-source
+    size: 2143421
+    checksum: sha256:a0f99f3a65a5aaae070f37b08387089dc8e9f346d657674131a641d8a57a0cdf
+    name: dbus
+    evr: 1:1.12.20-10.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-broker-28-10.el9.src.rpm
+    repoid: baseos-source
+    size: 252707
+    checksum: sha256:1a0f77933ff82be8853c6d568f5234f77ae8cb228ea9c12075e0b8792292af0b
+    name: dbus-broker
+    evr: 28-10.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/ethtool-6.19-1.el9.src.rpm
     repoid: baseos-source
     size: 468515
@@ -751,6 +879,12 @@ arches:
     checksum: sha256:8382ea2d585f3f0c5e0a6f4eea20bc7e5b30e1f78bc5fb35e570c80585461dfa
     name: libnl3
     evr: 3.11.0-1.el9
+  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/libseccomp-2.5.6-1.el9.src.rpm
+    repoid: baseos-source
+    size: 641578
+    checksum: sha256:7b28246c41d520aefdda32ca76504a9927d11e78a690d370e4d49ae72fc7e814
+    name: libseccomp
+    evr: 2.5.6-1.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/libusbx-1.0.30-1.el9.src.rpm
     repoid: baseos-source
     size: 666408
