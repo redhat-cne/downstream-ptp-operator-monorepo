@@ -231,7 +231,7 @@ spec:
         - name: ociArtifactExpiresAfter
           value: $(params.image-expires-after)
         - name: SCRIPT_RUNNER_IMAGE
-          value: quay.io/konflux-ci/appstudio-utils@sha256:32cda04122ee0a5d5b4307e121d192d1265c3bff727c9d894f36b6772da53d8c
+          value: registry.redhat.io/openshift4/ose-tools-rhel9:v4.22
         - name: SCRIPT
           value: |
             set -euo pipefail
@@ -289,6 +289,9 @@ spec:
           value: $(tasks.prefetch-dependencies.results.CACHI2_ARTIFACT)
         - name: IMAGE_APPEND_PLATFORM
           value: $(params.image-append-platform)
+        - name: ADDITIONAL_BASE_IMAGES
+          value:
+            - $(tasks.pin-pr-component-images.results.SCRIPT_RUNNER_IMAGE_REFERENCE)
         - name: ADDITIONAL_SECRET
           value: experimental-ptp-tenant-stage-catalog
         - name: LABELS

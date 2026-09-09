@@ -47,7 +47,7 @@ spec:
     - name: bundle-image-override
       value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22:on-pr-{{revision}}
     - name: run-opm-pre-actions-hermetic
-      value: "false"
+      value: "true"
   pipelineRef:
     name: fbc-pipeline
   taskRunTemplate:

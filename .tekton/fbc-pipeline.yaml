@@ -145,7 +145,7 @@ spec:
         - name: ociArtifactExpiresAfter
           value: $(params.image-expires-after)
         - name: SCRIPT_RUNNER_IMAGE
-          value: quay.io/konflux-ci/yq:latest
+          value: registry.redhat.io/openshift4/ose-tools-rhel9:v4.22
         - name: SCRIPT
           value: |
             set -euo pipefail
@@ -153,18 +153,14 @@ spec:
             BUNDLE_BUILDS_FILE=".konflux/catalog/bundle.builds.in.yaml"
             if [ -n "${OVERRIDE}" ]; then
               echo "bundle-image-override set; waiting for ${OVERRIDE}"
-              curl -fsSL -o /tmp/crane.tgz \
-                https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
-              tar -xzf /tmp/crane.tgz -C /tmp crane
-              chmod +x /tmp/crane
               # Avoid shell command substitution; Tekton validates paren-dollar refs.
               # 180*20s = 60m: optional wait when bundle-image-override is set.
               WAIT_ATTEMPTS=180
               i=0
               DIGEST=""
               while [ "${i}" -lt "${WAIT_ATTEMPTS}" ]; do
-                if /tmp/crane digest "${OVERRIDE}" > /tmp/crane-digest.txt 2>/dev/null; then
-                  IFS= read -r DIGEST < /tmp/crane-digest.txt
+                if skopeo inspect --format '{{.Digest}}' "docker://${OVERRIDE}" > /tmp/skopeo-digest.txt 2>/dev/null; then
+                  IFS= read -r DIGEST < /tmp/skopeo-digest.txt
                   echo "Bundle image available: ${OVERRIDE} -> ${DIGEST}"
                   break
                 fi
@@ -195,7 +191,7 @@ spec:
             ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh \
               --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml \
               --set-bundle-builds-file "${BUNDLE_BUILDS_FILE}"
-        # Push/release: true (Conforma). On-PR: false (network for bundle override).
+        # Hermetic skopeo wait for bundle-image-override (ose-tools-rhel9 runner).
         - name: HERMETIC
           value: $(params.run-opm-pre-actions-hermetic)
         - name: SOURCE_ARTIFACT
