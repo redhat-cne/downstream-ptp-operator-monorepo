@@ -17,9 +17,9 @@ packages:
       only:
         - x86_64
         - aarch64
-# Force matching libs into the hermetic repo. CentOS Stream base images drift
-# ahead of pinned transitive deps (e.g. acl needing libacl=EVR); without these
-# reinstalls, hermetic yum fails with "nothing provides libacl…".
+# Force matching libs into the hermetic repo. The UBI runtime drifts ahead of
+# pinned transitive deps (e.g. acl needing libacl=EVR); without these reinstalls,
+# hermetic yum fails with "nothing provides libacl…".
 # rpm-lockfile-prototype omits RPMs already in context.image unless they are
 # listed here. util-linux/openssl/systemd must stay locked to the image NEVRAs.
 # Relock with scripts/relock-linuxptp-daemon-rpms.sh.
@@ -32,11 +32,14 @@ reinstallPackages:
   - libfdisk
   - openssl
   - systemd
+# UBI9 runtime (FIPS OS). UBI CDN for base libs; CentOS Stream AppStream for
+# linuxptp/chrony/synce4l/gpsd (not in the UBI public subset).
 contentOrigin:
   repofiles:
+    - ./ubi.repo
     - ./centos.repo
 arches:
   - x86_64
   - aarch64
 context:
-  image: quay.io/centos/centos:stream9@sha256:7d3c87ab567add60d0153a6a17bc10d0f19cd982a2d533724298ebd1ee751eab
+  image: registry.access.redhat.com/ubi9/ubi:latest@sha256:206b65b8ee0f04b992818c9a51b29081b14974630d4850bc358097d0c44ea156
