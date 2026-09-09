@@ -18,13 +18,13 @@ arches:
     name: gpsd-minimal-clients
     evr: 1:3.26.1-2.el9
     sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/linuxptp-4.4-5.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/linuxptp-4.4-6.el9.aarch64.rpm
     repoid: appstream
-    size: 311285
-    checksum: sha256:e0b659d138465a65b6afb1859df2a5e14ba4064337bd82a479ca60405f7c2c43
+    size: 316932
+    checksum: sha256:187e26906000e4583ca68e7d4fd3854d9b994c3f4cd92c1b4b3d831808a74884
     name: linuxptp
-    evr: 4.4-5.el9
-    sourcerpm: linuxptp-4.4-5.el9.src.rpm
+    evr: 4.4-6.el9
+    sourcerpm: linuxptp-4.4-6.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/python3-pyserial-3.4-12.el9.noarch.rpm
     repoid: appstream
     size: 185055
@@ -256,12 +256,12 @@ arches:
     checksum: sha256:2928e36a9067a6e987ec2cae547bad50ebde3f906998fcc04a21013fc7a4f539
     name: gpsd-minimal
     evr: 1:3.26.1-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-5.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-6.el9.src.rpm
     repoid: appstream-source
-    size: 385631
-    checksum: sha256:cad25cbf012118086900bdcafc7121cfa27f05190c65abf7cf6c413f8251a2d0
+    size: 408175
+    checksum: sha256:b12de67183a45f40506fbcdf6480a798c6cf67788c740d8d1057e2cfe82cf056
     name: linuxptp
-    evr: 4.4-5.el9
+    evr: 4.4-6.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/pyserial-3.4-12.el9.src.rpm
     repoid: appstream-source
     size: 162928
@@ -417,13 +417,13 @@ arches:
     name: gpsd-minimal-clients
     evr: 1:3.26.1-2.el9
     sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/linuxptp-4.4-5.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/linuxptp-4.4-6.el9.x86_64.rpm
     repoid: appstream
-    size: 307859
-    checksum: sha256:2c9e2c25f14d4e2990a8a3061450cc7be3c9182104a149988f51e3bb7d5c8409
+    size: 312193
+    checksum: sha256:78813ccd071cbaf32dabe47ee34ae69c806db1e2da62e92e3aa17e9039ce8e77
     name: linuxptp
-    evr: 4.4-5.el9
-    sourcerpm: linuxptp-4.4-5.el9.src.rpm
+    evr: 4.4-6.el9
+    sourcerpm: linuxptp-4.4-6.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/python3-pyserial-3.4-12.el9.noarch.rpm
     repoid: appstream
     size: 185055
@@ -655,12 +655,12 @@ arches:
     checksum: sha256:2928e36a9067a6e987ec2cae547bad50ebde3f906998fcc04a21013fc7a4f539
     name: gpsd-minimal
     evr: 1:3.26.1-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-5.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-6.el9.src.rpm
     repoid: appstream-source
-    size: 385631
-    checksum: sha256:cad25cbf012118086900bdcafc7121cfa27f05190c65abf7cf6c413f8251a2d0
+    size: 408175
+    checksum: sha256:b12de67183a45f40506fbcdf6480a798c6cf67788c740d8d1057e2cfe82cf056
     name: linuxptp
-    evr: 4.4-5.el9
+    evr: 4.4-6.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/pyserial-3.4-12.el9.src.rpm
     repoid: appstream-source
     size: 162928
