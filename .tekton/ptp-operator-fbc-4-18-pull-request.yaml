@@ -9,8 +9,9 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "pull_request" && target_branch == "release-4.18"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-target-branch: "[release-4.18]"
+    pipelinesascode.tekton.dev/on-label: "[run-konflux-ci]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: ptp-operator-fbc-4-18
