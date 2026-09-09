@@ -3,7 +3,8 @@ ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_
 ARG RUNTIME_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-base-rhel9:assembly.stream
 
 # Built with path-context "." (repo root). Sources under pkg/linuxptp-daemon/.
-# Live yum on openshift-base-rhel9 (not hermetic RPM lock). See Dockerfile.ocp.
+# Live yum on openshift-base-rhel9. OCP CI images include AppStream; Konflux
+# openshift-base-rhel9 does not, so add CentOS Stream AppStream for operands.
 
 FROM ${BUILDER_IMAGE} AS builder
 USER root
@@ -12,6 +13,8 @@ COPY pkg/linuxptp-daemon/ .
 RUN make clean && make
 
 FROM ${RUNTIME_IMAGE}
+
+COPY .konflux/rpms/linuxptp-daemon/centos-appstream.repo /etc/yum.repos.d/
 
 RUN yum -y update && yum -y update glibc && yum --setopt=skip_missing_names_on_install=False -y \
   install \
