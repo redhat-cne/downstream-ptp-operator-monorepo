@@ -11,14 +11,14 @@ metadata:
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: |
       event == "push" &&
-      target_branch == "release-4.22" &&
+      target_branch == "release-__OCP_VERSION__" &&
       !event_title.contains("[BRANCH-CUT]") &&
       (
         '.konflux/container_build_args.conf'.pathChanged() ||
         '.konflux/Dockerfile.bundle'.pathChanged() ||
         '.konflux/overlay/***'.pathChanged() ||
         '.tekton/build-pipeline.yaml'.pathChanged() ||
-        '.tekton/ptp-operator-bundle-mono-4-22-push.yaml'.pathChanged() ||
+        '.tekton/ptp-operator-bundle-mono-__OCP_VERSION_DASH__-push.yaml'.pathChanged() ||
         'bundle/***'.pathChanged() ||
         'config/***'.pathChanged() ||
         'hack/***'.pathChanged() ||
@@ -28,10 +28,10 @@ metadata:
       )
   creationTimestamp: null
   labels:
-    appstudio.openshift.io/application: ptp-operator-mono-4-22
-    appstudio.openshift.io/component: ptp-operator-bundle-mono-4-22
+    appstudio.openshift.io/application: ptp-operator-mono-__OCP_VERSION_DASH__
+    appstudio.openshift.io/component: ptp-operator-bundle-mono-__OCP_VERSION_DASH__
     pipelines.appstudio.openshift.io/type: build
-  name: ptp-operator-bundle-mono-4-22-on-push
+  name: ptp-operator-bundle-mono-__OCP_VERSION_DASH__-on-push
   namespace: experimental-ptp-tenant
 spec:
   params:
@@ -40,7 +40,7 @@ spec:
     - name: revision
       value: '{{revision}}'
     - name: output-image
-      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22:{{revision}}
+      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-__OCP_VERSION_DASH__:{{revision}}
     - name: build-platforms
       value:
         - linux/x86_64
@@ -67,10 +67,15 @@ spec:
     - name: additional-labels
       value:
         - name=experimental-ptp/ptp-operator-bundle-mono-operator-bundle
+    # Wait for sibling push operand tags, then refresh tenant pins before overlay.
+    - name: pr-component-image-tag
+      value: '{{revision}}'
+    - name: pin-pr-component-images-hermetic
+      value: "false"
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
-    serviceAccountName: build-pipeline-ptp-operator-bundle-mono-4-22
+    serviceAccountName: build-pipeline-ptp-operator-bundle-mono-__OCP_VERSION_DASH__
   workspaces:
     - name: git-auth
       secret:

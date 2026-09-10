@@ -189,7 +189,8 @@ spec:
             else
               echo "Using pin file ${BUNDLE_BUILDS_FILE}"
             fi
-            # PR bundle wait sets hermetic=false, which skips the run-script yq sidecar.
+            # ose-tools-rhel9 has no yq; bootstrap uses vendored .konflux/tools/yq
+            # (hermetic push) or skopeo/curl fallbacks (non-hermetic PR wait).
             bash .konflux/scripts/bootstrap-ose-tools-run-script.sh yq
             ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh \
               --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml \
