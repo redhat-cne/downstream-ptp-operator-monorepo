@@ -67,11 +67,6 @@ spec:
     - name: additional-labels
       value:
         - name=experimental-ptp/ptp-operator-bundle-mono-operator-bundle
-    # Wait for sibling push operand tags, then refresh tenant pins before overlay.
-    - name: pr-component-image-tag
-      value: '{{revision}}'
-    - name: pin-pr-component-images-hermetic
-      value: "false"
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
