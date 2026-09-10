@@ -236,6 +236,9 @@ spec:
           value: |
             set -euo pipefail
             TAG="$(params.pr-component-image-tag)"
+            if [ -n "${TAG}" ] && ! command -v skopeo >/dev/null 2>&1; then
+              microdnf install -y skopeo
+            fi
             chmod +x .konflux/scripts/pin-pr-component-images.sh
             .konflux/scripts/pin-pr-component-images.sh --tag "${TAG}"
         # Hermetic when pr-component-image-tag is empty (no-op). Bundle PR builds
