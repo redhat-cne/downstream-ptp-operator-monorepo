@@ -13,11 +13,11 @@ RUN make clean && make
 
 FROM ${RUNTIME_IMAGE}
 
-COPY .konflux/rpms/linuxptp-daemon/centos-baseos.repo /etc/yum.repos.d/
+# AppStream only: CentOS BaseOS conflicts with UBI openssl-fips-provider.
 COPY .konflux/rpms/linuxptp-daemon/centos-appstream.repo /etc/yum.repos.d/
 COPY .konflux/rpms/linuxptp-daemon/RPM-GPG-KEY-centosofficial /etc/pki/rpm-gpg/
 
-RUN yum -y update && yum -y update glibc && yum --setopt=skip_missing_names_on_install=False -y \
+RUN yum --setopt=skip_missing_names_on_install=False -y \
   install \
   pciutils \
   linuxptp \
