@@ -2,26 +2,25 @@
 # Operator (manager)
 - key: manager
   source: quay.io/openshift/origin-ptp-operator:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:eaf200c4d28e2c6fccab16712bd239da0e00843638d6d157fb6bdf7093044f56
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-22@sha256:12242c6bf882a7d009bb982f94ab4a837cb3040b534c9354ebaeec86febcf749
 #
 # linuxptp-daemon
 - key: linuxptp_daemon_image
   source: quay.io/openshift/origin-ptp:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-22@sha256:3793886057b58fd4eb7bd44336560748b620134460decde1c215de2b20c7a9cd
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-22@sha256:b01316ea2dc3944b6e616c67312a7223b3a5a97e9e32f53a4420b35d9ac8b8d0
 #
-# kube-rbac-proxy (tenant-built multi-arch from vendored openshift/kube-rbac-proxy)
+# kube-rbac-proxy (OCP payload; bundled, not tenant-built)
 - key: kube_rbac_proxy_image
   source: quay.io/openshift/origin-kube-rbac-proxy:4.22
-  # Digest is rewritten on PR by pin-pr-component-images.sh; refresh after the first push build.
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/kube-rbac-proxy-mono-4-22@sha256:bf9f7f7b088829c7c6e21b75be110cbae01ad120e4ac038fd4537d6710eea230
+  target: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9@sha256:761eeec56d073159fe36e4a59986095933c59e9f14aea0ceb9cf0264cf7043bc
 #
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22@sha256:9208d5da66780a3e191561a929e9e3ff59cc4cd3b99421f8903948868bc60a2b
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-22@sha256:008b3dffde27295070fc4e8bf678642cee19686c320698b7dcc1eb670e90b90d
 #
 # must-gather
 - key: must_gather_image
   source: quay.io/openshift/origin-ptp-operator-must-gather:4.22
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-22@sha256:42fe1035a98ff19d8ba24b0e2510fbee7a5799657e4481828e2f269f40f64c6d
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-22@sha256:b6e4a6686e0afc27a7c029d2ac0c530cc439331a9c4fb918957883991c876c1c
 #

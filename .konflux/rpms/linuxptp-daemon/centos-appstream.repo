@@ -1,0 +1,7 @@
+[centos-appstream]
+name=CentOS Stream 9 - AppStream
+baseurl=https://mirror.stream.centos.org/9-stream/AppStream/$basearch/os/
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+gpgcheck=1
+repo_gpgcheck=0
+enabled=1
