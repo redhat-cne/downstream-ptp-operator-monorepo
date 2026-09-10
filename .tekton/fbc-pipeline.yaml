@@ -152,9 +152,7 @@ spec:
             OVERRIDE="$(params.bundle-image-override)"
             BUNDLE_BUILDS_FILE=".konflux/catalog/bundle.builds.in.yaml"
             if [ -n "${OVERRIDE}" ]; then
-              if ! command -v skopeo >/dev/null 2>&1; then
-                microdnf install -y skopeo
-              fi
+              bash .konflux/scripts/bootstrap-ose-tools-run-script.sh skopeo
               echo "bundle-image-override set; waiting for ${OVERRIDE}"
               # Avoid shell command substitution; Tekton validates paren-dollar refs.
               # 180*20s = 60m: optional wait when bundle-image-override is set.
@@ -191,6 +189,8 @@ spec:
             else
               echo "Using pin file ${BUNDLE_BUILDS_FILE}"
             fi
+            # PR bundle wait sets hermetic=false, which skips the run-script yq sidecar.
+            bash .konflux/scripts/bootstrap-ose-tools-run-script.sh yq
             ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh \
               --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml \
               --set-bundle-builds-file "${BUNDLE_BUILDS_FILE}"
