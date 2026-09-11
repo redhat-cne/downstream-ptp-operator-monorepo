@@ -9,8 +9,9 @@ metadata:
     build.appstudio.redhat.com/target_branch: '{{target_branch}}'
     pipelinesascode.tekton.dev/cancel-in-progress: "true"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
-    pipelinesascode.tekton.dev/on-cel-expression: |
-      event == "pull_request" && target_branch == "release-4.22"
+    pipelinesascode.tekton.dev/on-event: "[pull_request]"
+    pipelinesascode.tekton.dev/on-target-branch: "[release-4.22]"
+    pipelinesascode.tekton.dev/on-label: "[run-konflux-ci]"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: ptp-operator-fbc-4-22
@@ -42,8 +43,12 @@ spec:
       value: "true"
     - name: hermetic
       value: "true"
-    # bundle-image-override and run-opm-pre-actions-hermetic stay at pipeline
-    # defaults (empty / true). Catalog uses committed bundle.builds.in.yaml.
+    # Wait for the PR bundle image, then catalog it instead of bundle.builds.in.yaml.
+    - name: bundle-image-override
+      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22:on-pr-{{revision}}
+    # microdnf skopeo bootstrap and bundle tag wait need network; push keeps default true.
+    - name: run-opm-pre-actions-hermetic
+      value: "false"
   pipelineRef:
     name: fbc-pipeline
   taskRunTemplate:
