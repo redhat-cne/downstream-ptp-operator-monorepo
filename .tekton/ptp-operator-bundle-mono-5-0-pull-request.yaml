@@ -55,8 +55,14 @@ spec:
     - name: additional-labels
       value:
         - name=experimental-ptp/ptp-operator-bundle-mono-operator-bundle
-    # pr-component-image-tag stays unset (pipeline default ""). CSV uses
-    # committed .konflux/overlay/pin_images.in.yaml, same as push.
+    # Use the component images built for this PR revision when generating the
+    # bundle. Leaving this unset makes the PR build reuse the committed pin
+    # file, which can point at older release-branch images.
+    - name: pr-component-image-tag
+      value: on-pr-{{revision}}
+    # Wait for operand on-pr-* images and rewrite pin_images.in.yaml before build.
+    - name: pin-pr-component-images-hermetic
+      value: "false"
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:

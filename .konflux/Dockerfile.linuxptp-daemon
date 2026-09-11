@@ -1,8 +1,8 @@
 ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_9_golang_1.25
-# Digest-pin stream9. Must match rpms.in.yaml context.image. Do not set
+# Digest-pin ubi9/ubi. Must match rpms.in.yaml context.image. Do not set
 # RUNTIME_IMAGE in the shared container_build_args.conf. Relock with
 # scripts/relock-linuxptp-daemon-rpms.sh after changing this digest.
-ARG RUNTIME_IMAGE=quay.io/centos/centos:stream9@sha256:d323b7623e947245a8eb506fbb0ad0e55eb2ae2d2407b66741a15f372caf9bdc
+ARG RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi:latest@sha256:206b65b8ee0f04b992818c9a51b29081b14974630d4850bc358097d0c44ea156
 
 # Built with path-context "." so Hermeto/cachi2 RPM injection (repo root) is
 # visible to yum. Sources are copied from pkg/linuxptp-daemon/.
@@ -40,9 +40,6 @@ RUN ln -s /usr/sbin/gpsd /usr/local/sbin/gpsd
 RUN ln -s /usr/bin/ubxtool /usr/local/bin/ubxtool
 
 COPY --from=builder /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon/bin/ptp /usr/local/bin/
-# release-4.12 linuxptp-daemon lacks extra/leap-seconds.list; newer branches ship it.
-RUN if [ -f pkg/linuxptp-daemon/extra/leap-seconds.list ]; then \
-      cp pkg/linuxptp-daemon/extra/leap-seconds.list /usr/share/zoneinfo/leap-seconds.list; \
-    fi
+COPY pkg/linuxptp-daemon/extra/leap-seconds.list /usr/share/zoneinfo/leap-seconds.list
 
 CMD ["/usr/local/bin/ptp"]
