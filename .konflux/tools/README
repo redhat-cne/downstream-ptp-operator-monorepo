@@ -1,0 +1,18 @@
+Vendored helper binaries for hermetic Konflux tasks.
+
+yq-linux-amd64 / yq-linux-arm64
+  Copied from quay.io/konflux-ci/yq (same image as YQ_IMAGE in
+  .konflux/container_build_args.conf). Used by
+  .konflux/scripts/bootstrap-ose-tools-run-script.sh when
+  run-opm-pre-actions runs with network isolation on push builds.
+
+Refresh (requires podman + network):
+  YQ_AMD64=sha256:72ecc822d08a077c7c22bc783b36b4d79b2dd6abf5bc44f3cf479b562a1d7cef
+  YQ_ARM64=sha256:c79eba3385ed9d5fb3c6effaa51c25181f0aef5d9a9a7cf6416fcd25a9292ac3
+  for arch in amd64 arm64; do
+    digest_var=YQ_${arch^^}
+    cid=$(podman create --platform linux/${arch} --entrypoint cat \
+      quay.io/konflux-ci/yq@${!digest_var} /usr/bin/yq)
+    podman cp "$cid:/usr/bin/yq" "yq-linux-${arch}"
+    podman rm "$cid"
+  done
