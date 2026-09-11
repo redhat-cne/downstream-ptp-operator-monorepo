@@ -21,6 +21,7 @@ MAX_ATTEMPTS=90
 SLEEP_SECONDS=20
 TENANT_PREFIX="quay.io/redhat-user-workloads/experimental-ptp-tenant/"
 CRANE_BIN=""
+USE_SKOPEO=false
 
 # Logs must go to stderr: wait_digest is captured via $(), and stdout pollution
 # would corrupt pin digests (breaking the bundle CSV YAML).
@@ -41,6 +42,34 @@ Options:
 EOF
 }
 
+pin_yaml_list_field() {
+  local field="$1"
+  python3 - "$PIN_FILE" "$field" <<'PY'
+import re, sys
+path, field = sys.argv[1], sys.argv[2]
+with open(path) as f:
+    text = f.read()
+for m in re.finditer(rf'^  {field}: (\S+)', text):
+    print(m.group(1))
+PY
+}
+
+pin_yaml_set_target() {
+  local key="$1" new_target="$2"
+  python3 - "$PIN_FILE" "$key" "$new_target" <<'PY'
+import re, sys
+path, key, new_target = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(path) as f:
+    text = f.read()
+pat = r'(- key: ' + re.escape(key) + r'\n(?:  [^\n]+\n)*?  target: )\S+'
+new_text, n = re.subn(pat, r'\1' + new_target, text, count=1)
+if n != 1:
+    raise SystemExit(f'failed to update target for key {key}')
+with open(path, 'w') as f:
+    f.write(new_text)
+PY
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tag) TAG="${2:-}"; shift 2 ;;
@@ -59,21 +88,19 @@ if [[ -z "${TAG}" ]]; then
 fi
 
 [[ -f "${PIN_FILE}" ]] || die "pin file not found: ${PIN_FILE}"
-command -v yq >/dev/null 2>&1 || die "yq is required"
+command -v python3 >/dev/null 2>&1 || die "python3 is required"
 
 ensure_crane() {
   if command -v crane >/dev/null 2>&1; then
     CRANE_BIN=$(command -v crane)
     return 0
   fi
-  local tmp
-  tmp="$(mktemp -d)"
-  log "crane not on PATH; downloading to ${tmp}"
-  curl -fsSL -o "${tmp}/crane.tgz" \
-    https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
-  tar -xzf "${tmp}/crane.tgz" -C "${tmp}" crane
-  chmod +x "${tmp}/crane"
-  CRANE_BIN="${tmp}/crane"
+  if command -v skopeo >/dev/null 2>&1; then
+    USE_SKOPEO=true
+    log "crane not found; using preinstalled skopeo"
+    return 0
+  fi
+  die "need crane or skopeo to resolve image digests"
 }
 
 resolve_digest() {
@@ -103,14 +130,9 @@ wait_digest() {
   return 1
 }
 
-# Prefer crane in CI; allow skopeo locally without download.
-if command -v crane >/dev/null 2>&1 || [[ "$(uname -s)" == "Linux" ]]; then
-  ensure_crane
-elif command -v skopeo >/dev/null 2>&1; then
-  log "Using skopeo to resolve digests"
-else
-  die "need crane or skopeo to resolve image digests"
-fi
+# Prefer an installed crane, then an installed skopeo. Never download tools
+# at runtime: this task runs hermetically and has no network access to GitHub.
+ensure_crane
 
 log "Rewriting tenant pins in ${PIN_FILE} to tag ${TAG}"
 
@@ -118,10 +140,10 @@ KEYS=()
 TARGETS=()
 while IFS= read -r line; do
   [[ -n "${line}" ]] && KEYS+=("${line}")
-done < <(yq eval '.[].key' "${PIN_FILE}")
+done < <(pin_yaml_list_field key)
 while IFS= read -r line; do
   [[ -n "${line}" ]] && TARGETS+=("${line}")
-done < <(yq eval '.[].target' "${PIN_FILE}")
+done < <(pin_yaml_list_field target)
 
 rewrites=0
 for i in "${!KEYS[@]}"; do
@@ -160,9 +182,7 @@ for i in "${!KEYS[@]}"; do
     continue
   fi
 
-  KEY="${key}" NEW_TARGET="${new_target}" yq eval -i \
-    '(.[] | select(.key == strenv(KEY)) | .target) = strenv(NEW_TARGET)' \
-    "${PIN_FILE}"
+  pin_yaml_set_target "${key}" "${new_target}"
   rewrites=$((rewrites + 1))
 done
 
@@ -170,5 +190,5 @@ if [[ "${DRY_RUN}" == true ]]; then
   log "Dry-run complete (${rewrites} rewrite(s) planned)"
 else
   log "Updated ${PIN_FILE} (${rewrites} rewrite(s))"
-  yq eval '.' "${PIN_FILE}"
+  cat "${PIN_FILE}"
 fi
