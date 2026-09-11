@@ -1,11 +1,26 @@
 ---
-# We use this IDMS to map the quay.io build to registry.redhat.io in the catalog.json post rendering
+# Map registry.redhat.io catalog pullspecs to tenant Quay builds during opm render.
 apiVersion: config.openshift.io/v1
 kind: ImageDigestMirrorSet
 metadata:
   name: catalog-idms
 spec:
   imageDigestMirrors:
-  - mirrors:
-    - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-13
-    source: registry.redhat.io/experimental-ptp/ptp-operator-bundle-mono-operator-bundle
+    - mirrors:
+        - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-13
+      source: registry.redhat.io/experimental-ptp/ptp-operator-mono-rhel9-operator
+    - mirrors:
+        - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-13
+      source: registry.redhat.io/experimental-ptp/ptp-operator-bundle-mono-operator-bundle
+    - mirrors:
+        - quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-13
+      source: registry.redhat.io/experimental-ptp/linuxptp-daemon-mono-rhel9
+    - mirrors:
+        - quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-13
+      source: registry.redhat.io/experimental-ptp/cloud-event-proxy-mono-rhel9
+    - mirrors:
+        - quay.io/openshift-release-dev/ocp-v4.0-art-dev
+      source: registry.redhat.io/openshift4/ose-kube-rbac-proxy-rhel9
+    - mirrors:
+        - quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-13
+      source: registry.redhat.io/experimental-ptp/ptp-must-gather-mono-rhel9
