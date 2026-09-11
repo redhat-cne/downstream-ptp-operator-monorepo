@@ -7,20 +7,6 @@ spec:
     This pipeline is ideal for building and verifying [file-based catalogs](https://konflux-ci.dev/docs/end-to-end/building-olm/#building-the-file-based-catalog).
     _Uses `buildah` to create a container image. Its build-time tests are limited to verifying the included catalog and do not scan the image.
     This pipeline is pushed as a Tekton bundle to [quay.io](https://quay.io/repository/konflux-ci/tekton-catalog/pipeline-fbc-builder?tab=tags)_
-  finally:
-    - name: show-sbom
-      params:
-        - name: IMAGE_URL
-          value: $(tasks.build-image-index.results.IMAGE_URL)
-      taskRef:
-        params:
-          - name: name
-            value: show-sbom
-          - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-show-sbom:0.1@sha256:a7346ed61237db4f82ff782e0c9e8b30536e0e67b907ad600341a6d192e80012
-          - name: kind
-            value: task
-        resolver: bundles
   params:
     - description: Source Repository URL
       name: git-url
@@ -145,7 +131,7 @@ spec:
           - name: name
             value: git-clone-oci-ta
           - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.1@sha256:d30f13dd15daf89dd6dc645243b3444d35570d13f7840c3fd65e366022515205
+            value: quay.io/konflux-ci/tekton-catalog/task-git-clone-oci-ta:0.2.6@sha256:2e8fe30b6d5c8a8a3e6bbc0ea5a55e05b6170d4a399830f25ea43e17881ce544
           - name: kind
             value: task
         resolver: bundles
@@ -159,26 +145,23 @@ spec:
         - name: ociArtifactExpiresAfter
           value: $(params.image-expires-after)
         - name: SCRIPT_RUNNER_IMAGE
-          value: quay.io/konflux-ci/yq:latest
+          value: registry.redhat.io/openshift4/ose-tools-rhel9:v4.16
         - name: SCRIPT
           value: |
             set -euo pipefail
             OVERRIDE="$(params.bundle-image-override)"
             BUNDLE_BUILDS_FILE=".konflux/catalog/bundle.builds.in.yaml"
             if [ -n "${OVERRIDE}" ]; then
+              bash .konflux/scripts/bootstrap-ose-tools-run-script.sh skopeo
               echo "bundle-image-override set; waiting for ${OVERRIDE}"
-              curl -fsSL -o /tmp/crane.tgz \
-                https://github.com/google/go-containerregistry/releases/download/v0.20.2/go-containerregistry_Linux_x86_64.tar.gz
-              tar -xzf /tmp/crane.tgz -C /tmp crane
-              chmod +x /tmp/crane
               # Avoid shell command substitution; Tekton validates paren-dollar refs.
               # 180*20s = 60m: optional wait when bundle-image-override is set.
               WAIT_ATTEMPTS=180
               i=0
               DIGEST=""
               while [ "${i}" -lt "${WAIT_ATTEMPTS}" ]; do
-                if /tmp/crane digest "${OVERRIDE}" > /tmp/crane-digest.txt 2>/dev/null; then
-                  IFS= read -r DIGEST < /tmp/crane-digest.txt
+                if skopeo inspect --format '{{.Digest}}' "docker://${OVERRIDE}" > /tmp/skopeo-digest.txt 2>/dev/null; then
+                  IFS= read -r DIGEST < /tmp/skopeo-digest.txt
                   echo "Bundle image available: ${OVERRIDE} -> ${DIGEST}"
                   break
                 fi
@@ -206,10 +189,13 @@ spec:
             else
               echo "Using pin file ${BUNDLE_BUILDS_FILE}"
             fi
+            # ose-tools-rhel9 has no yq; bootstrap uses vendored .konflux/tools/yq
+            # (hermetic push) or skopeo/curl fallbacks (non-hermetic PR wait).
+            bash .konflux/scripts/bootstrap-ose-tools-run-script.sh yq
             ./telco5g-konflux/scripts/catalog/konflux-update-catalog-template.sh \
               --set-catalog-template-input-file .konflux/catalog/catalog-template.in.yaml \
               --set-bundle-builds-file "${BUNDLE_BUILDS_FILE}"
-        # Push/release: true (Conforma). On-PR: false (network for bundle override).
+        # Hermetic skopeo wait for bundle-image-override (ose-tools-rhel9 runner).
         - name: HERMETIC
           value: $(params.run-opm-pre-actions-hermetic)
         - name: SOURCE_ARTIFACT
@@ -276,7 +262,7 @@ spec:
           - name: name
             value: prefetch-dependencies-oci-ta
           - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.10.1@sha256:c09c1c3ced67fb8740b2925a7de09c0810d4e8c8f148d41c21ffe37810d85c62
+            value: quay.io/konflux-ci/tekton-catalog/task-prefetch-dependencies-oci-ta:0.10.2@sha256:374f776bcb2048c3adeaf4dbb460c52d001bc6020320df5e878c2d05391302da
           - name: kind
             value: task
         resolver: bundles
@@ -353,7 +339,7 @@ spec:
           - name: name
             value: build-image-index
           - name: bundle
-            value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.3@sha256:b33bfa8dc27dbf459f0779598ba45dcaa490bcc9f8efe1652bcf360ec8cb5582
+            value: quay.io/konflux-ci/tekton-catalog/task-build-image-index:0.3.1@sha256:290c9ec319423ff9ae7b2cb78fa859e1d333abcdd2ef6c001533377812020071
           - name: kind
             value: task
         resolver: bundles
@@ -505,6 +491,8 @@ spec:
           value: $(tasks.build-image-index.results.IMAGE_DIGEST)
         - name: image-url
           value: $(tasks.build-image-index.results.IMAGE_URL)
+        - name: image-mirror-set-path
+          value: .tekton/images-mirror-set.yaml
         - name: SOURCE_ARTIFACT
           value: $(tasks.prefetch-dependencies.results.SOURCE_ARTIFACT)
       runAfter:
