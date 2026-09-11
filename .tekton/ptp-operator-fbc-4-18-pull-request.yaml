@@ -43,8 +43,12 @@ spec:
       value: "true"
     - name: hermetic
       value: "true"
-    # bundle-image-override and run-opm-pre-actions-hermetic stay at pipeline
-    # defaults (empty / true). Catalog uses committed bundle.builds.in.yaml.
+    # Wait for the PR bundle image, then catalog it instead of bundle.builds.in.yaml.
+    - name: bundle-image-override
+      value: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-18:on-pr-{{revision}}
+    # microdnf skopeo bootstrap and bundle tag wait need network; push keeps default true.
+    - name: run-opm-pre-actions-hermetic
+      value: "false"
   pipelineRef:
     name: fbc-pipeline
   taskRunTemplate:
