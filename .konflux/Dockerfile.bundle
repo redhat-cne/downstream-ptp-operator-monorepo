@@ -1,0 +1,48 @@
+# Runtime image is used to overlay clusterserviceversion.yaml for Konflux
+
+ARG YQ_IMAGE=quay.io/konflux-ci/yq:latest
+FROM ${YQ_IMAGE} AS overlay
+
+WORKDIR /tmp
+
+ENV MANIFESTS_PATH=/tmp/manifests
+COPY --chown=yq:yq bundle/manifests $MANIFESTS_PATH
+
+ENV METADATA_PATH=/tmp/metadata
+COPY --chown=yq:yq bundle/metadata $METADATA_PATH
+
+ENV OVERLAY_PATH=/tmp/overlay
+RUN mkdir -p $OVERLAY_PATH
+COPY .konflux/overlay/ $OVERLAY_PATH
+COPY telco5g-konflux/scripts/bundle/konflux-bundle-overlay.sh $OVERLAY_PATH/konflux-bundle-overlay.sh
+
+RUN $OVERLAY_PATH/konflux-bundle-overlay.sh  \
+    --set-csv-file $MANIFESTS_PATH/ptp-operator.clusterserviceversion.yaml \
+    --set-mapping-file $OVERLAY_PATH/map_images.in.yaml \
+    --set-mapping-production \
+    --set-pinning-file $OVERLAY_PATH/pin_images.in.yaml \
+    --set-release-file $OVERLAY_PATH/release.in.yaml
+
+RUN CHANNEL_VERSION=$(yq -r '.variables.version | split(".") | .[0:2] | join(".")' $OVERLAY_PATH/release.in.yaml) && \
+    export CHANNEL_VERSION && \
+    yq -i '.annotations["operators.operatorframework.io.bundle.channels.v1"] = "stable," + strenv(CHANNEL_VERSION)' $METADATA_PATH/annotations.yaml && \
+    yq -i '.annotations["operators.operatorframework.io.bundle.channel.default.v1"] = "stable"' $METADATA_PATH/annotations.yaml
+
+FROM scratch
+
+LABEL operators.operatorframework.io.bundle.mediatype.v1=registry+v1
+LABEL operators.operatorframework.io.bundle.manifests.v1=manifests/
+LABEL operators.operatorframework.io.bundle.metadata.v1=metadata/
+LABEL operators.operatorframework.io.bundle.package.v1=ptp-operator
+LABEL operators.operatorframework.io.bundle.channels.v1=stable,4.18
+LABEL operators.operatorframework.io.bundle.channel.default.v1=stable
+LABEL operators.operatorframework.io.metrics.builder=operator-sdk-v1.36.1-ocp
+LABEL operators.operatorframework.io.metrics.mediatype.v1=metrics+v1
+LABEL operators.operatorframework.io.metrics.project_layout=go.kubebuilder.io/v3
+
+LABEL operators.operatorframework.io.test.mediatype.v1=scorecard+v1
+LABEL operators.operatorframework.io.test.config.v1=tests/scorecard/
+
+COPY --from=overlay /tmp/manifests /manifests/
+COPY --from=overlay /tmp/metadata /metadata/
+COPY bundle/tests/scorecard /tests/scorecard/
