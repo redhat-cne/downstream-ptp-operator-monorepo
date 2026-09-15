@@ -1,0 +1,17 @@
+# See the OWNERS docs at https://go.k8s.io/owners
+
+aliases:
+  cloud-event-proxy-reviewers:
+    - aneeshkp
+    - atyronesmith
+    - josephdrichard
+    - jzding
+    - rdavid
+    - vitus133
+
+  cloud-event-proxy-approvers:
+    - aneeshkp
+    - josephdrichard
+    - jzding
+    - rdavid
+    - vitus133
