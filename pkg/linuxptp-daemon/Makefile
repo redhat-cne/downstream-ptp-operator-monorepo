@@ -6,3 +6,6 @@ clean:
 	./hack/cleanup.sh
 fmt:
 	./hack/gofmt.sh
+
+test:
+	go test ./... -coverprofile=cover.out
