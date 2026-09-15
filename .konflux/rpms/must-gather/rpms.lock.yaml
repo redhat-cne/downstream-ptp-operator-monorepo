@@ -1,0 +1,38 @@
+---
+lockfileVersion: 1
+lockfileVendor: redhat
+arches:
+- arch: aarch64
+  packages:
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/r/rsync-3.2.5-7.el9_8.2.aarch64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 425538
+    checksum: sha256:1e1fa89a9a4b843862fb9436295f187c55d314a9eb23d4bb8d6b07b2f41ba067
+    name: rsync
+    evr: 3.2.5-7.el9_8.2
+    sourcerpm: rsync-3.2.5-7.el9_8.2.src.rpm
+  source:
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/r/rsync-3.2.5-7.el9_8.2.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 1358189
+    checksum: sha256:37d0ee99d570df9eadf8244580dc078258ae4c9833ca3458cb6dc5851a7c37ca
+    name: rsync
+    evr: 3.2.5-7.el9_8.2
+  module_metadata: []
+- arch: x86_64
+  packages:
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/r/rsync-3.2.5-7.el9_8.2.x86_64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 430699
+    checksum: sha256:73c95e6404602b407a3cced5f1ae769a2c32b5b4ce9d646fc42617941863082c
+    name: rsync
+    evr: 3.2.5-7.el9_8.2
+    sourcerpm: rsync-3.2.5-7.el9_8.2.src.rpm
+  source:
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/r/rsync-3.2.5-7.el9_8.2.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 1358189
+    checksum: sha256:37d0ee99d570df9eadf8244580dc078258ae4c9833ca3458cb6dc5851a7c37ca
+    name: rsync
+    evr: 3.2.5-7.el9_8.2
+  module_metadata: []
