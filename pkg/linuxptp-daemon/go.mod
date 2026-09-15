@@ -91,4 +91,4 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 )
 
-replace github.com/openshift/ptp-operator => github.com/josephdrichard/ptp-operator v0.0.0-20251205063307-b04f1e9f5fc5
+replace github.com/openshift/ptp-operator v0.0.0-20251126211433-0dee6a03855c => ../..
