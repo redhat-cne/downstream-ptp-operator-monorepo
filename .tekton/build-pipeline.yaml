@@ -237,7 +237,7 @@ spec:
             set -euo pipefail
             TAG="$(params.pr-component-image-tag)"
             if [ -n "${TAG}" ] && ! command -v skopeo >/dev/null 2>&1; then
-              microdnf install -y skopeo
+              bash .konflux/scripts/bootstrap-ose-tools-run-script.sh skopeo
             fi
             chmod +x .konflux/scripts/pin-pr-component-images.sh
             .konflux/scripts/pin-pr-component-images.sh --tag "${TAG}"
