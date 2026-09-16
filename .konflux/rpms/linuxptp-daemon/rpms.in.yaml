@@ -42,4 +42,4 @@ arches:
   - x86_64
   - aarch64
 context:
-  image: quay.io/centos/centos:stream9@sha256:cfee9f59eb4d66295690829cebb75c6c97ca199c8929f8f933d88745280cbab4
+  image: registry.access.redhat.com/ubi9/ubi@sha256:b0288b22a9c4ac633625bd9c8f9e39c0ad3043990d0fc8f9c62d60740af0e73e

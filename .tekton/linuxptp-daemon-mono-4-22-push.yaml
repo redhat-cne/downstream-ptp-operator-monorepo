@@ -16,7 +16,8 @@ metadata:
         '.konflux/container_build_args.conf'.pathChanged() ||
         '.tekton/build-pipeline.yaml'.pathChanged() ||
         '.tekton/linuxptp-daemon-mono-4-22-push.yaml'.pathChanged() ||
-        'pkg/linuxptp-daemon/addons/redhat/Dockerfile.ocp'.pathChanged() ||
+        '.konflux/Dockerfile.linuxptp-daemon'.pathChanged() ||
+        '.konflux/rpms/linuxptp-daemon/***'.pathChanged() ||
         'pkg/linuxptp-daemon/***'.pathChanged() ||
         'telco5g-konflux'.pathChanged() ||
         'telco5g-konflux/***'.pathChanged()
@@ -40,21 +41,18 @@ spec:
       value:
         - linux/x86_64
         - linux/arm64
-    # Same layout as openshift/linuxptp-daemon addons/redhat/Dockerfile.ocp (live yum on OCP base).
     - name: path-context
-      value: pkg/linuxptp-daemon
+      value: .
     - name: dockerfile
-      value: addons/redhat/Dockerfile.ocp
+      value: .konflux/Dockerfile.linuxptp-daemon
     - name: build-args-file
       value: .konflux/container_build_args.conf
     - name: hermetic
-      value: "false"
-    # Vendor is committed under pkg/linuxptp-daemon. Gomod prefetch injects
-    # cachi2.env into every RUN and breaks runtime yum on Dockerfile.ocp.
+      value: "true"
     - name: dev-package-managers
-      value: "false"
+      value: "true"
     - name: prefetch-input
-      value: ""
+      value: '[{"type": "rpm", "path": ".konflux/rpms/linuxptp-daemon", "options": {"dnf": {"appstream": {"gpgcheck": "0"}, "baseos": {"gpgcheck": "0"}, "appstream-source": {"gpgcheck": "0"}, "baseos-source": {"gpgcheck": "0"}}}}]'
     - name: build-source-image
       value: "true"
     - name: skip-sast-coverity
