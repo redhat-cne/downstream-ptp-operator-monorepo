@@ -170,7 +170,7 @@ github.com/modern-go/reflect2
 # github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822
 ## explicit
 github.com/munnerz/goautoneg
-# github.com/openshift/ptp-operator v0.0.0-20260130144609-2312fffc395b
+# github.com/openshift/ptp-operator v0.0.0-20260130144609-2312fffc395b => ../..
 ## explicit; go 1.22.0
 github.com/openshift/ptp-operator/api/v1
 github.com/openshift/ptp-operator/pkg/client/clientset/versioned
