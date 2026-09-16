@@ -54,7 +54,7 @@ spec:
     - name: dev-package-managers
       value: "false"
     - name: prefetch-input
-      value: "[]"
+      value: ""
     - name: build-source-image
       value: "true"
     - name: skip-sast-coverity
