@@ -17,10 +17,10 @@
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:4.20
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-20@sha256:1076a7db2f462f641356a590bcbcb32de5baaa6f4964b15bc348680cf6a7e99d
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-20@sha256:158ad171bda8c6ea411743fb54e2a28f512ed1995bd4553e93dd178947ba3d9f
 #
 # must-gather
 - key: must_gather_image
   source: quay.io/openshift/origin-ptp-operator-must-gather:4.20
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-20@sha256:6e8fac6be905624206d0599e92272e35dfe7671b1894e056e0debfe62eca4772
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-must-gather-mono-4-20@sha256:d791715334eb5337e45e11b388d97ab1fc6ab0705727285509de71fefeebcd42
 #
