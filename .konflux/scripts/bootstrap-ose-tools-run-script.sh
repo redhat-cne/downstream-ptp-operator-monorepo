@@ -24,11 +24,25 @@ normalize_arch() {
   esac
 }
 
+install_skopeo_rpm() {
+  # ose-tools-rhel9 is UBI9-based; dnf is on PATH (microdnf often is not).
+  if command -v dnf >/dev/null 2>&1; then
+    dnf install -y skopeo
+    return 0
+  fi
+  if command -v yum >/dev/null 2>&1; then
+    yum install -y skopeo
+    return 0
+  fi
+  echo "ERROR: dnf/yum not found; cannot install skopeo on ose-tools-rhel9" >&2
+  return 1
+}
+
 bootstrap_skopeo() {
   if command -v skopeo >/dev/null 2>&1; then
     return 0
   fi
-  microdnf install -y skopeo
+  install_skopeo_rpm
 }
 
 bootstrap_yq_from_vendored() {
