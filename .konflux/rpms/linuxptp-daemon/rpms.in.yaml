@@ -1,0 +1,45 @@
+packages:
+  - pciutils
+  - linuxptp
+  - ethtool
+  - hwdata
+  - synce4l
+  - iproute
+  - procps-ng
+  - chrony
+  - name: gpsd-minimal
+    arches:
+      only:
+        - x86_64
+        - aarch64
+  - name: gpsd-minimal-clients
+    arches:
+      only:
+        - x86_64
+        - aarch64
+# Force matching libs into the hermetic repo. The UBI runtime drifts ahead of
+# pinned transitive deps (e.g. acl needing libacl=EVR); without these reinstalls,
+# hermetic yum fails with "nothing provides libacl…".
+# rpm-lockfile-prototype omits RPMs already in context.image unless they are
+# listed here. util-linux/openssl/systemd must stay locked to the image NEVRAs.
+# Relock with scripts/relock-linuxptp-daemon-rpms.sh.
+reinstallPackages:
+  - systemd-libs
+  - libacl
+  - acl
+  - util-linux
+  - util-linux-core
+  - libfdisk
+  - openssl
+  - systemd
+# UBI9 runtime (FIPS OS). UBI CDN for base libs; CentOS Stream AppStream for
+# linuxptp/chrony/synce4l/gpsd (not in the UBI public subset).
+contentOrigin:
+  repofiles:
+    - ./ubi.repo
+    - ./centos.repo
+arches:
+  - x86_64
+  - aarch64
+context:
+  image: quay.io/centos/centos:stream9@sha256:cfee9f59eb4d66295690829cebb75c6c97ca199c8929f8f933d88745280cbab4
