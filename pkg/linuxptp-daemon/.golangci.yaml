@@ -3,14 +3,20 @@ run:
   timeout: 5m
   issues-exit-code: 1
   tests: true
-  skip-dirs:
-    - vendor
-  skip-dirs-use-default: false
 output:
-  format: colored-line-number
+  formats:
+    - format: colored-line-number
   print-issued-lines: true
   print-linter-name: true
 issues:
+  exclude-rules:
+    - linters:
+        - revive
+      text: dot-imports
+      path: _test\.go
+  exclude-dirs:
+    - vendor
+  exclude-dirs-use-default: false
   exclude-use-default: false
   exclude:
     - 'ST1000: at least one file in a package should have a package comment'
