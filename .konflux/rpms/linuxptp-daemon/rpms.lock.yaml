@@ -11,6 +11,13 @@ arches:
     name: python3-pyserial
     evr: 3.4-12.el9
     sourcerpm: pyserial-3.4-12.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/a/acl-2.4.0-1.el9_8.aarch64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 84537
+    checksum: sha256:241864fdb68d73b5a63df6269ae0895aec7c08e723fb0506fe446c148c9dad3f
+    name: acl
+    evr: 2.4.0-1.el9_8
+    sourcerpm: acl-2.4.0-1.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/k/kbd-2.4.0-12.el9_8.aarch64.rpm
     repoid: ubi-9-baseos-rpms
     size: 419233
@@ -39,20 +46,13 @@ arches:
     name: kmod
     evr: 28-11.el9
     sourcerpm: kmod-28-11.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/k/kmod-libs-28-11.el9.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libacl-2.4.0-1.el9_8.aarch64.rpm
     repoid: ubi-9-baseos-rpms
-    size: 62168
-    checksum: sha256:58526b701eb3a72de98062c58b56524c35916a7b1191bb1a846da33be5a5f709
-    name: kmod-libs
-    evr: 28-11.el9
-    sourcerpm: kmod-28-11.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libbpf-1.5.0-3.el9.aarch64.rpm
-    repoid: ubi-9-baseos-rpms
-    size: 188694
-    checksum: sha256:2a9b81f70ed90d0f711f9f47db6437124b30f89d1c4b009b2fa961684e2b3eb8
-    name: libbpf
-    evr: 2:1.5.0-3.el9
-    sourcerpm: libbpf-1.5.0-3.el9.src.rpm
+    size: 31468
+    checksum: sha256:70ba010505e9805254f772c3dd9cd9e6176fc9e007e8c9be7204c44f85d8bbd2
+    name: libacl
+    evr: 2.4.0-1.el9_8
+    sourcerpm: acl-2.4.0-1.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libedit-3.1-39.20210216cvs.el9.aarch64.rpm
     repoid: ubi-9-baseos-rpms
     size: 110092
@@ -60,13 +60,13 @@ arches:
     name: libedit
     evr: 3.1-39.20210216cvs.el9
     sourcerpm: libedit-3.1-39.20210216cvs.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libmnl-1.0.4-16.el9_4.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libfdisk-2.37.4-25.el9.aarch64.rpm
     repoid: ubi-9-baseos-rpms
-    size: 30479
-    checksum: sha256:b07344f5116a1913e746042748b05f978d284833282d9633e29f3d595ab596e9
-    name: libmnl
-    evr: 1.0.4-16.el9_4
-    sourcerpm: libmnl-1.0.4-16.el9_4.src.rpm
+    size: 156711
+    checksum: sha256:af043918fc50ce5b3de50c48c3de0143140b692fbf639db6f259270c4211a776
+    name: libfdisk
+    evr: 2.37.4-25.el9
+    sourcerpm: util-linux-2.37.4-25.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/l/libnl3-3.11.0-1.el9.aarch64.rpm
     repoid: ubi-9-baseos-rpms
     size: 363241
@@ -81,13 +81,48 @@ arches:
     name: libusbx
     evr: 1.0.30-1.el9_8
     sourcerpm: libusbx-1.0.30-1.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/p/psmisc-23.4-3.el9.aarch64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/o/openssl-3.5.8-1.el9_8.aarch64.rpm
     repoid: ubi-9-baseos-rpms
-    size: 252522
-    checksum: sha256:609ffc1ea49d733bf2fabf521851acf20e62cd873c3679f735bc7486b2434359
-    name: psmisc
-    evr: 23.4-3.el9
-    sourcerpm: psmisc-23.4-3.el9.src.rpm
+    size: 1546056
+    checksum: sha256:1ef4001b9a9df4695c80e986d3c8ceb7900bb6925f86fde09d16aff9f8d733f5
+    name: openssl
+    evr: 1:3.5.8-1.el9_8
+    sourcerpm: openssl-3.5.8-1.el9_8.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/s/systemd-252-67.el9_8.6.aarch64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 4135917
+    checksum: sha256:758ae3df6d76cace670ce7af7caa557a7cf8807a2160ccb30c49f7d8ec018749
+    name: systemd
+    evr: 252-67.el9_8.6
+    sourcerpm: systemd-252-67.el9_8.6.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/s/systemd-libs-252-67.el9_8.6.aarch64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 629233
+    checksum: sha256:55e58c413ee69f19a69ba25905f96343076e21abe54cdff51f0d80e48be06769
+    name: systemd-libs
+    evr: 252-67.el9_8.6
+    sourcerpm: systemd-252-67.el9_8.6.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/s/systemd-udev-252-67.el9_8.6.aarch64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 2056516
+    checksum: sha256:99b7239c5b5e93b84556942bb421a496cdf3fd4bd68c5640f897255b13c67bbe
+    name: systemd-udev
+    evr: 252-67.el9_8.6
+    sourcerpm: systemd-252-67.el9_8.6.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/u/util-linux-2.37.4-25.el9.aarch64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 2390152
+    checksum: sha256:3681bbe37d46309673f366135787f5713f0ef575e3cd413cd221af2512e3634b
+    name: util-linux
+    evr: 2.37.4-25.el9
+    sourcerpm: util-linux-2.37.4-25.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/os/Packages/u/util-linux-core-2.37.4-25.el9.aarch64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 472949
+    checksum: sha256:de7ad826dd42b383d93f6dc6b720a26d4cd4815d00c0f093c2e28037a8881424
+    name: util-linux-core
+    evr: 2.37.4-25.el9
+    sourcerpm: util-linux-2.37.4-25.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/gpsd-minimal-3.26.1-2.el9.aarch64.rpm
     repoid: appstream
     size: 626724
@@ -116,13 +151,6 @@ arches:
     name: synce4l
     evr: 1.1.0-2.el9
     sourcerpm: synce4l-1.1.0-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/acl-2.4.0-2.el9.aarch64.rpm
-    repoid: baseos
-    size: 77253
-    checksum: sha256:1d4ca14e2b7f2da10f486efe6d85822491cd961da95ba9218e155d671c095392
-    name: acl
-    evr: 2.4.0-2.el9
-    sourcerpm: acl-2.4.0-2.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/bluez-libs-5.87+2.git8750129efca8-1.el9.aarch64.rpm
     repoid: baseos
     size: 87303
@@ -144,27 +172,6 @@ arches:
     name: cryptsetup-libs
     evr: 2.8.6-2.el9
     sourcerpm: cryptsetup-2.8.6-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/dbus-1.12.20-10.el9.aarch64.rpm
-    repoid: baseos
-    size: 2997
-    checksum: sha256:3628a340989bddcecd2c490ad9a7ce3fecb85a1ca28d154bf4c82db804eac6b0
-    name: dbus
-    evr: 1:1.12.20-10.el9
-    sourcerpm: dbus-1.12.20-10.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/dbus-broker-28-10.el9.aarch64.rpm
-    repoid: baseos
-    size: 167947
-    checksum: sha256:101950b78684129b309aba96ac2cf5a4f7187ba9ac5184576494704451577f6a
-    name: dbus-broker
-    evr: 28-10.el9
-    sourcerpm: dbus-broker-28-10.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/dbus-common-1.12.20-10.el9.noarch.rpm
-    repoid: baseos
-    size: 13541
-    checksum: sha256:6e522cb85f206cdac3e1c6d9ed7400a35364c7e014687c17b17431a8d10d07e2
-    name: dbus-common
-    evr: 1:1.12.20-10.el9
-    sourcerpm: dbus-1.12.20-10.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/device-mapper-1.02.207-6.el9.aarch64.rpm
     repoid: baseos
     size: 141089
@@ -193,41 +200,6 @@ arches:
     name: hwdata
     evr: 0.348-9.24.el9
     sourcerpm: hwdata-0.348-9.24.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/iproute-6.17.0-3.el9.aarch64.rpm
-    repoid: baseos
-    size: 892216
-    checksum: sha256:e2dfd04e08c9104083af4125ccc0e3285813d09ec70cbe5c73393abec5b5a8d3
-    name: iproute
-    evr: 6.17.0-3.el9
-    sourcerpm: iproute-6.17.0-3.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libacl-2.4.0-2.el9.aarch64.rpm
-    repoid: baseos
-    size: 24963
-    checksum: sha256:4b3f377d2ba55efbdc6c959e8216b383ce0b70fb2bf9f4b92776138f61ea47a4
-    name: libacl
-    evr: 2.4.0-2.el9
-    sourcerpm: acl-2.4.0-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libfdisk-2.37.4-27.el9.aarch64.rpm
-    repoid: baseos
-    size: 149831
-    checksum: sha256:2ae747206879c75f0b14e08eda7460eee4f87c347b5b8933a031b75c6ee27c8b
-    name: libfdisk
-    evr: 2.37.4-27.el9
-    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/libseccomp-2.5.6-1.el9.aarch64.rpm
-    repoid: baseos
-    size: 70875
-    checksum: sha256:74a99b069ffe2fdd6f2ee19c73197c0ad1b71353df39c5af8c404932a5817974
-    name: libseccomp
-    evr: 2.5.6-1.el9
-    sourcerpm: libseccomp-2.5.6-1.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/openssl-3.5.8-1.el9.aarch64.rpm
-    repoid: baseos
-    size: 1538803
-    checksum: sha256:4046cc98903b0bdf84ef0b7f24cba48ab414445a50ed58d6efbe41ecceedcb03
-    name: openssl
-    evr: 1:3.5.8-1.el9
-    sourcerpm: openssl-3.5.8-1.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/pciutils-3.7.0-8.el9.aarch64.rpm
     repoid: baseos
     size: 90992
@@ -249,55 +221,6 @@ arches:
     name: procps-ng
     evr: 3.3.17-15.el9
     sourcerpm: procps-ng-3.3.17-15.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-252-78.el9.aarch64.rpm
-    repoid: baseos
-    size: 4134703
-    checksum: sha256:c97950426da2186056fdf1d1900ac2c4ade8cd8db44072a8865bc52cf1b46e50
-    name: systemd
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-libs-252-78.el9.aarch64.rpm
-    repoid: baseos
-    size: 624619
-    checksum: sha256:176eab1534229e86c93e94630da085287e0a93d260bae66503b4167632eda244
-    name: systemd-libs
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-pam-252-78.el9.aarch64.rpm
-    repoid: baseos
-    size: 243897
-    checksum: sha256:6845e3290cf7ce8085ea6f160681070df506b031deb1a2d1acd79b36ce5a00d6
-    name: systemd-pam
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-rpm-macros-252-78.el9.noarch.rpm
-    repoid: baseos
-    size: 36797
-    checksum: sha256:a0ee77264681d14a9298dc6d9e3ca4c4abb4a546619d2075b6c666e376cf78d0
-    name: systemd-rpm-macros
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/systemd-udev-252-78.el9.aarch64.rpm
-    repoid: baseos
-    size: 2057057
-    checksum: sha256:b46747750130c441853b7ea83019491964c7ddd688efa810791b014b4688e5fc
-    name: systemd-udev
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/util-linux-2.37.4-27.el9.aarch64.rpm
-    repoid: baseos
-    size: 2382280
-    checksum: sha256:5e38d7b9b460d714e833889d1c49272feb40f0eb190ae936b5a0265d95c51df2
-    name: util-linux
-    evr: 2.37.4-27.el9
-    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/aarch64/os/Packages/util-linux-core-2.37.4-27.el9.aarch64.rpm
-    repoid: baseos
-    size: 466061
-    checksum: sha256:30796f54ae7f633cc724739c9ae147b9cecfd55bf92b980d8461c394ce0a05b0
-    name: util-linux-core
-    evr: 2.37.4-27.el9
-    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
   source:
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/appstream/source/SRPMS/Packages/p/pyserial-3.4-12.el9.src.rpm
     repoid: ubi-9-appstream-source-rpms
@@ -305,6 +228,12 @@ arches:
     checksum: sha256:4111a8613d41912213ddebe4c4c7d10989c72d38ffd7da906c03d0e220bbfd44
     name: pyserial
     evr: 3.4-12.el9
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/a/acl-2.4.0-1.el9_8.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 609918
+    checksum: sha256:b140deb68f46517b0093e18969d8fb42a17216064fb2ee5783e9316d786430db
+    name: acl
+    evr: 2.4.0-1.el9_8
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/k/kbd-2.4.0-12.el9_8.src.rpm
     repoid: ubi-9-baseos-source-rpms
     size: 1172413
@@ -317,24 +246,12 @@ arches:
     checksum: sha256:4f6fefbf0d004b23494fe18ccfff2b9151ea887a276c56a6f25ea597a250991c
     name: kmod
     evr: 28-11.el9
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/l/libbpf-1.5.0-3.el9.src.rpm
-    repoid: ubi-9-baseos-source-rpms
-    size: 146253564
-    checksum: sha256:07c40367b17345fa5e647ef3c20965502ec3d93fe876c2ab6c9ba0af0959cb28
-    name: libbpf
-    evr: 2:1.5.0-3.el9
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/l/libedit-3.1-39.20210216cvs.el9.src.rpm
     repoid: ubi-9-baseos-source-rpms
     size: 536886
     checksum: sha256:6fc876ae57fdeb5d64557015d9225f828c95029314bc5f26e31127e95c373244
     name: libedit
     evr: 3.1-39.20210216cvs.el9
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/l/libmnl-1.0.4-16.el9_4.src.rpm
-    repoid: ubi-9-baseos-source-rpms
-    size: 313835
-    checksum: sha256:ebfb5c801e7a3a2b83b4c4612ea923b9dd155428e738ff52b03e8966b78d2c08
-    name: libmnl
-    evr: 1.0.4-16.el9_4
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/l/libnl3-3.11.0-1.el9.src.rpm
     repoid: ubi-9-baseos-source-rpms
     size: 5068824
@@ -347,12 +264,24 @@ arches:
     checksum: sha256:2392c9af1b8e09c077a81248dbc667e855e0c6b0ad863898f14d24b4c218ed35
     name: libusbx
     evr: 1.0.30-1.el9_8
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/p/psmisc-23.4-3.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/o/openssl-3.5.8-1.el9_8.src.rpm
     repoid: ubi-9-baseos-source-rpms
-    size: 386002
-    checksum: sha256:9e65fd323b6c88f71e05576b931a10ba4bdce9314114ba88e436482efa77d6bd
-    name: psmisc
-    evr: 23.4-3.el9
+    size: 53429735
+    checksum: sha256:393e8694b8161826f67f149cd7dde6b63da96f02efc050fda651d265907f2c20
+    name: openssl
+    evr: 1:3.5.8-1.el9_8
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/s/systemd-252-67.el9_8.6.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 45003976
+    checksum: sha256:f535f4c20ed82f56cc7f4c86202e3cd582815f702bb0c24005a07a496ec94c97
+    name: systemd
+    evr: 252-67.el9_8.6
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/aarch64/baseos/source/SRPMS/Packages/u/util-linux-2.37.4-25.el9.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 6291867
+    checksum: sha256:6c788387cde9c0fde5481382f3f8416e3ecbcf09c908b409b6c63358b90a399f
+    name: util-linux
+    evr: 2.37.4-25.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-2.el9.src.rpm
     repoid: appstream-source
     size: 11647206
@@ -371,12 +300,6 @@ arches:
     checksum: sha256:675f10b1752218152a081e226248c6c044687d9336ada4d3050972c46c842473
     name: synce4l
     evr: 1.1.0-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/acl-2.4.0-2.el9.src.rpm
-    repoid: baseos-source
-    size: 603792
-    checksum: sha256:5872b8f2484ea20cbdbcedad561e841fd3430027750ab6f5f93a5ba97bb70f29
-    name: acl
-    evr: 2.4.0-2.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/bluez-5.87+2.git8750129efca8-1.el9.src.rpm
     repoid: baseos-source
     size: 1998049
@@ -395,18 +318,6 @@ arches:
     checksum: sha256:0eaa1623e4e8db6595fadd0c030e4f281c56e6f8795ec7e690cbedfa5e0be399
     name: cryptsetup
     evr: 2.8.6-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-1.12.20-10.el9.src.rpm
-    repoid: baseos-source
-    size: 2143421
-    checksum: sha256:a0f99f3a65a5aaae070f37b08387089dc8e9f346d657674131a641d8a57a0cdf
-    name: dbus
-    evr: 1:1.12.20-10.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-broker-28-10.el9.src.rpm
-    repoid: baseos-source
-    size: 252707
-    checksum: sha256:1a0f77933ff82be8853c6d568f5234f77ae8cb228ea9c12075e0b8792292af0b
-    name: dbus-broker
-    evr: 28-10.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/ethtool-6.19-1.el9.src.rpm
     repoid: baseos-source
     size: 468515
@@ -419,30 +330,12 @@ arches:
     checksum: sha256:9b494c73efc7535def746ae462b1a665c7f2cb04c00253a4acb2571a65ceb1d6
     name: hwdata
     evr: 0.348-9.24.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/iproute-6.17.0-3.el9.src.rpm
-    repoid: baseos-source
-    size: 976273
-    checksum: sha256:45822e883343d5d26965e8d3dce2a30ba97136e0d4ef82fb55c95a444b9e48e8
-    name: iproute
-    evr: 6.17.0-3.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/libseccomp-2.5.6-1.el9.src.rpm
-    repoid: baseos-source
-    size: 641578
-    checksum: sha256:7b28246c41d520aefdda32ca76504a9927d11e78a690d370e4d49ae72fc7e814
-    name: libseccomp
-    evr: 2.5.6-1.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/lvm2-2.03.33-6.el9.src.rpm
     repoid: baseos-source
     size: 3217522
     checksum: sha256:6a7b894505d75a14077ab5734217c958d9054fa87f7b05d15f4f37681bee13ff
     name: lvm2
     evr: 9:2.03.33-6.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/openssl-3.5.8-1.el9.src.rpm
-    repoid: baseos-source
-    size: 53419600
-    checksum: sha256:5727db51a67344d4306486f6db213224b52ed90b6459b53669a387ec9ac58305
-    name: openssl
-    evr: 1:3.5.8-1.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/pciutils-3.7.0-8.el9.src.rpm
     repoid: baseos-source
     size: 395241
@@ -455,18 +348,6 @@ arches:
     checksum: sha256:9a0b1e95430dbc46938d95418be58aa992e0206190abc2daefd20d49b732142c
     name: procps-ng
     evr: 3.3.17-15.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-78.el9.src.rpm
-    repoid: baseos-source
-    size: 45055662
-    checksum: sha256:107cb10af24dbc93d4e16e5fb60e7fc39a6680795087c9ec06e2536355dc49f4
-    name: systemd
-    evr: 252-78.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-27.el9.src.rpm
-    repoid: baseos-source
-    size: 6287668
-    checksum: sha256:b9e7540ef979655bf778c2f32bb486b3e908565e033037f22122805496273f5c
-    name: util-linux
-    evr: 2.37.4-27.el9
   module_metadata: []
 - arch: x86_64
   packages:
@@ -477,6 +358,13 @@ arches:
     name: python3-pyserial
     evr: 3.4-12.el9
     sourcerpm: pyserial-3.4-12.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/a/acl-2.4.0-1.el9_8.x86_64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 85269
+    checksum: sha256:611da2c85401a2f26dba165c0be27b2e62fa71ceb5c392c8f5a9d30c31238d5b
+    name: acl
+    evr: 2.4.0-1.el9_8
+    sourcerpm: acl-2.4.0-1.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/k/kbd-2.4.0-12.el9_8.x86_64.rpm
     repoid: ubi-9-baseos-rpms
     size: 432856
@@ -505,20 +393,13 @@ arches:
     name: kmod
     evr: 28-11.el9
     sourcerpm: kmod-28-11.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/k/kmod-libs-28-11.el9.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libacl-2.4.0-1.el9_8.x86_64.rpm
     repoid: ubi-9-baseos-rpms
-    size: 63619
-    checksum: sha256:f296bc24a1b8ba6c40ed73ba736be97ed78e4124b6dbdd8a0a25a9683d4ff1ce
-    name: kmod-libs
-    evr: 28-11.el9
-    sourcerpm: kmod-28-11.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libbpf-1.5.0-3.el9.x86_64.rpm
-    repoid: ubi-9-baseos-rpms
-    size: 188749
-    checksum: sha256:72673b289f5b720462aca02125411285b259139988be54dff7646d7639f7b26d
-    name: libbpf
-    evr: 2:1.5.0-3.el9
-    sourcerpm: libbpf-1.5.0-3.el9.src.rpm
+    size: 31657
+    checksum: sha256:a81fb7a4d7c946e9bd886ee3c471a4b5040dedbb8ffb2a388120b2094be93cc8
+    name: libacl
+    evr: 2.4.0-1.el9_8
+    sourcerpm: acl-2.4.0-1.el9_8.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libedit-3.1-39.20210216cvs.el9.x86_64.rpm
     repoid: ubi-9-baseos-rpms
     size: 112056
@@ -526,13 +407,13 @@ arches:
     name: libedit
     evr: 3.1-39.20210216cvs.el9
     sourcerpm: libedit-3.1-39.20210216cvs.el9.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libmnl-1.0.4-16.el9_4.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libfdisk-2.37.4-25.el9.x86_64.rpm
     repoid: ubi-9-baseos-rpms
-    size: 30949
-    checksum: sha256:badfd4eb5b7cd3622da84168674002ec718ef810ce615a1113d3e19e265b777e
-    name: libmnl
-    evr: 1.0.4-16.el9_4
-    sourcerpm: libmnl-1.0.4-16.el9_4.src.rpm
+    size: 161769
+    checksum: sha256:1b861f267752e718ce696a80dcc06ef1dde8e9aa73fa2abed3775626d719c124
+    name: libfdisk
+    evr: 2.37.4-25.el9
+    sourcerpm: util-linux-2.37.4-25.el9.src.rpm
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/l/libnl3-3.11.0-1.el9.x86_64.rpm
     repoid: ubi-9-baseos-rpms
     size: 376137
@@ -547,13 +428,48 @@ arches:
     name: libusbx
     evr: 1.0.30-1.el9_8
     sourcerpm: libusbx-1.0.30-1.el9_8.src.rpm
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/p/psmisc-23.4-3.el9.x86_64.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/o/openssl-3.5.8-1.el9_8.x86_64.rpm
     repoid: ubi-9-baseos-rpms
-    size: 253357
-    checksum: sha256:30ad5408417c7f06fb945dc321bef3ce31f813f25389707dd1efa7c1d337b806
-    name: psmisc
-    evr: 23.4-3.el9
-    sourcerpm: psmisc-23.4-3.el9.src.rpm
+    size: 1569041
+    checksum: sha256:2e0d5017032a48c23d4efa43afbe98d45179365eaec16f38e93c271b7728a67a
+    name: openssl
+    evr: 1:3.5.8-1.el9_8
+    sourcerpm: openssl-3.5.8-1.el9_8.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/s/systemd-252-67.el9_8.6.x86_64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 4383786
+    checksum: sha256:025ffe42235a9d4d40138bab7511995392d2a50ba6912be97b47e634b15823b8
+    name: systemd
+    evr: 252-67.el9_8.6
+    sourcerpm: systemd-252-67.el9_8.6.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/s/systemd-libs-252-67.el9_8.6.x86_64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 662007
+    checksum: sha256:d491d7375ed820bf4fa0d5f6d80a6f1a72cfa6ff31e79dabf9288246061cf88e
+    name: systemd-libs
+    evr: 252-67.el9_8.6
+    sourcerpm: systemd-252-67.el9_8.6.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/s/systemd-udev-252-67.el9_8.6.x86_64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 2107056
+    checksum: sha256:3b043cd40ac49fb9f107d1ddd73e1a361643a33f1272e960026e42ae5a597bc5
+    name: systemd-udev
+    evr: 252-67.el9_8.6
+    sourcerpm: systemd-252-67.el9_8.6.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/u/util-linux-2.37.4-25.el9.x86_64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 2382511
+    checksum: sha256:35e0b73e574a7d8e93af0adf54adb2303f03423fd5761e357df86288f59d7933
+    name: util-linux
+    evr: 2.37.4-25.el9
+    sourcerpm: util-linux-2.37.4-25.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os/Packages/u/util-linux-core-2.37.4-25.el9.x86_64.rpm
+    repoid: ubi-9-baseos-rpms
+    size: 476811
+    checksum: sha256:5575c8fc753d5a81022786dac33e172a6d1602ef41d247a58465754d3f952726
+    name: util-linux-core
+    evr: 2.37.4-25.el9
+    sourcerpm: util-linux-2.37.4-25.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/gpsd-minimal-3.26.1-2.el9.x86_64.rpm
     repoid: appstream
     size: 630567
@@ -582,13 +498,6 @@ arches:
     name: synce4l
     evr: 1.1.0-2.el9
     sourcerpm: synce4l-1.1.0-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/acl-2.4.0-2.el9.x86_64.rpm
-    repoid: baseos
-    size: 78016
-    checksum: sha256:706c131ab22d2b8f0834d8747a36a06d1c4c905d4e8ba79dd2ebfc33b4d8fa66
-    name: acl
-    evr: 2.4.0-2.el9
-    sourcerpm: acl-2.4.0-2.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/bluez-libs-5.87+2.git8750129efca8-1.el9.x86_64.rpm
     repoid: baseos
     size: 84131
@@ -610,27 +519,6 @@ arches:
     name: cryptsetup-libs
     evr: 2.8.6-2.el9
     sourcerpm: cryptsetup-2.8.6-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/dbus-1.12.20-10.el9.x86_64.rpm
-    repoid: baseos
-    size: 3045
-    checksum: sha256:c36fc19c6d1cd8d9d10499f5c9b6ac42db27b5cd525cb0b6480b16a476f2df5d
-    name: dbus
-    evr: 1:1.12.20-10.el9
-    sourcerpm: dbus-1.12.20-10.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/dbus-broker-28-10.el9.x86_64.rpm
-    repoid: baseos
-    size: 173733
-    checksum: sha256:40743c77bb6514893e4aab880ad34b4cad500927b0afd4bf74a94d14e0bcbf9f
-    name: dbus-broker
-    evr: 28-10.el9
-    sourcerpm: dbus-broker-28-10.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/dbus-common-1.12.20-10.el9.noarch.rpm
-    repoid: baseos
-    size: 13541
-    checksum: sha256:6e522cb85f206cdac3e1c6d9ed7400a35364c7e014687c17b17431a8d10d07e2
-    name: dbus-common
-    evr: 1:1.12.20-10.el9
-    sourcerpm: dbus-1.12.20-10.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/device-mapper-1.02.207-6.el9.x86_64.rpm
     repoid: baseos
     size: 143027
@@ -659,41 +547,6 @@ arches:
     name: hwdata
     evr: 0.348-9.24.el9
     sourcerpm: hwdata-0.348-9.24.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/iproute-6.17.0-3.el9.x86_64.rpm
-    repoid: baseos
-    size: 887737
-    checksum: sha256:7cbd881d2972ce0923eb59ce3223ce7bfbc283bfb006e5b3821c64f53bcfeb86
-    name: iproute
-    evr: 6.17.0-3.el9
-    sourcerpm: iproute-6.17.0-3.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libacl-2.4.0-2.el9.x86_64.rpm
-    repoid: baseos
-    size: 25007
-    checksum: sha256:2d928a27d32720058d90b415dcf24a9df070393a5a5947117fb45524a8a9654a
-    name: libacl
-    evr: 2.4.0-2.el9
-    sourcerpm: acl-2.4.0-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libfdisk-2.37.4-27.el9.x86_64.rpm
-    repoid: baseos
-    size: 154919
-    checksum: sha256:b548802a8ca756bd0968969beeb5c1bb7836ec22755faed921b748b8c3b6828a
-    name: libfdisk
-    evr: 2.37.4-27.el9
-    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/libseccomp-2.5.6-1.el9.x86_64.rpm
-    repoid: baseos
-    size: 70501
-    checksum: sha256:73779d9eb83b4334fb312a7a6bcf7764780777f168724d7e57f6477fd912ac0a
-    name: libseccomp
-    evr: 2.5.6-1.el9
-    sourcerpm: libseccomp-2.5.6-1.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/openssl-3.5.8-1.el9.x86_64.rpm
-    repoid: baseos
-    size: 1562772
-    checksum: sha256:b97860c63a00ab5a00a3bb1ffa0fc2657e7da128e1adbb7a0a6b90c30ae8204e
-    name: openssl
-    evr: 1:3.5.8-1.el9
-    sourcerpm: openssl-3.5.8-1.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/pciutils-3.7.0-8.el9.x86_64.rpm
     repoid: baseos
     size: 93974
@@ -715,55 +568,6 @@ arches:
     name: procps-ng
     evr: 3.3.17-15.el9
     sourcerpm: procps-ng-3.3.17-15.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-252-78.el9.x86_64.rpm
-    repoid: baseos
-    size: 4384213
-    checksum: sha256:8928a714a1804b3f1e5cef750d2f3c10f3b2054c009aa11a5cb5747eb3b174a6
-    name: systemd
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-libs-252-78.el9.x86_64.rpm
-    repoid: baseos
-    size: 657517
-    checksum: sha256:10cf9e4fe79afee84cf06ea989fcb2544ada5f39fda301cda81efd970381808d
-    name: systemd-libs
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-pam-252-78.el9.x86_64.rpm
-    repoid: baseos
-    size: 254261
-    checksum: sha256:a1fce5fb7bf0c6ac86e738dbb21c5e02361015f1858d22b0c368de76e8a152c7
-    name: systemd-pam
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-rpm-macros-252-78.el9.noarch.rpm
-    repoid: baseos
-    size: 36797
-    checksum: sha256:a0ee77264681d14a9298dc6d9e3ca4c4abb4a546619d2075b6c666e376cf78d0
-    name: systemd-rpm-macros
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/systemd-udev-252-78.el9.x86_64.rpm
-    repoid: baseos
-    size: 2106454
-    checksum: sha256:2e54899780b903a3767d0dc64d79900eac87e6bd330a9a9ec92088046f4005ce
-    name: systemd-udev
-    evr: 252-78.el9
-    sourcerpm: systemd-252-78.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/util-linux-2.37.4-27.el9.x86_64.rpm
-    repoid: baseos
-    size: 2375710
-    checksum: sha256:3cfa4add546aa6f87319c685980c1e451e9772d12fcd95cea6237288cc299eb7
-    name: util-linux
-    evr: 2.37.4-27.el9
-    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os/Packages/util-linux-core-2.37.4-27.el9.x86_64.rpm
-    repoid: baseos
-    size: 467005
-    checksum: sha256:dafdde295a33cea8ac397372808d2a958020790045be6cf1fefae1ce81919a77
-    name: util-linux-core
-    evr: 2.37.4-27.el9
-    sourcerpm: util-linux-2.37.4-27.el9.src.rpm
   source:
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/source/SRPMS/Packages/p/pyserial-3.4-12.el9.src.rpm
     repoid: ubi-9-appstream-source-rpms
@@ -771,6 +575,12 @@ arches:
     checksum: sha256:4111a8613d41912213ddebe4c4c7d10989c72d38ffd7da906c03d0e220bbfd44
     name: pyserial
     evr: 3.4-12.el9
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/a/acl-2.4.0-1.el9_8.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 609918
+    checksum: sha256:b140deb68f46517b0093e18969d8fb42a17216064fb2ee5783e9316d786430db
+    name: acl
+    evr: 2.4.0-1.el9_8
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/k/kbd-2.4.0-12.el9_8.src.rpm
     repoid: ubi-9-baseos-source-rpms
     size: 1172413
@@ -783,24 +593,12 @@ arches:
     checksum: sha256:4f6fefbf0d004b23494fe18ccfff2b9151ea887a276c56a6f25ea597a250991c
     name: kmod
     evr: 28-11.el9
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/l/libbpf-1.5.0-3.el9.src.rpm
-    repoid: ubi-9-baseos-source-rpms
-    size: 146253564
-    checksum: sha256:07c40367b17345fa5e647ef3c20965502ec3d93fe876c2ab6c9ba0af0959cb28
-    name: libbpf
-    evr: 2:1.5.0-3.el9
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/l/libedit-3.1-39.20210216cvs.el9.src.rpm
     repoid: ubi-9-baseos-source-rpms
     size: 536886
     checksum: sha256:6fc876ae57fdeb5d64557015d9225f828c95029314bc5f26e31127e95c373244
     name: libedit
     evr: 3.1-39.20210216cvs.el9
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/l/libmnl-1.0.4-16.el9_4.src.rpm
-    repoid: ubi-9-baseos-source-rpms
-    size: 313835
-    checksum: sha256:ebfb5c801e7a3a2b83b4c4612ea923b9dd155428e738ff52b03e8966b78d2c08
-    name: libmnl
-    evr: 1.0.4-16.el9_4
   - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/l/libnl3-3.11.0-1.el9.src.rpm
     repoid: ubi-9-baseos-source-rpms
     size: 5068824
@@ -813,12 +611,24 @@ arches:
     checksum: sha256:2392c9af1b8e09c077a81248dbc667e855e0c6b0ad863898f14d24b4c218ed35
     name: libusbx
     evr: 1.0.30-1.el9_8
-  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/p/psmisc-23.4-3.el9.src.rpm
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/o/openssl-3.5.8-1.el9_8.src.rpm
     repoid: ubi-9-baseos-source-rpms
-    size: 386002
-    checksum: sha256:9e65fd323b6c88f71e05576b931a10ba4bdce9314114ba88e436482efa77d6bd
-    name: psmisc
-    evr: 23.4-3.el9
+    size: 53429735
+    checksum: sha256:393e8694b8161826f67f149cd7dde6b63da96f02efc050fda651d265907f2c20
+    name: openssl
+    evr: 1:3.5.8-1.el9_8
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/s/systemd-252-67.el9_8.6.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 45003976
+    checksum: sha256:f535f4c20ed82f56cc7f4c86202e3cd582815f702bb0c24005a07a496ec94c97
+    name: systemd
+    evr: 252-67.el9_8.6
+  - url: https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/source/SRPMS/Packages/u/util-linux-2.37.4-25.el9.src.rpm
+    repoid: ubi-9-baseos-source-rpms
+    size: 6291867
+    checksum: sha256:6c788387cde9c0fde5481382f3f8416e3ecbcf09c908b409b6c63358b90a399f
+    name: util-linux
+    evr: 2.37.4-25.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-2.el9.src.rpm
     repoid: appstream-source
     size: 11647206
@@ -837,12 +647,6 @@ arches:
     checksum: sha256:675f10b1752218152a081e226248c6c044687d9336ada4d3050972c46c842473
     name: synce4l
     evr: 1.1.0-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/acl-2.4.0-2.el9.src.rpm
-    repoid: baseos-source
-    size: 603792
-    checksum: sha256:5872b8f2484ea20cbdbcedad561e841fd3430027750ab6f5f93a5ba97bb70f29
-    name: acl
-    evr: 2.4.0-2.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/bluez-5.87+2.git8750129efca8-1.el9.src.rpm
     repoid: baseos-source
     size: 1998049
@@ -861,18 +665,6 @@ arches:
     checksum: sha256:0eaa1623e4e8db6595fadd0c030e4f281c56e6f8795ec7e690cbedfa5e0be399
     name: cryptsetup
     evr: 2.8.6-2.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-1.12.20-10.el9.src.rpm
-    repoid: baseos-source
-    size: 2143421
-    checksum: sha256:a0f99f3a65a5aaae070f37b08387089dc8e9f346d657674131a641d8a57a0cdf
-    name: dbus
-    evr: 1:1.12.20-10.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/dbus-broker-28-10.el9.src.rpm
-    repoid: baseos-source
-    size: 252707
-    checksum: sha256:1a0f77933ff82be8853c6d568f5234f77ae8cb228ea9c12075e0b8792292af0b
-    name: dbus-broker
-    evr: 28-10.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/ethtool-6.19-1.el9.src.rpm
     repoid: baseos-source
     size: 468515
@@ -885,30 +677,12 @@ arches:
     checksum: sha256:9b494c73efc7535def746ae462b1a665c7f2cb04c00253a4acb2571a65ceb1d6
     name: hwdata
     evr: 0.348-9.24.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/iproute-6.17.0-3.el9.src.rpm
-    repoid: baseos-source
-    size: 976273
-    checksum: sha256:45822e883343d5d26965e8d3dce2a30ba97136e0d4ef82fb55c95a444b9e48e8
-    name: iproute
-    evr: 6.17.0-3.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/libseccomp-2.5.6-1.el9.src.rpm
-    repoid: baseos-source
-    size: 641578
-    checksum: sha256:7b28246c41d520aefdda32ca76504a9927d11e78a690d370e4d49ae72fc7e814
-    name: libseccomp
-    evr: 2.5.6-1.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/lvm2-2.03.33-6.el9.src.rpm
     repoid: baseos-source
     size: 3217522
     checksum: sha256:6a7b894505d75a14077ab5734217c958d9054fa87f7b05d15f4f37681bee13ff
     name: lvm2
     evr: 9:2.03.33-6.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/openssl-3.5.8-1.el9.src.rpm
-    repoid: baseos-source
-    size: 53419600
-    checksum: sha256:5727db51a67344d4306486f6db213224b52ed90b6459b53669a387ec9ac58305
-    name: openssl
-    evr: 1:3.5.8-1.el9
   - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/pciutils-3.7.0-8.el9.src.rpm
     repoid: baseos-source
     size: 395241
@@ -921,16 +695,4 @@ arches:
     checksum: sha256:9a0b1e95430dbc46938d95418be58aa992e0206190abc2daefd20d49b732142c
     name: procps-ng
     evr: 3.3.17-15.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/systemd-252-78.el9.src.rpm
-    repoid: baseos-source
-    size: 45055662
-    checksum: sha256:107cb10af24dbc93d4e16e5fb60e7fc39a6680795087c9ec06e2536355dc49f4
-    name: systemd
-    evr: 252-78.el9
-  - url: https://mirror.stream.centos.org/9-stream/BaseOS/source/tree/Packages/util-linux-2.37.4-27.el9.src.rpm
-    repoid: baseos-source
-    size: 6287668
-    checksum: sha256:b9e7540ef979655bf778c2f32bb486b3e908565e033037f22122805496273f5c
-    name: util-linux
-    evr: 2.37.4-27.el9
   module_metadata: []
