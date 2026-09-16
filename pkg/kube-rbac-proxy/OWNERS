@@ -1,0 +1,9 @@
+reviewers:
+- ibihim
+- liouk
+- control-plane-approvers
+
+approvers:
+- ibihim
+- liouk
+- control-plane-approvers
