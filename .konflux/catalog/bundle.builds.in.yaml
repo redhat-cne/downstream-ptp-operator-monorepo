@@ -1,3 +1,3 @@
 ---
 # retrigger build with EC policy exclusions
-quay: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22@sha256:b3759010f85f2c818e4cd66b1a2ce20ab9c83c5a9b3767066896f4c1c5d9604b
+quay: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-bundle-mono-4-22@sha256:ee3ee3e94e83942e62f42d9b644de57f5c89215e8ce6579933f6903b305fa809
