@@ -1,4 +1,4 @@
-FROM golang:1.23 AS builder
+FROM golang:1.27 AS builder
 ENV GO111MODULE=on
 ENV CGO_ENABLED=1
 ENV COMMON_GO_ARGS=-race
