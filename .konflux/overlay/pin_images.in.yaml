@@ -2,12 +2,12 @@
 # Operator (manager)
 - key: manager
   source: quay.io/openshift/origin-ptp-operator:4.20
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-20@sha256:14a2beaa96de81ad0e7a9480a711e67cdf1999af817b58f20fcce0edfc7916c7
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/ptp-operator-mono-4-20@sha256:8f6bad35f8e5329a1752694bbfda8f2c3e6963133ed37599859314fe7482376f
 #
 # linuxptp-daemon
 - key: linuxptp_daemon_image
   source: quay.io/openshift/origin-ptp:4.20
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-20@sha256:4dfcb69e879396365a30e2f7a267b72e61268242c5815d59fc1f5f9cba633774
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-20@sha256:e6afe23d72ac4b0bfee5affa0b2e17032e65b1cc1cdf69e08ad6bc1e7f074f67
 #
 # kube-rbac-proxy (OCP payload; bundled, not tenant-built)
 - key: kube_rbac_proxy_image
