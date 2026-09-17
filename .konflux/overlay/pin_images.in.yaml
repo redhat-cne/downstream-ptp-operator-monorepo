@@ -7,7 +7,7 @@
 # linuxptp-daemon
 - key: linuxptp_daemon_image
   source: quay.io/openshift/origin-ptp:4.19
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-19@sha256:4dfcb69e879396365a30e2f7a267b72e61268242c5815d59fc1f5f9cba633774
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/linuxptp-daemon-mono-4-19@sha256:58893c0e5b00cdc2f3d9518ba474c0de6f7efae499d58c4a10d870e1a9f01951
 #
 # kube-rbac-proxy (OCP payload; bundled, not tenant-built)
 - key: kube_rbac_proxy_image
@@ -17,7 +17,7 @@
 # cloud-event-proxy
 - key: cloud_event_proxy_image
   source: quay.io/openshift/origin-cloud-event-proxy:4.19
-  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-19@sha256:1076a7db2f462f641356a590bcbcb32de5baaa6f4964b15bc348680cf6a7e99d
+  target: quay.io/redhat-user-workloads/experimental-ptp-tenant/cloud-event-proxy-mono-4-19@sha256:2bc149c3e7fd702a926faffdfcaf30070b8fdb00f9f1cad833fc659dbc329042
 #
 # must-gather
 - key: must_gather_image
