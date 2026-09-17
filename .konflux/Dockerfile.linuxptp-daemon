@@ -2,7 +2,7 @@ ARG BUILDER_IMAGE=brew.registry.redhat.io/rh-osbs/openshift-golang-builder:rhel_
 # Digest-pin ubi9/ubi. Must match rpms.in.yaml context.image. Do not set
 # RUNTIME_IMAGE in the shared container_build_args.conf. Relock with
 # scripts/relock-linuxptp-daemon-rpms.sh after changing this digest.
-ARG RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi@sha256:b0288b22a9c4ac633625bd9c8f9e39c0ad3043990d0fc8f9c62d60740af0e73e
+ARG RUNTIME_IMAGE=registry.access.redhat.com/ubi9/ubi@sha256:9295c5c688f487fa5cf27a734fa55ecd57aeb7dc0904ba537da4f42dfa1d0acb
 
 # Built with path-context "." so Hermeto/cachi2 RPM injection (repo root) is
 # visible to yum. Operand layout matches pkg/linuxptp-daemon/addons/redhat/Dockerfile.ocp.
