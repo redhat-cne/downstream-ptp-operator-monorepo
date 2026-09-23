@@ -123,20 +123,20 @@ arches:
     name: util-linux-core
     evr: 2.37.4-25.el9
     sourcerpm: util-linux-2.37.4-25.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/gpsd-minimal-3.26.1-2.el9.aarch64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/gpsd-minimal-3.26.1-4.el9.aarch64.rpm
     repoid: appstream
-    size: 626724
-    checksum: sha256:9f9e58bed37feef69bb2adc2c6b08edec1af4af0259f229ca0acdb35b5d27eb3
+    size: 626944
+    checksum: sha256:f373e29bdbf37a8b473ab81381751ece3310f8684bf3f221be02011d73e8b949
     name: gpsd-minimal
-    evr: 1:3.26.1-2.el9
-    sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/gpsd-minimal-clients-3.26.1-2.el9.aarch64.rpm
+    evr: 1:3.26.1-4.el9
+    sourcerpm: gpsd-minimal-3.26.1-4.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/gpsd-minimal-clients-3.26.1-4.el9.aarch64.rpm
     repoid: appstream
-    size: 722936
-    checksum: sha256:152d4d930b742c11f03e65b20a292666342f1081a4bed5dcee05cb20838e0a20
+    size: 723167
+    checksum: sha256:c450d414e3b53f4177e7c92f87a452ac8fa4416359e86e77dd8d9aeb8251be22
     name: gpsd-minimal-clients
-    evr: 1:3.26.1-2.el9
-    sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
+    evr: 1:3.26.1-4.el9
+    sourcerpm: gpsd-minimal-3.26.1-4.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/aarch64/os/Packages/linuxptp-4.4-6.el9.aarch64.rpm
     repoid: appstream
     size: 316932
@@ -282,12 +282,12 @@ arches:
     checksum: sha256:6c788387cde9c0fde5481382f3f8416e3ecbcf09c908b409b6c63358b90a399f
     name: util-linux
     evr: 2.37.4-25.el9
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-2.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-4.el9.src.rpm
     repoid: appstream-source
-    size: 11647206
-    checksum: sha256:2928e36a9067a6e987ec2cae547bad50ebde3f906998fcc04a21013fc7a4f539
+    size: 11649373
+    checksum: sha256:4641876e20d6a39aa187a2ec32150075225cc0fb803d590774b6366314aeb5dd
     name: gpsd-minimal
-    evr: 1:3.26.1-2.el9
+    evr: 1:3.26.1-4.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-6.el9.src.rpm
     repoid: appstream-source
     size: 408175
@@ -470,20 +470,20 @@ arches:
     name: util-linux-core
     evr: 2.37.4-25.el9
     sourcerpm: util-linux-2.37.4-25.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/gpsd-minimal-3.26.1-2.el9.x86_64.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/gpsd-minimal-3.26.1-4.el9.x86_64.rpm
     repoid: appstream
-    size: 630567
-    checksum: sha256:783246314fcad3a7a639fc2eb3e826dae2e2822edfcaa1bff8592cbf03fa16cc
+    size: 631131
+    checksum: sha256:ae8e00096e573732351c425df978a9370ffa7e40ae16e2030264ca4fc4cf0955
     name: gpsd-minimal
-    evr: 1:3.26.1-2.el9
-    sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/gpsd-minimal-clients-3.26.1-2.el9.x86_64.rpm
+    evr: 1:3.26.1-4.el9
+    sourcerpm: gpsd-minimal-3.26.1-4.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/gpsd-minimal-clients-3.26.1-4.el9.x86_64.rpm
     repoid: appstream
     size: 697378
-    checksum: sha256:5aeb959dfca158092c2486440aaeb24dbb7ab2f28baefddfe4b05b85525d76d4
+    checksum: sha256:07ba85b7fa4874d18e0a45bed478828680fe96fea2ffd83f33f305be1f3d02ed
     name: gpsd-minimal-clients
-    evr: 1:3.26.1-2.el9
-    sourcerpm: gpsd-minimal-3.26.1-2.el9.src.rpm
+    evr: 1:3.26.1-4.el9
+    sourcerpm: gpsd-minimal-3.26.1-4.el9.src.rpm
   - url: https://mirror.stream.centos.org/9-stream/AppStream/x86_64/os/Packages/linuxptp-4.4-6.el9.x86_64.rpm
     repoid: appstream
     size: 312193
@@ -629,12 +629,12 @@ arches:
     checksum: sha256:6c788387cde9c0fde5481382f3f8416e3ecbcf09c908b409b6c63358b90a399f
     name: util-linux
     evr: 2.37.4-25.el9
-  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-2.el9.src.rpm
+  - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/gpsd-minimal-3.26.1-4.el9.src.rpm
     repoid: appstream-source
-    size: 11647206
-    checksum: sha256:2928e36a9067a6e987ec2cae547bad50ebde3f906998fcc04a21013fc7a4f539
+    size: 11649373
+    checksum: sha256:4641876e20d6a39aa187a2ec32150075225cc0fb803d590774b6366314aeb5dd
     name: gpsd-minimal
-    evr: 1:3.26.1-2.el9
+    evr: 1:3.26.1-4.el9
   - url: https://mirror.stream.centos.org/9-stream/AppStream/source/tree/Packages/linuxptp-4.4-6.el9.src.rpm
     repoid: appstream-source
     size: 408175
