@@ -1,0 +1,127 @@
+name: Standalone Repositories Outbound PR Bridge
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release-4.12'
+      - 'release-4.13'
+      - 'release-4.14'
+      - 'release-4.15'
+      - 'release-4.16'
+      - 'release-4.17'
+      - 'release-4.18'
+      - 'release-4.19'
+      - 'release-4.20'
+      - 'release-4.21'
+      - 'release-4.22'
+      - 'release-4.23'
+      # release-5.0 excluded once migrated in ART ocp-build-data
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target release branch (e.g. main, release-4.22)'
+        required: true
+        default: 'main'
+      commit_sha:
+        description: 'Commit SHA to mirror (defaults to HEAD)'
+        required: false
+        default: ''
+      components:
+        description: 'Comma-separated components to bridge (ptpop,lptpd,cep) or leave empty for auto-detect'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Run in dry-run mode without creating PRs'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  sync-to-standalone:
+    name: Bridge Monorepo Commits to Standalone Repos
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Authenticate via GitHub App (if configured)
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        continue-on-error: true
+        with:
+          app-id: ${{ secrets.SYNC_APP_ID }}
+          private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+          owner: ${{ vars.SYNC_BOT_FORK_OWNER || 'ptp-monorepo-sync-bot' }}
+
+      - name: Checkout Monorepo Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - name: Determine Run Parameters
+        id: params
+        run: |
+          TARGET_BRANCH="${{ github.event.inputs.branch }}"
+          if [ -z "$TARGET_BRANCH" ]; then
+            TARGET_BRANCH="${GITHUB_REF_NAME}"
+          fi
+
+          COMMIT_SHA="${{ github.event.inputs.commit_sha }}"
+          if [ -z "$COMMIT_SHA" ]; then
+            COMMIT_SHA="${GITHUB_SHA}"
+          fi
+
+          FORK_OWNER="${{ vars.SYNC_BOT_FORK_OWNER || secrets.SYNC_BOT_FORK_OWNER || 'ptp-monorepo-sync-bot' }}"
+          COMPONENTS="${{ github.event.inputs.components }}"
+          DRY_RUN="${{ github.event.inputs.dry_run }}"
+
+          echo "branch=${TARGET_BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "commit=${COMMIT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "fork_owner=${FORK_OWNER}" >> "$GITHUB_OUTPUT"
+          echo "components=${COMPONENTS}" >> "$GITHUB_OUTPUT"
+          echo "dry_run=${DRY_RUN}" >> "$GITHUB_OUTPUT"
+
+      - name: Configure GitHub CLI Auth
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          BOT_TOKEN: ${{ secrets.SYNC_BOT_TOKEN }}
+        run: |
+          if [ -n "$APP_TOKEN" ]; then
+            echo "Using GitHub App installation token for GitHub CLI."
+            echo "$APP_TOKEN" | gh auth login --with-token
+            git config --global url."https://x-access-token:${APP_TOKEN}@github.com/".insteadOf "https://github.com/"
+          elif [ -n "$BOT_TOKEN" ]; then
+            echo "Using SYNC_BOT_TOKEN for GitHub CLI."
+            echo "$BOT_TOKEN" | gh auth login --with-token
+            git config --global url."https://x-access-token:${BOT_TOKEN}@github.com/".insteadOf "https://github.com/"
+          else
+            echo "Using default GITHUB_TOKEN."
+            echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          fi
+          git config --global user.name "ptp-monorepo-sync-bot[bot]"
+          git config --global user.email "ptp-monorepo-sync-bot[bot]@users.noreply.github.com"
+
+      - name: Execute Standalone PR Bridge
+        id: run-bridge
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.SYNC_BOT_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=(
+            "--branch" "${{ steps.params.outputs.branch }}"
+            "--commit" "${{ steps.params.outputs.commit }}"
+            "--fork-owner" "${{ steps.params.outputs.fork_owner }}"
+            "--monorepo-repo" "${{ github.repository }}"
+          )
+
+          if [ -n "${{ steps.params.outputs.components }}" ]; then
+            ARGS+=("--components" "${{ steps.params.outputs.components }}")
+          fi
+
+          if [ "${{ steps.params.outputs.dry_run }}" = "true" ]; then
+            ARGS+=("--dry-run")
+          fi
+
+          ./scripts/create-standalone-backport-pr.sh "${ARGS[@]}"
