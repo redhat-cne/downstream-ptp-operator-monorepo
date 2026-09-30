@@ -12,6 +12,6 @@ export GO15VENDOREXPERIMENT=1
 export GOBIN=${PWD}/bin
 export GOPATH=${PWD}/.gopath
 
-GIT_COMMIT=$(git rev-list -1 HEAD)
+GIT_COMMIT=${GIT_COMMIT:-$(git rev-list -1 HEAD 2>/dev/null || echo "unknown")}
 LINKER_RELEASE_FLAGS="-X main.GitCommit=${GIT_COMMIT}"
 go build -ldflags "${LINKER_RELEASE_FLAGS}" --mod=vendor "$@" -o bin/ptp ${REPO_PATH}/cmd
