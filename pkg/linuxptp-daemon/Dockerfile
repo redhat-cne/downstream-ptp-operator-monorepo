@@ -1,11 +1,11 @@
 FROM registry.access.redhat.com/ubi9/go-toolset:1.25 AS builder
+ARG GIT_COMMIT="unknown"
 # Set as root to permission issues as its only for the builder
 USER root
 WORKDIR /go/src/github.com/k8snetworkplumbingwg/linuxptp-daemon
 
 COPY go.mod go.sum ./
 COPY vendor vendor
-RUN --mount=type=cache,target=/go/pkg/mod go mod download
 
 COPY addons addons
 COPY cmd cmd
@@ -13,8 +13,8 @@ COPY deploy deploy
 COPY hack hack
 COPY Makefile Makefile
 COPY pkg pkg
-COPY .git .git
 
+ENV GIT_COMMIT=${GIT_COMMIT}
 RUN --mount=type=cache,target=/root/.cache/go-build make
 
 FROM quay.io/centos/centos:stream9
