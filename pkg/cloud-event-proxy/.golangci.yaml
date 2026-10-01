@@ -13,7 +13,7 @@ output:
       print-issued-lines: true
       print-linter-name: true
 issues:
-  new-from-rev: 4b49778d9ec5abe5584861d34d90d31c73e39a24
+  new-from-rev: bc71d45e1ffe9874286d6621429394fc59f6a696
 linters:
   exclusions:
     rules:
