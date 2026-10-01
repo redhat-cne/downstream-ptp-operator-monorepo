@@ -1,10 +1,13 @@
-name: CI
+name: "cloud-event-proxy: CI"
 on: [push, pull_request]
 
 jobs:
   golangci:
     name: Linting
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: pkg/cloud-event-proxy
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v2
@@ -15,6 +18,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3.2.0
         with:
+          working-directory: pkg/cloud-event-proxy
           # Caching conflicts happen in GHA, so just disable for now
           skip-pkg-cache: true
           skip-build-cache: true
@@ -24,6 +28,9 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: pkg/cloud-event-proxy
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
