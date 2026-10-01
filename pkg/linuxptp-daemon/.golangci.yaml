@@ -4,7 +4,7 @@ run:
   issues-exit-code: 1
   tests: true
 issues:
-  new-from-rev: ef22be997212d7c21c26638feac5cee4b7e29489
+  new-from-rev: 0096e87442efd337f1784617366a12f8bd68f824
 linters:
   settings:
     govet:
