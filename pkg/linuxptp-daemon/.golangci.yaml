@@ -21,7 +21,7 @@ issues:
   exclude:
     - 'ST1000: at least one file in a package should have a package comment'
     - 'package-comments: should have a package comment'
-  new-from-rev: f6ebf03dd73344ec3ef985edb302a9c0e85a66bb
+  new-from-rev: daccf1d2b24418e0d15ff74916a08ff31a2395b0
 linters-settings:
   govet:
     # Enable all analyzers.
