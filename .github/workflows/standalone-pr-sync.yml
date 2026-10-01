@@ -91,14 +91,17 @@ jobs:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
           BOT_TOKEN: ${{ secrets.SYNC_BOT_TOKEN }}
         run: |
-          if [ -n "$APP_TOKEN" ]; then
-            echo "Using GitHub App installation token for GitHub CLI."
-            echo "$APP_TOKEN" | gh auth login --with-token
-            git config --global url."https://x-access-token:${APP_TOKEN}@github.com/".insteadOf "https://github.com/"
-          elif [ -n "$BOT_TOKEN" ]; then
-            echo "Using SYNC_BOT_TOKEN for GitHub CLI."
+          # App token can push to bot forks but cannot createPullRequest on openshift/*.
+          # Prefer SYNC_BOT_TOKEN (user PAT) for gh CLI; keep App/PAT for git push.
+          PUSH_TOKEN="${APP_TOKEN:-${BOT_TOKEN:-${{ secrets.GITHUB_TOKEN }}}}"
+          git config --global url."https://x-access-token:${PUSH_TOKEN}@github.com/".insteadOf "https://github.com/"
+
+          if [ -n "$BOT_TOKEN" ]; then
+            echo "Using SYNC_BOT_TOKEN for GitHub CLI (required for upstream PR create)."
             echo "$BOT_TOKEN" | gh auth login --with-token
-            git config --global url."https://x-access-token:${BOT_TOKEN}@github.com/".insteadOf "https://github.com/"
+          elif [ -n "$APP_TOKEN" ]; then
+            echo "Using GitHub App installation token for GitHub CLI (may lack upstream PR create)."
+            echo "$APP_TOKEN" | gh auth login --with-token
           else
             echo "Using default GITHUB_TOKEN."
             echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
@@ -109,7 +112,7 @@ jobs:
       - name: Execute Standalone PR Bridge
         id: run-bridge
         env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token || secrets.SYNC_BOT_TOKEN || secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYNC_BOT_TOKEN || steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           ARGS=(
             "--branch" "${{ steps.params.outputs.branch }}"
