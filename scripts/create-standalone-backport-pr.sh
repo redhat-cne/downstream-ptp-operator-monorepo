@@ -158,8 +158,14 @@ else
     if echo "$CHANGED_FILES" | grep -q '^pkg/cloud-event-proxy/'; then
         COMP_ARRAY+=("cep")
     fi
-    # Check operator root files
-    if echo "$CHANGED_FILES" | grep -v '^pkg/' | grep -v '^\.tekton/' | grep -v '^\.konflux/' | grep -v '^\.github/' | grep -q .; then
+    # Check operator root files (monorepo-only paths are not standalone content)
+    if echo "$CHANGED_FILES" \
+        | grep -v '^pkg/' \
+        | grep -v '^\.tekton/' \
+        | grep -v '^\.konflux/' \
+        | grep -v '^\.github/' \
+        | grep -v '^scripts/' \
+        | grep -q .; then
         COMP_ARRAY+=("ptpop")
     fi
     DETECTED_COMPONENTS="$(IFS=,; echo "${COMP_ARRAY[*]}")"
@@ -225,7 +231,7 @@ for COMP in "${COMPS[@]}"; do
     # Extract component-specific patches (-o must precede pathspecs '--')
     if [ "$COMP" = "ptpop" ]; then
         git format-patch -o "$PATCH_DIR" "$RANGE" \
-            -- . ":(exclude)pkg" ":(exclude).tekton" ":(exclude).konflux" ":(exclude).github" >/dev/null || true
+            -- . ":(exclude)pkg" ":(exclude).tekton" ":(exclude).konflux" ":(exclude).github" ":(exclude)scripts" >/dev/null || true
     else
         git format-patch -o "$PATCH_DIR" --relative="$SUBPATH" "$RANGE" >/dev/null || true
     fi
@@ -320,11 +326,12 @@ Monorepo-Commit: ${FULL_SHA}\\
         git push -u fork "${TOPIC_BRANCH}" --force
     )
 
-    # Check for existing PR
+    # Check for existing PR (empty list must yield empty string — jq '.[0]|...' prints "null: null")
     echo "Checking for existing PR on ${UPSTREAM_REPO}..."
-    EXISTING_PR="$(gh pr list --repo "${UPSTREAM_REPO}" --head "${FORK_OWNER}:${TOPIC_BRANCH}" --state all --json number,url,state -q '.[0] | "\(.state): \(.url)"' || true)"
+    EXISTING_PR="$(gh pr list --repo "${UPSTREAM_REPO}" --head "${FORK_OWNER}:${TOPIC_BRANCH}" --state all \
+        --json number,url,state -q 'if length > 0 then "\(.[0].state): \(.[0].url)" else empty end' || true)"
 
-    if [ -n "$EXISTING_PR" ] && [ "$EXISTING_PR" != "null" ]; then
+    if [ -n "$EXISTING_PR" ]; then
         echo "A Pull Request already exists for this topic branch: ${EXISTING_PR}"
     else
         echo "Creating cross-repository Pull Request on ${UPSTREAM_REPO}..."
