@@ -96,9 +96,11 @@ jobs:
           PUSH_TOKEN="${APP_TOKEN:-${BOT_TOKEN:-${{ secrets.GITHUB_TOKEN }}}}"
           git config --global url."https://x-access-token:${PUSH_TOKEN}@github.com/".insteadOf "https://github.com/"
 
+          # Do not run `gh auth login --with-token` for SYNC_BOT_TOKEN: it requires
+          # classic scopes repo+read:org even when public_repo is enough for PR create.
+          # The bridge step uses GH_TOKEN from the environment instead.
           if [ -n "$BOT_TOKEN" ]; then
-            echo "Using SYNC_BOT_TOKEN for GitHub CLI (required for upstream PR create)."
-            echo "$BOT_TOKEN" | gh auth login --with-token
+            echo "Using SYNC_BOT_TOKEN via GH_TOKEN for GitHub CLI (upstream PR create)."
           elif [ -n "$APP_TOKEN" ]; then
             echo "Using GitHub App installation token for GitHub CLI (may lack upstream PR create)."
             echo "$APP_TOKEN" | gh auth login --with-token
