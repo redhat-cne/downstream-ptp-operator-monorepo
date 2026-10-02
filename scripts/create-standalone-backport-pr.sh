@@ -535,35 +535,64 @@ Monorepo-Commit: ${FULL_SHA}\\
         git push -u fork "${TOPIC_BRANCH}" --force
     )
 
-    # Check for existing PR (empty list must yield empty string — jq '.[0]|...' prints "null: null")
+    # Resolve existing cross-fork PR URL for this topic branch.
+    # NOTE: `gh pr list --head owner:branch` returns [] for cross-fork PRs; use the REST
+    # API head=owner:branch filter (or branch-only list) instead.
     echo "Checking for existing PR on ${UPSTREAM_REPO}..."
-    EXISTING_PR="$(gh pr list --repo "${UPSTREAM_REPO}" --head "${FORK_OWNER}:${TOPIC_BRANCH}" --state all \
-        --json number,url,state -q 'if length > 0 then "\(.[0].state): \(.[0].url)" else empty end' || true)"
+    EXISTING_URL="$(gh api "repos/${UPSTREAM_REPO}/pulls?head=${FORK_OWNER}:${TOPIC_BRANCH}&state=open" \
+        --jq '.[0].html_url // empty' 2>/dev/null || true)"
+    if [ -z "$EXISTING_URL" ]; then
+        EXISTING_URL="$(gh api "repos/${UPSTREAM_REPO}/pulls?head=${FORK_OWNER}:${TOPIC_BRANCH}&state=all" \
+            --jq '.[0].html_url // empty' 2>/dev/null || true)"
+    fi
+    if [ -z "$EXISTING_URL" ]; then
+        # Fallback: branch-only match (works with gh pr list for cross-fork heads).
+        EXISTING_URL="$(gh pr list --repo "${UPSTREAM_REPO}" --head "${TOPIC_BRANCH}" --state all \
+            --json url -q '.[0].url // empty' 2>/dev/null || true)"
+    fi
 
-    if [ -n "$EXISTING_PR" ]; then
-        echo "A Pull Request already exists for this topic branch: ${EXISTING_PR}"
+    if [ -n "$EXISTING_URL" ]; then
+        echo "A Pull Request already exists for this topic branch: ${EXISTING_URL}"
         # Keep title/body in sync when the monorepo PR is edited or new commits land.
-        EXISTING_URL="$(echo "$EXISTING_PR" | sed -E 's/^[A-Z_]+:[[:space:]]*//')"
-        if [[ "$EXISTING_URL" == https://* ]]; then
-            gh pr edit "$EXISTING_URL" --title "${PR_TITLE}" --body "${PR_BODY}" 2>/dev/null \
-                || echo "Warning: could not refresh title/body on ${EXISTING_URL}"
-            apply_provenance_label "${EXISTING_URL}" "${UPSTREAM_REPO}" "${PROVENANCE_LABEL}"
+        if gh pr edit "$EXISTING_URL" --title "${PR_TITLE}" --body "${PR_BODY}"; then
+            echo "Refreshed title/body on ${EXISTING_URL}"
+        else
+            echo "Warning: could not refresh title/body on ${EXISTING_URL}" >&2
         fi
+        apply_provenance_label "${EXISTING_URL}" "${UPSTREAM_REPO}" "${PROVENANCE_LABEL}"
     else
         echo "Creating cross-repository Pull Request on ${UPSTREAM_REPO}..."
-        CREATED_PR_URL="$(gh pr create \
+        set +e
+        CREATE_OUT="$(gh pr create \
             --repo "${UPSTREAM_REPO}" \
             --base "${TARGET_BASE}" \
             --head "${FORK_OWNER}:${TOPIC_BRANCH}" \
             --title "${PR_TITLE}" \
-            --body "${PR_BODY}")"
-
-        echo "Pull Request created successfully: ${CREATED_PR_URL}"
-
-        apply_provenance_label "${CREATED_PR_URL}" "${UPSTREAM_REPO}" "${PROVENANCE_LABEL}"
-
-        echo "Posting provenance traceability comment..."
-        gh pr comment "${CREATED_PR_URL}" --body "${PR_COMMENT}" || echo "Warning: failed to post comment on ${CREATED_PR_URL}"
+            --body "${PR_BODY}" 2>&1)"
+        CREATE_RC=$?
+        set -e
+        if [ "$CREATE_RC" -eq 0 ]; then
+            CREATED_PR_URL="$(echo "$CREATE_OUT" | tail -n1)"
+            echo "Pull Request created successfully: ${CREATED_PR_URL}"
+            apply_provenance_label "${CREATED_PR_URL}" "${UPSTREAM_REPO}" "${PROVENANCE_LABEL}"
+            echo "Posting provenance traceability comment..."
+            gh pr comment "${CREATED_PR_URL}" --body "${PR_COMMENT}" || echo "Warning: failed to post comment on ${CREATED_PR_URL}"
+        elif echo "$CREATE_OUT" | grep -q 'already exists'; then
+            # Race / detection miss: recover URL and edit instead of failing the job.
+            EXISTING_URL="$(echo "$CREATE_OUT" | grep -Eo 'https://github.com/[^[:space:]]+/pull/[0-9]+' | head -n1 || true)"
+            echo "Create reported existing PR: ${EXISTING_URL:-unknown}"
+            if [ -n "$EXISTING_URL" ]; then
+                gh pr edit "$EXISTING_URL" --title "${PR_TITLE}" --body "${PR_BODY}" \
+                    || echo "Warning: could not refresh title/body on ${EXISTING_URL}" >&2
+                apply_provenance_label "${EXISTING_URL}" "${UPSTREAM_REPO}" "${PROVENANCE_LABEL}"
+            else
+                echo "$CREATE_OUT" >&2
+                die "Failed to create PR and could not parse existing PR URL"
+            fi
+        else
+            echo "$CREATE_OUT" >&2
+            die "Failed to create PR on ${UPSTREAM_REPO}"
+        fi
     fi
 
 done
