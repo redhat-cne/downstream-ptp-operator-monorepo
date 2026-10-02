@@ -245,7 +245,7 @@ refresh_standalone_pr() {
     local repo="$2"
     local title="$3"
     local body="$4"
-    local num err_file payload_file
+    local num err_file payload_file body_file
 
     num="$(echo "$pr_url" | grep -Eo '/pull/[0-9]+' | grep -Eo '[0-9]+' | tail -n1 || true)"
     if [ -z "$num" ]; then
@@ -299,6 +299,9 @@ refresh_standalone_pr() {
     cleanup_refresh_tmp
     return 1
 }
+
+# Apply provenance label; create if missing. Never apply restricted backport labels.
+apply_provenance_label() {
     local pr_url="$1"
     local repo="$2"
     local label="$3"
