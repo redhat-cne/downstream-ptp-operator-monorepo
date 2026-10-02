@@ -1,0 +1,37 @@
+name: "linuxptp-daemon: golangci-lint"
+
+on:
+  push:
+    branches:
+      - main
+      - 'release-*'
+      - 'one-repo*'
+  pull_request:
+    branches:
+      - main
+      - 'release-*'
+      - 'one-repo*'
+
+jobs:
+  lint:
+    name: Run GolangCI-Lint
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: pkg/linuxptp-daemon
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.24  # Change this to match your Go version
+
+      - name: Install golangci-lint
+        run: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+      - name: lint test
+        run: make lint

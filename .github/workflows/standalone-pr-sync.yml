@@ -1,0 +1,183 @@
+name: Standalone Repositories Outbound PR Bridge
+
+# Open standalone PRs while the monorepo PR is still open so jira-lifecycle-plugin
+# (on the monorepo AND on openshift/* / cep) links every PR to the same OCPBUGS.
+# The bug moves to MODIFIED only after ALL linked PRs merge — not when the monorepo
+# PR alone merges. Do NOT trigger on push-after-merge.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+    branches:
+      - 'main'
+      - 'release-4.12'
+      - 'release-4.13'
+      - 'release-4.14'
+      - 'release-4.15'
+      - 'release-4.16'
+      - 'release-4.17'
+      - 'release-4.18'
+      - 'release-4.19'
+      - 'release-4.20'
+      - 'release-4.21'
+      - 'release-4.22'
+      - 'release-4.23'
+      - 'release-5.0'
+      - 'release-5.1'
+      - 'release-5.2'
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Target release branch (e.g. main, release-4.22)'
+        required: true
+        default: 'main'
+      commit_sha:
+        description: 'Commit SHA to mirror (defaults to HEAD) — single-commit fallback'
+        required: false
+        default: ''
+      monorepo_pr:
+        description: 'Monorepo PR number for stable topic branches / provenance (optional)'
+        required: false
+        default: ''
+      components:
+        description: 'Comma-separated components to bridge (ptpop,lptpd,cep) or leave empty for auto-detect'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Run in dry-run mode without creating PRs'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  sync-to-standalone:
+    name: Bridge Monorepo PR to Standalone Repos
+    # Skip drafts until ready_for_review; ignore closed PRs if any stray event arrives.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.state == 'open' && github.event.pull_request.draft == false)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Authenticate via GitHub App (if configured)
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        continue-on-error: true
+        with:
+          app-id: ${{ secrets.SYNC_APP_ID }}
+          private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+          owner: ${{ vars.SYNC_BOT_FORK_OWNER || 'ptp-monorepo-sync-bot' }}
+
+      - name: Checkout Monorepo Repository
+        uses: actions/checkout@v4
+        with:
+          # Full history so base..head ranges from monorepo PRs apply cleanly.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Determine Run Parameters
+        id: params
+        run: |
+          set -euo pipefail
+
+          FORK_OWNER="${{ vars.SYNC_BOT_FORK_OWNER || secrets.SYNC_BOT_FORK_OWNER || 'ptp-monorepo-sync-bot' }}"
+          COMPONENTS="${{ github.event.inputs.components }}"
+          DRY_RUN="${{ github.event.inputs.dry_run }}"
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            MONOREPO_PR="${{ github.event.pull_request.number }}"
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            # Mirror the full PR diff so standalone PRs stay in sync on synchronize.
+            RANGE="${BASE_SHA}..${HEAD_SHA}"
+            COMMIT_SHA="${HEAD_SHA}"
+            echo "Mode: pull_request #${MONOREPO_PR} (${RANGE})"
+          else
+            TARGET_BRANCH="${{ github.event.inputs.branch }}"
+            COMMIT_SHA="${{ github.event.inputs.commit_sha }}"
+            if [ -z "$COMMIT_SHA" ]; then
+              COMMIT_SHA="${GITHUB_SHA}"
+            fi
+            MONOREPO_PR="${{ github.event.inputs.monorepo_pr }}"
+            PR_TITLE=""
+            RANGE=""
+            echo "Mode: workflow_dispatch (commit=${COMMIT_SHA})"
+          fi
+
+          {
+            echo "branch=${TARGET_BRANCH}"
+            echo "commit=${COMMIT_SHA}"
+            echo "range=${RANGE}"
+            echo "fork_owner=${FORK_OWNER}"
+            echo "components=${COMPONENTS}"
+            echo "dry_run=${DRY_RUN}"
+            echo "monorepo_pr=${MONOREPO_PR}"
+            echo "pr_title<<EOF"
+            echo "${PR_TITLE}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Configure GitHub CLI Auth
+        env:
+          APP_TOKEN: ${{ steps.app-token.outputs.token }}
+          BOT_TOKEN: ${{ secrets.SYNC_BOT_TOKEN }}
+        run: |
+          # App token can push to bot forks but cannot createPullRequest on openshift/*.
+          # Prefer SYNC_BOT_TOKEN (user PAT) for gh CLI; keep App/PAT for git push.
+          PUSH_TOKEN="${APP_TOKEN:-${BOT_TOKEN:-${{ secrets.GITHUB_TOKEN }}}}"
+          git config --global url."https://x-access-token:${PUSH_TOKEN}@github.com/".insteadOf "https://github.com/"
+
+          # Do not run `gh auth login --with-token` for SYNC_BOT_TOKEN: it requires
+          # classic scopes repo+read:org even when public_repo is enough for PR create.
+          # The bridge step uses GH_TOKEN from the environment instead.
+          if [ -n "$BOT_TOKEN" ]; then
+            echo "Using SYNC_BOT_TOKEN via GH_TOKEN for GitHub CLI (upstream PR create)."
+          elif [ -n "$APP_TOKEN" ]; then
+            echo "Using GitHub App installation token for GitHub CLI (may lack upstream PR create)."
+            echo "$APP_TOKEN" | gh auth login --with-token
+          else
+            echo "Using default GITHUB_TOKEN."
+            echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          fi
+          git config --global user.name "ptp-monorepo-sync-bot[bot]"
+          git config --global user.email "ptp-monorepo-sync-bot[bot]@users.noreply.github.com"
+
+      - name: Execute Standalone PR Bridge
+        id: run-bridge
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_BOT_TOKEN || steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+        run: |
+          ARGS=(
+            "--branch" "${{ steps.params.outputs.branch }}"
+            "--fork-owner" "${{ steps.params.outputs.fork_owner }}"
+            "--monorepo-repo" "${{ github.repository }}"
+          )
+
+          if [ -n "${{ steps.params.outputs.range }}" ]; then
+            ARGS+=("--range" "${{ steps.params.outputs.range }}")
+          else
+            ARGS+=("--commit" "${{ steps.params.outputs.commit }}")
+          fi
+
+          if [ -n "${{ steps.params.outputs.monorepo_pr }}" ]; then
+            ARGS+=("--monorepo-pr" "${{ steps.params.outputs.monorepo_pr }}")
+          fi
+
+          if [ -n "${{ steps.params.outputs.pr_title }}" ]; then
+            ARGS+=("--pr-title" "${{ steps.params.outputs.pr_title }}")
+          fi
+
+          if [ -n "${{ steps.params.outputs.components }}" ]; then
+            ARGS+=("--components" "${{ steps.params.outputs.components }}")
+          fi
+
+          if [ "${{ steps.params.outputs.dry_run }}" = "true" ]; then
+            ARGS+=("--dry-run")
+          fi
+
+          ./scripts/create-standalone-backport-pr.sh "${ARGS[@]}"
