@@ -238,8 +238,67 @@ resolve_jira_keys() {
     echo ""
 }
 
-# Apply provenance label; create if missing. Never apply restricted backport labels.
-apply_provenance_label() {
+# Refresh title/body on an existing standalone PR. Prefer REST over `gh pr edit`
+# (cross-fork + long bodies are more reliable via pulls API; always log errors).
+refresh_standalone_pr() {
+    local pr_url="$1"
+    local repo="$2"
+    local title="$3"
+    local body="$4"
+    local num err_file payload_file
+
+    num="$(echo "$pr_url" | grep -Eo '/pull/[0-9]+' | grep -Eo '[0-9]+' | tail -n1 || true)"
+    if [ -z "$num" ]; then
+        echo "Warning: could not parse PR number from ${pr_url}" >&2
+        return 1
+    fi
+
+    err_file="$(mktemp "${TMPDIR:-/tmp}/gh-edit-err.XXXXXX")"
+    payload_file="$(mktemp "${TMPDIR:-/tmp}/gh-edit-payload.XXXXXX")"
+    body_file="${payload_file}.body"
+    cleanup_refresh_tmp() { rm -f "$err_file" "$payload_file" "$body_file"; }
+    if ! command -v jq >/dev/null 2>&1; then
+        # Fallback without jq: title-only via raw-field, then body-file via gh pr edit.
+        if gh api -X PATCH "repos/${repo}/pulls/${num}" -f title="${title}" 2>"$err_file"; then
+            echo "Refreshed title on ${pr_url}"
+        else
+            echo "Warning: could not refresh title on ${pr_url}:" >&2
+            cat "$err_file" >&2 || true
+            cleanup_refresh_tmp
+            return 1
+        fi
+        printf '%s' "$body" > "$body_file"
+        if gh pr edit "$num" --repo "$repo" --body-file "$body_file" 2>"$err_file"; then
+            echo "Refreshed body on ${pr_url}"
+            cleanup_refresh_tmp
+            return 0
+        fi
+        echo "Warning: could not refresh body on ${pr_url}:" >&2
+        cat "$err_file" >&2 || true
+        cleanup_refresh_tmp
+        return 1
+    fi
+
+    jq -n --arg title "$title" --arg body "$body" '{title: $title, body: $body}' > "$payload_file"
+    if gh api -X PATCH "repos/${repo}/pulls/${num}" --input "$payload_file" 2>"$err_file"; then
+        echo "Refreshed title/body on ${pr_url}"
+        cleanup_refresh_tmp
+        return 0
+    fi
+    echo "Warning: could not refresh title/body on ${pr_url}:" >&2
+    cat "$err_file" >&2 || true
+
+    # Last resort: title only (still unblocks Jira retitles).
+    if gh api -X PATCH "repos/${repo}/pulls/${num}" -f title="${title}" 2>"$err_file"; then
+        echo "Refreshed title only on ${pr_url}"
+        cleanup_refresh_tmp
+        return 0
+    fi
+    echo "Warning: title-only refresh also failed on ${pr_url}:" >&2
+    cat "$err_file" >&2 || true
+    cleanup_refresh_tmp
+    return 1
+}
     local pr_url="$1"
     local repo="$2"
     local label="$3"
@@ -553,12 +612,8 @@ Monorepo-Commit: ${FULL_SHA}\\
 
     if [ -n "$EXISTING_URL" ]; then
         echo "A Pull Request already exists for this topic branch: ${EXISTING_URL}"
-        # Keep title/body in sync when the monorepo PR is edited or new commits land.
-        if gh pr edit "$EXISTING_URL" --title "${PR_TITLE}" --body "${PR_BODY}"; then
-            echo "Refreshed title/body on ${EXISTING_URL}"
-        else
-            echo "Warning: could not refresh title/body on ${EXISTING_URL}" >&2
-        fi
+        refresh_standalone_pr "${EXISTING_URL}" "${UPSTREAM_REPO}" "${PR_TITLE}" "${PR_BODY}" \
+            || echo "Warning: standalone PR metadata refresh failed for ${EXISTING_URL}" >&2
         apply_provenance_label "${EXISTING_URL}" "${UPSTREAM_REPO}" "${PROVENANCE_LABEL}"
     else
         echo "Creating cross-repository Pull Request on ${UPSTREAM_REPO}..."
@@ -582,8 +637,8 @@ Monorepo-Commit: ${FULL_SHA}\\
             EXISTING_URL="$(echo "$CREATE_OUT" | grep -Eo 'https://github.com/[^[:space:]]+/pull/[0-9]+' | head -n1 || true)"
             echo "Create reported existing PR: ${EXISTING_URL:-unknown}"
             if [ -n "$EXISTING_URL" ]; then
-                gh pr edit "$EXISTING_URL" --title "${PR_TITLE}" --body "${PR_BODY}" \
-                    || echo "Warning: could not refresh title/body on ${EXISTING_URL}" >&2
+                refresh_standalone_pr "${EXISTING_URL}" "${UPSTREAM_REPO}" "${PR_TITLE}" "${PR_BODY}" \
+                    || echo "Warning: standalone PR metadata refresh failed for ${EXISTING_URL}" >&2
                 apply_provenance_label "${EXISTING_URL}" "${UPSTREAM_REPO}" "${PROVENANCE_LABEL}"
             else
                 echo "$CREATE_OUT" >&2
