@@ -1,7 +1,12 @@
 name: Standalone Repositories Outbound PR Bridge
 
+# Open standalone PRs while the monorepo PR is still open so jira-lifecycle-plugin
+# (on the monorepo AND on openshift/* / cep) links every PR to the same OCPBUGS.
+# The bug moves to MODIFIED only after ALL linked PRs merge — not when the monorepo
+# PR alone merges. Do NOT trigger on push-after-merge.
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     branches:
       - 'main'
       - 'release-4.12'
@@ -26,7 +31,11 @@ on:
         required: true
         default: 'main'
       commit_sha:
-        description: 'Commit SHA to mirror (defaults to HEAD)'
+        description: 'Commit SHA to mirror (defaults to HEAD) — single-commit fallback'
+        required: false
+        default: ''
+      monorepo_pr:
+        description: 'Monorepo PR number for stable topic branches / provenance (optional)'
         required: false
         default: ''
       components:
@@ -45,7 +54,11 @@ permissions:
 
 jobs:
   sync-to-standalone:
-    name: Bridge Monorepo Commits to Standalone Repos
+    name: Bridge Monorepo PR to Standalone Repos
+    # Skip drafts until ready_for_review; ignore closed PRs if any stray event arrives.
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.state == 'open' && github.event.pull_request.draft == false)
     runs-on: ubuntu-latest
 
     steps:
@@ -61,30 +74,53 @@ jobs:
       - name: Checkout Monorepo Repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 50
+          # Full history so base..head ranges from monorepo PRs apply cleanly.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Determine Run Parameters
         id: params
         run: |
-          TARGET_BRANCH="${{ github.event.inputs.branch }}"
-          if [ -z "$TARGET_BRANCH" ]; then
-            TARGET_BRANCH="${GITHUB_REF_NAME}"
-          fi
-
-          COMMIT_SHA="${{ github.event.inputs.commit_sha }}"
-          if [ -z "$COMMIT_SHA" ]; then
-            COMMIT_SHA="${GITHUB_SHA}"
-          fi
+          set -euo pipefail
 
           FORK_OWNER="${{ vars.SYNC_BOT_FORK_OWNER || secrets.SYNC_BOT_FORK_OWNER || 'ptp-monorepo-sync-bot' }}"
           COMPONENTS="${{ github.event.inputs.components }}"
           DRY_RUN="${{ github.event.inputs.dry_run }}"
 
-          echo "branch=${TARGET_BRANCH}" >> "$GITHUB_OUTPUT"
-          echo "commit=${COMMIT_SHA}" >> "$GITHUB_OUTPUT"
-          echo "fork_owner=${FORK_OWNER}" >> "$GITHUB_OUTPUT"
-          echo "components=${COMPONENTS}" >> "$GITHUB_OUTPUT"
-          echo "dry_run=${DRY_RUN}" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            MONOREPO_PR="${{ github.event.pull_request.number }}"
+            PR_TITLE="${{ github.event.pull_request.title }}"
+            # Mirror the full PR diff so standalone PRs stay in sync on synchronize.
+            RANGE="${BASE_SHA}..${HEAD_SHA}"
+            COMMIT_SHA="${HEAD_SHA}"
+            echo "Mode: pull_request #${MONOREPO_PR} (${RANGE})"
+          else
+            TARGET_BRANCH="${{ github.event.inputs.branch }}"
+            COMMIT_SHA="${{ github.event.inputs.commit_sha }}"
+            if [ -z "$COMMIT_SHA" ]; then
+              COMMIT_SHA="${GITHUB_SHA}"
+            fi
+            MONOREPO_PR="${{ github.event.inputs.monorepo_pr }}"
+            PR_TITLE=""
+            RANGE=""
+            echo "Mode: workflow_dispatch (commit=${COMMIT_SHA})"
+          fi
+
+          {
+            echo "branch=${TARGET_BRANCH}"
+            echo "commit=${COMMIT_SHA}"
+            echo "range=${RANGE}"
+            echo "fork_owner=${FORK_OWNER}"
+            echo "components=${COMPONENTS}"
+            echo "dry_run=${DRY_RUN}"
+            echo "monorepo_pr=${MONOREPO_PR}"
+            echo "pr_title<<EOF"
+            echo "${PR_TITLE}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Configure GitHub CLI Auth
         env:
@@ -118,10 +154,23 @@ jobs:
         run: |
           ARGS=(
             "--branch" "${{ steps.params.outputs.branch }}"
-            "--commit" "${{ steps.params.outputs.commit }}"
             "--fork-owner" "${{ steps.params.outputs.fork_owner }}"
             "--monorepo-repo" "${{ github.repository }}"
           )
+
+          if [ -n "${{ steps.params.outputs.range }}" ]; then
+            ARGS+=("--range" "${{ steps.params.outputs.range }}")
+          else
+            ARGS+=("--commit" "${{ steps.params.outputs.commit }}")
+          fi
+
+          if [ -n "${{ steps.params.outputs.monorepo_pr }}" ]; then
+            ARGS+=("--monorepo-pr" "${{ steps.params.outputs.monorepo_pr }}")
+          fi
+
+          if [ -n "${{ steps.params.outputs.pr_title }}" ]; then
+            ARGS+=("--pr-title" "${{ steps.params.outputs.pr_title }}")
+          fi
 
           if [ -n "${{ steps.params.outputs.components }}" ]; then
             ARGS+=("--components" "${{ steps.params.outputs.components }}")
