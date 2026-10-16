@@ -1,4 +1,4 @@
-name: Test
+name: "linuxptp-daemon: Test"
 
 on: [push, pull_request]
 
@@ -6,6 +6,9 @@ jobs:
   build:
     name: build
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pkg/linuxptp-daemon
     steps:
     
     - name: Set up Go 1.23
@@ -26,6 +29,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: pkg/linuxptp-daemon
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,6 +48,9 @@ jobs:
         run: make test
   kind:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pkg/linuxptp-daemon
     needs: [build,test]  # Runs after the "build and test " job is completed
     steps:
       - name: Checkout Code
